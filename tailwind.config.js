@@ -8,8 +8,8 @@ module.exports = {
       colors: {
         "primary": "#1c60de",
         "text": "#000000",
-        "sub-text": "#626262",
-        "non-focus": "#b8c2d2",
+        "subText": "#626262",
+        "nonFocus": "#b8c2d2",
         "white": "#ffffff",
         "red": "#f43168",
         "gray": "#e8e8e8",
@@ -17,7 +17,7 @@ module.exports = {
         "green": "#0dc47c",
         "yellow": "#fba742",
         "night": "#454ab6",
-        "Dark-gray": "#d9d9d9"
+        "DarkGray": "#d9d9d9"
       },
       fontSize: {
         "xs": "0.75rem",
@@ -28,29 +28,18 @@ module.exports = {
         "2xl": "2rem"
       },
       fontFamily: {
-        "noto-sans": "Noto Sans"
+        notoThin: ["NotoSans_100Thin", "sans-serif"],
+        notoExtraLight: ["NotoSans_200ExtraLight", "sans-serif"],
+        notoLight: ["NotoSans_300Light", "sans-serif"],
+        noto: ["NotoSans_400Regular", "sans-serif"],
+        notoMedium: ["NotoSans_500Medium", "sans-serif"],
+        notoSemiBold: ["NotoSans_600SemiBold", "sans-serif"],
+        notoBold: ["NotoSans_700Bold", "sans-serif"],
+        notoExtraBold: ["NotoSans_800ExtraBold", "sans-serif"],
+        notoBlack: ["NotoSans_900Black", "sans-serif"],
       },
       borderRadius: {
-        "rounded-0": "0rem",
-        "rounded-1": "0.07291655987501144rem",
-        "rounded-2": "0.15625rem",
-        "rounded-3": "0.26875001192092896rem",
-        "rounded-4": "0.3125rem",
-        "rounded-5": "0.375rem",
-        "rounded-6": "0.53125rem",
-        "rounded-7": "0.75rem",
-        "rounded-8": "0.78125rem",
-        "rounded-9": "0.875rem",
-        "rounded-10": "1.25rem",
-        "rounded-11": "1.5rem",
-        "rounded-12": "1.625rem",
-        "rounded-13": "2rem",
-        "rounded-14": "2.1875rem",
-        "rounded-15": "2.5625rem",
-        "rounded-16": "2.75rem",
-        "rounded-17": "3rem",
-        "rounded-18": "4rem",
-        "rounded-19": "62.4375rem"
+        "normal": "12px",
       }
     },
   },
