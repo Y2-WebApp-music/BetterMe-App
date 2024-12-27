@@ -1,15 +1,16 @@
 import {
-  NotoSans_100Thin,
-  NotoSans_200ExtraLight,
-  NotoSans_300Light,
-  NotoSans_400Regular,
-  NotoSans_500Medium,
-  NotoSans_600SemiBold,
-  NotoSans_700Bold,
-  NotoSans_800ExtraBold,
-  NotoSans_900Black,
-} from "@expo-google-fonts/noto-sans";
-import { useFonts } from "expo-font";
+  useFonts,
+  NotoSansThai_100Thin,
+  NotoSansThai_200ExtraLight,
+  NotoSansThai_300Light,
+  NotoSansThai_400Regular,
+  NotoSansThai_500Medium,
+  NotoSansThai_600SemiBold,
+  NotoSansThai_700Bold,
+  NotoSansThai_800ExtraBold,
+  NotoSansThai_900Black,
+} from '@expo-google-fonts/noto-sans-thai';
+// import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
 import React, { useEffect } from "react";
 import "../global.css";
@@ -18,26 +19,26 @@ import "../global.css";
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const [loaded] = useFonts({
-    NotoSans_100Thin,
-    NotoSans_200ExtraLight,
-    NotoSans_300Light,
-    NotoSans_400Regular,
-    NotoSans_500Medium,
-    NotoSans_600SemiBold,
-    NotoSans_700Bold,
-    NotoSans_800ExtraBold,
-    NotoSans_900Black,
+  const [fontsLoaded] = useFonts({
+    NotoSansThai_100Thin,
+    NotoSansThai_200ExtraLight,
+    NotoSansThai_300Light,
+    NotoSansThai_400Regular,
+    NotoSansThai_500Medium,
+    NotoSansThai_600SemiBold,
+    NotoSansThai_700Bold,
+    NotoSansThai_800ExtraBold,
+    NotoSansThai_900Black,
   });
 
   useEffect(() => {
-    if (loaded) {
+    if (fontsLoaded) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [fontsLoaded]);
 
-  if (!loaded) {
-    return null;
+  if (!fontsLoaded) {
+    return null; // Return nothing until fonts are loaded
   }
 
   return (
