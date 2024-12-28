@@ -17,7 +17,7 @@ module.exports = {
         "green": "#0dc47c",
         "yellow": "#fba742",
         "night": "#454ab6",
-        "DarkGray": "#d9d9d9"
+        "DarkGray": "#CFCFCF"
       },
       fontSize: {
         "xs": "0.75rem",
