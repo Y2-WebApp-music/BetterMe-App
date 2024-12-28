@@ -1,26 +1,41 @@
 import { Link } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import { BetterMeIcon } from '../constants/icon';
+import { SafeAreaView, ScrollView, Text, View } from 'react-native';
+import FormInput from '../components/FormInput';
+import { useState } from 'react';
 
 export default function App() {
+
+  const [form,setForm]= useState({
+    username:'',
+    password:''
+  })
+
   return (
-    <View className="flex-1 gap-2 justify-center items-center bg-Background">
-      <BetterMeIcon width={80} height={80} color={"#1C60DE"}/>
-      <Text className='text-[40px] font-notoSemiBold text-primary'>Better Me</Text>
-      <Text className='text-xl font-notoMedium text-primary'>ชีวิตดีๆที่ลงตัว</Text>
-      <View className="flex-row space-x-2 pt-10">
-        <ActivityIndicator size="large" color="#1C60DE" />
-      </View>
-    </View>
+    <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
+      <ScrollView className='w-[92%] h-full'>
+        <View className='min-h-[85vh] w-full flex justify-center items-center'>
+          <View className='w-full'>
+            <Text className='text-[40px] text-primary font-notoMedium'>Better Me</Text>
+            <Text className='text-heading2 text-primary font-noto -translate-y-2'>ชีวิตดีๆที่ลงตัว</Text>
+          </View>
+          <View className='w-full mt-20'>
+            <Text className='text-heading text-primary font-noto'>Welcome back</Text>
+            <FormInput
+              name='email/username'
+              value={form.username}
+              handleChange={(e:string)=>setForm({ ...form,username: e})}
+              keyboardType="text"
+            />
+            <FormInput
+              name='password'
+              value={form.password}
+              handleChange={(e:string)=>setForm({ ...form,password: e})}
+              keyboardType="password"
+            />
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F3FEFF',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

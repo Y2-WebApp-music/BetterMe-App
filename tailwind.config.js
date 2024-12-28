@@ -21,11 +21,11 @@ module.exports = {
       },
       fontSize: {
         "xs": "0.75rem",
-        "sm": "0.875rem",
-        "base": "1rem",
-        "lg": "1.25rem",
-        "xl": "1.625rem",
-        "2xl": "2rem"
+        "detail": "0.875rem",
+        "body": "1rem",
+        "heading2": "1.25rem",
+        "heading": "1.625rem",
+        "title": "2rem"
       },
       fontFamily: {
         notoThin: ["NotoSansThai_100Thin", "sans-serif"],
