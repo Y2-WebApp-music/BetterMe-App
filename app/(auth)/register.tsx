@@ -31,8 +31,8 @@ const Register = () => {
   });
 
   const [step,setStep] = useState(1)
-  const progressStep1 = useRef(new Animated.Value(0)).current;
-  const progressStep2 = useRef(new Animated.Value(0)).current;
+  const progress1 = useRef(new Animated.Value(0)).current;
+  const progress2 = useRef(new Animated.Value(0)).current;
 
   const calculateStep1Progress = () => {
     let percentage = 0;
@@ -55,13 +55,13 @@ const Register = () => {
 
   useEffect(() => {
     if (step === 1) {
-      Animated.timing(progressStep1, {
+      Animated.timing(progress1, {
         toValue: calculateStep1Progress(),
         duration: 300,
         useNativeDriver: false,
       }).start();
     } else if (step === 2) {
-      Animated.timing(progressStep2, {
+      Animated.timing(progress2, {
         toValue: calculateStep2Progress(),
         duration: 300,
         useNativeDriver: false,
@@ -69,12 +69,12 @@ const Register = () => {
     }
   }, [form, step]);
 
-  const interpolateStep1Width = progressStep1.interpolate({
+  const Step1Width = progress1.interpolate({
     inputRange: [0, 100],
     outputRange: ['0%', '100%'],
   });
 
-  const interpolateStep2Width = progressStep2.interpolate({
+  const Step2Width = progress2.interpolate({
     inputRange: [0, 100],
     outputRange: ['0%', '100%'],
   });
@@ -117,7 +117,7 @@ const Register = () => {
                         height: 8,
                         borderRadius: 4,
                         backgroundColor: '#1C60DE',
-                        width: interpolateStep1Width,
+                        width: Step1Width,
                       }}
                     ></Animated.View>
                   </View>
@@ -134,7 +134,7 @@ const Register = () => {
                         height: 8,
                         borderRadius: 4,
                         backgroundColor: '#1C60DE',
-                        width: interpolateStep2Width,
+                        width: Step2Width,
                       }}
                     ></Animated.View>
                   </View>
