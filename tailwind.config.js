@@ -23,7 +23,7 @@ module.exports = {
         "xs": "0.75rem",
         "detail": "0.875rem",
         "body": "1rem",
-        "heading2": "1.25rem",
+        "heading2": "1.3rem",
         "heading": "1.625rem",
         "title": "2rem"
       },

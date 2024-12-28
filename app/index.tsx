@@ -31,9 +31,9 @@ export default function App() {
             </View>
 
             <View className='w-full mt-20' style={{paddingBottom: 20}} >
-              <Text className='text-heading text-primary font-noto'>Welcome back</Text>
+              <Text className='text-heading text-primary font-notoMedium'>Welcome back</Text>
               <FormInput
-                name='email/username'
+                name='email / username'
                 value={form.username}
                 handleChange={(e:string)=>setForm({ ...form,username: e})}
                 keyboardType="default"
@@ -44,8 +44,8 @@ export default function App() {
                 handleChange={(e:string)=>setForm({ ...form,password: e})}
                 keyboardType="password"
               />
-              <View className='w-full flex items-end'>
-                <Link href="./auth/forgetPassword" relativeToDirectory className='text-subText underline'>forget password?</Link>
+              <View className='w-full flex items-end mt-1'>
+                <Link href="./auth/forgetPassword" relativeToDirectory className='text-subText'>forget password?</Link>
               </View>
             </View>
 
