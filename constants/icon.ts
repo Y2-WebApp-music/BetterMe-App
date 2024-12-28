@@ -15,6 +15,7 @@ export { default as ForwardIcon } from '../assets/icons/Forward.svg';
 export { default as GalleryIcon } from '../assets/icons/Gallery.svg';
 export { default as GridIcon } from '../assets/icons/Grid.svg';
 export { default as BetterMeIcon } from '../assets/icons/icon-BetterMe.svg';
+export { default as GoogleIcon } from '../assets/icons/icon-google.svg';
 export { default as LikeIcon } from '../assets/icons/Like.svg';
 export { default as MenuIcon } from '../assets/icons/menu.svg';
 export { default as NightIcon } from '../assets/icons/Night.svg';

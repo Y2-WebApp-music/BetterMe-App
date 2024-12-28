@@ -9,9 +9,9 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/Logo_BetterMe.png",
+      "image": "./assets/Starting.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#F3FEFF"
     },
     "ios": {
       "supportsTablet": true
@@ -19,7 +19,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/Logo_BetterMe.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#F3FEFF"
       }
     },
     "web": {

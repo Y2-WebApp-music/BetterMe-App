@@ -1,8 +1,8 @@
 import { Link } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { Button, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, Text, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, Text, View } from 'react-native';
 import FormInput from '../components/FormInput';
 import { useState } from 'react';
+import { GoogleIcon } from '../constants/icon';
 
 export default function App() {
 
@@ -24,6 +24,7 @@ export default function App() {
           showsVerticalScrollIndicator={false}
         >
           <View className='min-h-[85vh] w-full flex justify-center items-center'>
+
             <View className='w-full'>
               <Text className='text-[40px] text-primary font-notoMedium'>Better Me</Text>
               <Text className='text-heading2 text-primary font-noto -translate-y-2'>ชีวิตดีๆที่ลงตัว</Text>
@@ -48,8 +49,22 @@ export default function App() {
               </View>
             </View>
 
-            <View>
+            <View className='flex gap-6 mt-6'>
+              <View className='flex flex-row items-center justify-center rounded-full p-1 px-4 bg-primary'>
+                <Text className='text-white text-heading2 font-notoMedium'>Login</Text>
+              </View>
+              <Text className='text-subText'>Or continue with</Text>
+              <View className='flex flex-row items-center justify-center border border-gray rounded-full p-2 px-4'>
+                <GoogleIcon width={26} height={26}/>
+                <Text>Google</Text>
+              </View>
             </View>
+
+            <View className='w-full flex justify-start items-start mt-16'>
+              <Text className='text-subText'>Don’t you have an account?</Text>
+              <Link href="./auth/register" relativeToDirectory className='text-primary text-heading2 font-notoSemiBold'>Create your account</Link>
+            </View>
+
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
