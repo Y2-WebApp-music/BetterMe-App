@@ -1,7 +1,9 @@
 // Import the functions you need from the SDKs you need
+import { FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, FIREBASE_PROJECT_ID, FIREBASE_STORAGE_BUCKET, FIREBASE_MESSAGING_SENDER_ID, FIREBASE_APP_ID } from '@env';
 import { initializeApp } from "firebase/app";
 import { getAuth } from 'firebase/auth'
-import { FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, FIREBASE_PROJECT_ID, FIREBASE_STORAGE_BUCKET, FIREBASE_MESSAGING_SENDER_ID, FIREBASE_APP_ID } from '@env';
+import { getStorage } from 'firebase/storage'
+import { getFirestore } from '@firebase/firestore'
 
 const firebaseConfig = {
   apiKey: FIREBASE_API_KEY,
@@ -15,4 +17,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
+
+export const firebaseStorage = getStorage(app)
+export const firebaseDB = getFirestore(app)
 

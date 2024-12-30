@@ -1,12 +1,17 @@
 import { View, Text, SafeAreaView, KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity, Animated, StyleSheet } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import FormInput from '../../components/FormInput'
-import { Link } from 'expo-router'
+import { Link, router } from 'expo-router'
 import BackButton from '../../components/Back'
 import { LeftArrowIcon } from '../../constants/icon'
 import PickDateModal from '../../components/modal/PickDateModal'
 import PickNumberModal from '../../components/modal/PickNumberModal'
 import BottomModal from '../../components/modal/BottomModal'
+
+import { doc, setDoc } from 'firebase/firestore'
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
+import { auth, firebaseDB } from '../../components/auth/firebaseConfig'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 type UserProp = {
   username:string,
@@ -34,9 +39,9 @@ const Register = () => {
     activity: 0,
   });
 
-  useEffect(() =>{
-    console.log('form =>',form);
-  },[form])
+  // useEffect(() =>{
+  //   console.log('form =>',form);
+  // },[form])
 
   const [step,setStep] = useState(1)
   const progress1 = useRef(new Animated.Value(0)).current;
@@ -129,6 +134,55 @@ const Register = () => {
     setGenderModal(false)
   }
 
+  const [err, setErr] = useState<string>('')
+  const checkPassword = () => {
+    if (form.password === form.confirmPassword) {
+      setStep(2)
+    } else {
+      setErr(`password and Confirm password is doesn't match`)
+    }
+  }
+
+  // Create User and Upload data to Firebase
+  const handleSubmit = async () => {
+    if (form.gender && form.weight && form.height && form.activity != 0){
+      try {
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          form.email,
+          form.password,
+        )
+        const user = userCredential.user
+
+        await updateProfile(user, {
+          displayName:form.username,
+          photoURL: null,
+        })
+        await AsyncStorage.setItem('@user', JSON.stringify(userCredential.user));
+
+        const userId = user.uid;
+        console.log('userId :', userId);
+
+        await setDoc(doc(firebaseDB, 'userData', userId), {
+          photoUser: '',
+          birth:form.birth,
+          gender:form.gender,
+          weight:form.weight,
+          height:form.height,
+          activity:form.activity,
+        })
+        console.log("User registered and data saved!");
+
+        router.replace('/(tabs)/home');
+      } catch (error: any) {
+        const errorMessage = error.message.replace('Firebase: ', '')
+        setErr(errorMessage)
+      }
+    } else {
+      setErr('please complete form')
+    }
+  }
+
 
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
@@ -192,7 +246,7 @@ const Register = () => {
               </View>
 
               {step === 1 ?(
-                <View>
+                <View className=''>
                   <FormInput
                     name='username'
                     value={form.username}
@@ -217,6 +271,7 @@ const Register = () => {
                     handleChange={(e:string)=>setForm({ ...form,confirmPassword: e})}
                     keyboardType="password"
                   />
+                  {err && <Text className='text-red text-detail mt-1'>{err}</Text>}
                 </View>
               ):step === 2 && (
                 <View className='flex flex-col'>
@@ -348,6 +403,7 @@ const Register = () => {
                   <PickNumberModal setNumber={updateWeight} isOpen={weightModal} setIsOpen={setWeightModal} title={'Select Weight'} unit={'kg'} min={28} max={150} start={40} dotMax={10} />
                   <PickNumberModal setNumber={updateHeight} isOpen={heightModal} setIsOpen={setHeightModal} title={'Select Height'} unit={'cm'} min={126} max={210} start={150} dotMax={10} />
 
+                  {err && <Text className='text-red text-detail mt-1'>{err}</Text>}
                 </View>
 
               )}
@@ -356,7 +412,7 @@ const Register = () => {
             <View className='flex gap-6 w-full'>
               {step === 1 ?(
                 <View className='w-full p-1 items-end'>
-                  <TouchableOpacity  onPress={()=>{setStep(2)}} className='will-change-contents flex flex-row items-center justify-center rounded-full p-1 px-6 bg-primary'>
+                  <TouchableOpacity  onPress={checkPassword} className='will-change-contents flex flex-row items-center justify-center rounded-full p-1 px-6 bg-primary'>
                     <Text className='w-fit text-white text-heading2 font-notoMedium'>Next</Text>
                   </TouchableOpacity>
                 </View>
@@ -367,7 +423,7 @@ const Register = () => {
                     <Text className='w-fit text-white text-heading2 font-notoMedium'>Back</Text>
                   </TouchableOpacity>
                   <View className='grow'></View>
-                  <TouchableOpacity className='will-change-contents flex flex-row items-center justify-center rounded-full p-1 px-6 bg-primary'>
+                  <TouchableOpacity onPress={handleSubmit} className='will-change-contents flex flex-row items-center justify-center rounded-full p-1 px-6 bg-primary'>
                     <Text className='w-fit text-white text-heading2 font-notoMedium'>Register</Text>
                   </TouchableOpacity>
                 </View>
