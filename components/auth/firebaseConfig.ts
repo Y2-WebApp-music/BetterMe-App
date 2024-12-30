@@ -1,23 +1,18 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAuth } from 'firebase/auth'
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, FIREBASE_PROJECT_ID, FIREBASE_STORAGE_BUCKET, FIREBASE_MESSAGING_SENDER_ID, FIREBASE_APP_ID } from '@env';
 
-// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCWpLmvXhaLQZh-GXhzKc_XW5gwFbHNr84",
-  authDomain: "betterme-e89d6.firebaseapp.com",
-  projectId: "betterme-e89d6",
-  storageBucket: "betterme-e89d6.firebasestorage.app",
-  messagingSenderId: "733097710375",
-  appId: "1:733097710375:web:8876fff4159a65aaab8f02"
+  apiKey: FIREBASE_API_KEY,
+  authDomain: FIREBASE_AUTH_DOMAIN,
+  projectId: FIREBASE_PROJECT_ID,
+  storageBucket: FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: FIREBASE_MESSAGING_SENDER_ID,
+  appId: FIREBASE_APP_ID,
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-
-// IOS : 778013634712-m9v4d2rs7m3luiudnmmj3jm1al010dis.apps.googleusercontent.com
-// Android : 778013634712-4k20lcufl7v1j7foachjq6fhqk9hva1o.apps.googleusercontent.com
 

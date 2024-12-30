@@ -1,94 +1,52 @@
-// /* eslint-disable react-hooks/exhaustive-deps */
-// import { CheckToken } from "@/api/auth.api";
-// import { useAuth } from "@/context/auth.context";
-// import {
-//   IUserAuthContext,
-//   IUserDetail,
-// } from "@/interface/userdetail.interface";
-// import AsyncStorage from "@react-native-async-storage/async-storage";
-// import { usePathname, useRouter } from "expo-router";
-// import React, { useEffect, useState } from "react";
-// import LoadingBubble from "./Loading";
+import React, { useEffect, useState } from 'react';
+import { useAuth } from '../../context/authContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
+import LoadingBubble from './Loading';
 
-// type Props = {
-//   children: React.ReactNode;
-// };
+type Props = {
+  children: React.ReactNode;
+};
 
-// const ProtectedLogin: React.FC<Props> = ({ children }) => {
-//   const auth = useAuth();
-//   const [appIsReady, setAppIsReady] = useState<boolean>(false);
-//   const router = useRouter();
+const ProtectedLogin: React.FC<Props> = ({ children }) => {
+  const router = useRouter();
+  const { user } = useAuth();
+  const [loading, setLoading] = useState<boolean>(true);
 
-//   useEffect(() => {
-//     const prepareApp = async () => {
-//       try {
-//         const token = await AsyncStorage.getItem("accessToken");
+  useEffect(() => {
+    const checkLocalUser = async () => {
+      try {
+        const userJSON = await AsyncStorage.getItem('@user');
+        const userData = userJSON ? JSON.parse(userJSON) : null;
+        if (userData) {
+          setLoading(false);
+        } else {
+          setLoading(false);
+        }
+      } catch (e) {
+        console.error('Error fetching user from AsyncStorage', e);
+        setLoading(false);
+      }
+    };
 
-//         if (!token) {
-//           throw new Error("Token not found");
-//         }
+    checkLocalUser();
+  }, []);
 
-//         const result: IUserDetail | null = await CheckToken(token).catch(
-//           (error) => {
-//             console.error(error);
-//             return null;
-//           }
-//         );
+  useEffect(() => {
+    if (!loading) {
+      if (!user) {
+        router.replace('/welcome');
+      } else {
+        router.replace('/(tabs)/home');
+      }
+    }
+  }, [loading, user, router]);
 
-//         if (!result) {
-//           throw new Error("Token is invalid");
-//         }
+  if (loading) {
+    return <LoadingBubble />;
+  }
 
-//         const userData: IUserAuthContext = {
-//           isAuth: true,
-//           user_id: result.user_id,
-//           email: result.email,
-//           name: result.name,
-//           role: result.role,
-//           surname: result.surname,
-//           phone: result.phone,
-//           profile_image_url: result.profile_image_url,
-//         };
+  return <>{children}</>;
+};
 
-//         auth?.setAuthContext(userData);
-//       } catch {
-//         auth?.setAuthContext({
-//           isAuth: false,
-//           user_id: "",
-//           email: "",
-//           name: "",
-//           role: "",
-//           surname: "",
-//           phone: "",
-//           profile_image_url: "",
-//         });
-//       } finally {
-//         setAppIsReady(true);
-//       }
-//     };
-
-//     prepareApp();
-//   }, [auth?.authContext.isAuth, usePathname()]);
-
-//   useEffect(() => {
-//     if (appIsReady && !auth?.authContext.isAuth) {
-//       const timeoutId = setTimeout(() => {
-//         router.replace("/loginpage");
-//       }, 500);
-//       return () => clearTimeout(timeoutId);
-//     } else {
-//       const timeoutId = setTimeout(() => {
-//         router.replace("/(tabs)/home");
-//       }, 500);
-//       return () => clearTimeout(timeoutId);
-//     }
-//   }, [appIsReady, auth?.authContext.isAuth, router]);
-
-//   if (!appIsReady) {
-//     return <LoadingBubble />;
-//   }
-
-//   return <>{children}</>;
-// };
-
-// export default ProtectedLogin;
+export default ProtectedLogin;
