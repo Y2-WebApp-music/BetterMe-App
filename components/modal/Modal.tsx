@@ -21,10 +21,12 @@ const Modal = ({isOpen, setIsOpen, withInput, children, ...rest}:DatePickerProp)
   ):(
     <SafeAreaView className='w-full h-full items-center justify-center' style={{ backgroundColor: "rgba(24, 24, 27, 0.5)" }}>
       <TouchableWithoutFeedback onPress={() => setIsOpen(false)}>
-        <View className="w-full h-full justify-center items-center">
+        <View className="w-full h-full justify-center items-center"
+        >
           <View
-            className="w-[92%] px-2 rounded-lg shadow-lg"
+            className="w-[92%] px-2 rounded-normal p-2 border border-gray"
             onStartShouldSetResponder={() => true}
+            style={{backgroundColor:'white'}}
           >
             {children}
           </View>

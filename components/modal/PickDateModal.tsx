@@ -20,9 +20,9 @@ const PickDateModal = ({value, isOpen, setIsOpen, setDate}:PickDateModalProp) =>
 
   return (
     <Modal isOpen={isOpen} setIsOpen={setIsOpen}>
-      <View className= 'w-full bg-white border h-fit border-gray p-4 rounded-normal'>
+      <View className= 'w-full bg-white h-fit p-4 rounded-normal'>
         <View className='w-full items-center justify-center'>
-            <Text className='text-heading2'>Select Date</Text>
+            <Text className='text-heading2 mt-2'>Select Date</Text>
         </View>
         <RNDateTimePicker
           display="spinner"
@@ -32,10 +32,13 @@ const PickDateModal = ({value, isOpen, setIsOpen, setDate}:PickDateModalProp) =>
           onChange={handleDateChange}
           style={{}}
           locale="en-Gn"
+          themeVariant='light'
         />
-        <TouchableOpacity onPress={()=>{setIsOpen(false)}} className='will-change-contents flex flex-row items-center justify-center rounded-full p-1 px-6 bg-primary'>
-          <Text className='w-fit text-white text-heading2 font-notoMedium'>Save</Text>
-        </TouchableOpacity>
+        <View className='w-full items-end justify-end'>
+          <TouchableOpacity onPress={()=>{setIsOpen(false)}} className='will-change-contents flex flex-row items-center justify-center rounded-full p-1 px-6 bg-primary'>
+            <Text className='w-fit text-white text-heading2 font-notoMedium'>Save</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </Modal>
   )

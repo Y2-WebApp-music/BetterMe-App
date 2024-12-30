@@ -237,10 +237,10 @@ const Register = () => {
                       <Text className='text-subText text-detail text-center'>gender</Text>
                       <TouchableOpacity
                         onPress={()=>{setGenderModal(true)}}
-                        className='w-fit p-2 flex flex-row justify-center items-end border border-primary rounded-normal'
+                        className={`border ${form.gender === 0? 'border-gray':'border-primary'} w-fit p-2 flex flex-row justify-center items-end rounded-normal`}
                       >
-                        <Text className='flex-1 text-primary text-center font-notoMedium text-heading2'>
-                          {form.gender ? gender.find(a => a.id === form.gender)?.gender : '-'}
+                        <Text className={`${form.gender === 0? 'text-subText':'text-primary'} flex-1 text-center font-notoMedium text-heading2`}>
+                          {form.gender ? gender.find(a => a.id === form.gender)?.gender : ''}
                         </Text>
                       </TouchableOpacity>
 
@@ -249,9 +249,9 @@ const Register = () => {
                       <Text className='text-subText text-detail text-center'>weight</Text>
                       <TouchableOpacity
                         onPress={()=>{setWeightModal(true)}}
-                        className='w-fit p-2 flex flex-row justify-center items-end border border-primary rounded-normal'
+                        className={`border ${form.weight === 0? 'border-gray':'border-primary'} w-fit p-2 flex flex-row justify-center items-end rounded-normal`}
                       >
-                        <Text className='flex-1 text-primary text-center font-notoMedium text-heading2'>
+                        <Text className={`${form.weight === 0? 'text-subText':'text-primary'} flex-1 text-center font-notoMedium text-heading2`}>
                           {form.weight}
                         </Text>
                         <Text className='text-subText -translate-y-1'>kg</Text>
@@ -262,9 +262,9 @@ const Register = () => {
                       <Text className='text-subText text-detail text-center'>height</Text>
                       <TouchableOpacity
                         onPress={()=>{setHeightModal(true)}}
-                        className='w-fit p-2 flex flex-row justify-center items-end border border-primary rounded-normal'
+                        className={`border ${form.height === 0? 'border-gray':'border-primary'} w-fit p-2 flex flex-row justify-center items-end rounded-normal`}
                       >
-                        <Text className='flex-1 text-primary text-center font-notoMedium text-heading2'>
+                        <Text className={`${form.height === 0? 'text-subText':'text-primary'} flex-1 text-center font-notoMedium text-heading2`}>
                           {form.height}
                         </Text>
                         <Text className='text-subText -translate-y-1'>cm</Text>
@@ -276,9 +276,9 @@ const Register = () => {
                     <Text className='text-subText text-detail'>your activity</Text>
                     <TouchableOpacity
                       onPress={()=>{setActivityModal(true)}}
-                      className='w-fit p-2 flex flex-row justify-center items-end border border-primary rounded-normal'
+                      className={`${form.activity===0 ? 'border-gray' : 'border-primary'} w-fit p-2 flex flex-row justify-center items-end border rounded-normal`}
                     >
-                      <Text className='flex-1 text-primary text-center font-notoMedium text-heading2'>
+                      <Text className={`${form.activity===0 ? 'text-subText' : 'text-primary'} flex-1  text-center font-notoMedium text-heading2`}>
                         {form.activity ? activity.find(a => a.id === form.activity)?.title : 'Select an Activity'}
                       </Text>
                     </TouchableOpacity>
@@ -345,8 +345,8 @@ const Register = () => {
                   </BottomModal>
 
                   <PickDateModal value={form.birth} isOpen={dateModal} setIsOpen={setDateModal} setDate={updateDate}/>
-                  <PickNumberModal setNumber={updateWeight} isOpen={weightModal} setIsOpen={setWeightModal} title={'Select Weight'} min={28} max={150} start={40} dotMax={10} />
-                  <PickNumberModal setNumber={updateHeight} isOpen={heightModal} setIsOpen={setHeightModal} title={'Select Height'} min={126} max={210} start={150} dotMax={10} />
+                  <PickNumberModal setNumber={updateWeight} isOpen={weightModal} setIsOpen={setWeightModal} title={'Select Weight'} unit={'kg'} min={28} max={150} start={40} dotMax={10} />
+                  <PickNumberModal setNumber={updateHeight} isOpen={heightModal} setIsOpen={setHeightModal} title={'Select Height'} unit={'cm'} min={126} max={210} start={150} dotMax={10} />
 
                 </View>
 
