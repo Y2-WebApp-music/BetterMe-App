@@ -14,13 +14,15 @@
       "backgroundColor": "#F3FEFF"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.guynut.BetterMe"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/Logo_BetterMe.png",
         "backgroundColor": "#F3FEFF"
-      }
+      },
+      "package": "com.guynut.BetterMe"
     },
     "web": {
       "favicon": "./assets/Logo_BetterMe.png"
@@ -29,6 +31,14 @@
       "expo-router",
       "expo-font",
       "expo-asset"
-    ]
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "ea1ca56a-2bf3-4c24-bcfe-f2af50e56a67"
+      }
+    }
   }
 }

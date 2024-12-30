@@ -1,64 +1,15 @@
 import { Link } from 'expo-router';
 import { KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import FormInput from '../components/FormInput';
-import { useMemo, useState } from 'react';
-import { GoogleIcon } from '../constants/icon';
-import * as Google from "expo-auth-session/providers/google";
-import * as WebBrowser from 'expo-web-browser';
-import { GoogleAuthProvider, onAuthStateChanged, signInWithCredential, User } from 'firebase/auth';
-import { auth } from '../components/auth/firebaseConfig';
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import FormInput from '../../components/FormInput';
+import { useState } from 'react';
+import { GoogleIcon } from '../../constants/icon';
 
-WebBrowser.maybeCompleteAuthSession();
-
-export default function App() {
+export default function Welcome() {
 
   const [form,setForm]= useState({
     username:'',
     password:''
   })
-
-  const [userInfo, setUserInfo] = useState<User>()
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    iosClientId:'778013634712-m9v4d2rs7m3luiudnmmj3jm1al010dis.apps.googleusercontent.com',
-    androidClientId:'778013634712-4k20lcufl7v1j7foachjq6fhqk9hva1o.apps.googleusercontent.com'
-  })
-
-  useMemo(()=>{
-    if (response?.type == "success"){
-      const { id_token } = response.params
-      const credential = GoogleAuthProvider.credential(id_token)
-      signInWithCredential(auth, credential)
-    }
-  },[response])
-
-  const checkLocalUser = async () => {
-    try {
-      const userJSON = await AsyncStorage.getItem("@user");
-      const userData = userJSON ? JSON.parse(userJSON) : null;
-      console.log('Local storage', userData);
-      setUserInfo(userData);
-    } catch (e) {
-      console.error("Error fetching user from AsyncStorage", e);
-      alert("Error retrieving user information.");
-    }
-  }
-
-  useMemo(()=>{
-    checkLocalUser()
-
-    const unsub = onAuthStateChanged(auth, async (user)=>{
-      if (user){
-        console.log(JSON.stringify(user, null, 2));
-        setUserInfo(user)
-        await AsyncStorage.setItem("@user", JSON.stringify(user))
-      }else{
-        console.log('else');
-      }
-    })
-
-    return () => unsub()
-  },[])
 
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
@@ -103,7 +54,7 @@ export default function App() {
               </View>
               <Text className='text-subText'>Or continue with</Text>
               <TouchableOpacity
-                onPress={()=> promptAsync()}
+                // onPress={()=> promptAsync()}
                 className='flex flex-row items-center justify-center border border-gray rounded-full p-2 px-4'
               >
                 <GoogleIcon width={26} height={26}/>
