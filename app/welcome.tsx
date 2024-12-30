@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { GoogleIcon } from '../constants/icon';
 import * as Google from "expo-auth-session/providers/google";
 import * as WebBrowser from 'expo-web-browser';
-import { GoogleAuthProvider, onAuthStateChanged, signInWithCredential, User } from 'firebase/auth';
+import { GoogleAuthProvider, onAuthStateChanged, signInWithCredential, signInWithEmailAndPassword, User } from 'firebase/auth';
 import { auth } from '../components/auth/firebaseConfig';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CLIENT_ID_IOS, CLIENT_ID_Android } from '@env';
@@ -33,7 +33,6 @@ export default function Welcome() {
 
           await AsyncStorage.setItem('@user', JSON.stringify(userCredential.user));
 
-          // Redirect to the home screen
           router.replace('/(tabs)/home');
         })
         .catch((error) => {
@@ -42,6 +41,16 @@ export default function Welcome() {
         });
     }
   }, [response]);
+
+  const [err, setErr] = useState<string>('')
+  const handleSubmit = async () => {
+    try {
+      await signInWithEmailAndPassword(auth, form.username, form.password)
+      router.replace('/(tabs)/home');
+    } catch (error) {
+      setErr('Email or password is wrong. Please try again.')
+    }
+  }
 
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
@@ -81,9 +90,9 @@ export default function Welcome() {
             </View>
 
             <View className='flex gap-6 mt-6'>
-              <View className='flex flex-row items-center justify-center rounded-full p-1 px-4 bg-primary'>
+              <TouchableOpacity onPress={handleSubmit} className='flex flex-row items-center justify-center rounded-full p-1 px-4 bg-primary'>
                 <Text className='text-white text-heading2 font-notoMedium'>Login</Text>
-              </View>
+              </TouchableOpacity>
               <Text className='text-subText'>Or continue with</Text>
               <TouchableOpacity
                 onPress={()=> promptAsync()}
