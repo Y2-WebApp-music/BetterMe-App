@@ -15,7 +15,6 @@ export default function App() {
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 20 : 5}
         style={{ flex: 1, width:"100%",alignItems:'center' }}
       >
         <ScrollView

@@ -20,10 +20,10 @@ module.exports = {
         "DarkGray": "#CFCFCF"
       },
       fontSize: {
-        "xs": "0.75rem",
-        "detail": "0.875rem",
-        "body": "1rem",
-        "heading2": "1.3rem",
+        "xs": "0.8rem",
+        "detail": "0.9rem",
+        "body": "1.1rem",
+        "heading2": "1.35rem",
         "heading": "1.625rem",
         "title": "2rem"
       },

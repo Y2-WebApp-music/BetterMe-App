@@ -1,6 +1,8 @@
 export { default as HomeIcon } from '../assets/icons/home.svg';
 export { default as AddIcon } from '../assets/icons/add.svg';
 export { default as ArrowIcon } from '../assets/icons/Arrow.svg';
+export { default as LeftArrowIcon } from '../assets/icons/LeftArrow.svg';
+export { default as RightArrowIcon } from '../assets/icons/RightArrow.svg';
 export { default as BackwardIcon } from '../assets/icons/backward.svg';
 export { default as CalendarIcon } from '../assets/icons/calendar.svg';
 export { default as CaptureIcon } from '../assets/icons/capture.svg';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { ArrowIcon } from '../constants/icon';
+import { LeftArrowIcon } from '../constants/icon';
 
 const BackButton = () => {
   const navigation = useNavigation();
@@ -11,9 +11,9 @@ const BackButton = () => {
   };
 
   return (
-    <TouchableOpacity onPress={handleBackPress} className="flex flex-row w-[92%] items-center justify-start">
-      <View className='rotate-90'>
-        <ArrowIcon width={14} height={14} color={"black"} />
+    <TouchableOpacity onPress={handleBackPress} className=" will-change-contents w-fit flex flex-row items-center justify-start">
+      <View>
+        <LeftArrowIcon width={14} height={14} color={"black"} />
       </View>
       <Text>Back</Text>
     </TouchableOpacity>

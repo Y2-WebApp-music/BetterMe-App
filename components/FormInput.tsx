@@ -9,7 +9,7 @@ type TextInputProp = {
   keyboardType: 'default' | 'numeric' | 'email-address' | 'phone-pad' | 'password'
 }
 
-const FormInput:React.FC<TextInputProp> = ({name,value,handleChange,keyboardType}) => {
+const FormInput:React.FC<TextInputProp> = ({name, value, handleChange, keyboardType}) => {
 
   const [showPassword,setShowPassword] = useState<boolean>(false)
   const [isFocused, setIsFocused] = useState<boolean>(false);

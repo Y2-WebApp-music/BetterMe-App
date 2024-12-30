@@ -1,8 +1,12 @@
-import { View, Text, SafeAreaView, KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity, Animated } from 'react-native'
+import { View, Text, SafeAreaView, KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity, Animated, StyleSheet } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import FormInput from '../../components/FormInput'
 import { Link } from 'expo-router'
 import BackButton from '../../components/Back'
+import { LeftArrowIcon } from '../../constants/icon'
+import PickDateModal from '../../components/modal/PickDateModal'
+import PickNumberModal from '../../components/modal/PickNumberModal'
+import BottomModal from '../../components/modal/BottomModal'
 
 type UserProp = {
   username:string,
@@ -29,6 +33,10 @@ const Register = () => {
     height: 0,
     activity: 0,
   });
+
+  useEffect(() =>{
+    console.log('form =>',form);
+  },[form])
 
   const [step,setStep] = useState(1)
   const progress1 = useRef(new Animated.Value(0)).current;
@@ -79,6 +87,49 @@ const Register = () => {
     outputRange: ['0%', '100%'],
   });
 
+  const [dateModal,setDateModal] = useState(false)
+  const updateDate = (date: Date) => {
+    setForm((prevForm) => ({
+      ...prevForm,
+      birth: date,
+    }));
+  };
+
+  const [weightModal,setWeightModal] = useState(false)
+  const updateWeight = (weight: number) => {
+    setForm((prevForm) => ({
+      ...prevForm,
+      weight: weight,
+    }));
+  };
+
+  const [heightModal,setHeightModal] = useState(false)
+  const updateHeight = (height: number) => {
+    setForm((prevForm) => ({
+      ...prevForm,
+      height: height,
+    }));
+  };
+
+  const [activityModal,setActivityModal] = useState(false)
+  const updateActivity = (id:number) => {
+    setForm((prevForm) => ({
+      ...prevForm,
+      activity: id,
+    }));
+    setActivityModal(false)
+  }
+
+  const [genderModal,setGenderModal] = useState(false)
+  const updateGender = (id:number) => {
+    setForm((prevForm) => ({
+      ...prevForm,
+      gender: id,
+    }));
+    setGenderModal(false)
+  }
+
+
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
       <View className='w-[92%] flex items-start mt-4'>
@@ -86,7 +137,6 @@ const Register = () => {
       </View>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 20 : 5}
         style={{ flex: 1, width:"100%",alignItems:'center' }}
       >
         <ScrollView
@@ -105,9 +155,9 @@ const Register = () => {
               <Text className='text-heading text-primary font-notoMedium'>Welcome to our app</Text>
 
               <View className='w-full flex flex-row justify-end items-end gap-2 mt-2'>
-                <View className='flex justify-center items-center'>
-                  <Text className={`text-primary`}>user info</Text>
-                  <View className={`h-2 w-2 bg-primary rounded-full`}></View>
+                <TouchableOpacity  onPress={()=>{setStep(1)}} className='flex justify-center items-center'>
+                  <Text className={`${step === 1? "text-primary":"text-subText"}`}>user info</Text>
+                  <View className={`${step === 1? "bg-primary":"bg-neutral-200"} h-2 w-2 rounded-full`}></View>
                   <View className='relative w-28 h-2 mt-1'>
                     <View className={`absolute top-0 w-full h-2 rounded-full bg-neutral-200`}></View>
                     <Animated.View
@@ -121,8 +171,8 @@ const Register = () => {
                       }}
                     ></Animated.View>
                   </View>
-                </View>
-                <View className='flex justify-center items-center'>
+                </TouchableOpacity>
+                <TouchableOpacity  onPress={()=>{setStep(2)}} className='flex justify-center items-center'>
                   <Text className={`${step === 2? "text-primary":"text-subText"}`}>personal data</Text>
                   <View className={`${step === 2? "bg-primary":"bg-neutral-200"} h-2 w-2 rounded-full`}></View>
                   <View className='relative w-28 h-2 mt-1'>
@@ -138,7 +188,7 @@ const Register = () => {
                       }}
                     ></Animated.View>
                   </View>
-                </View>
+                </TouchableOpacity>
               </View>
 
               {step === 1 ?(
@@ -169,51 +219,158 @@ const Register = () => {
                   />
                 </View>
               ):step === 2 && (
-                <View>
-                  {/* <FormInput
-                    name='date of birth'
-                    value={form.birth}
-                    handleChange={(e:string)=>setForm({ ...form,birth: e})}
-                    keyboardType="default"
-                  />
-                  <FormInput
-                    name='gender'
-                    value={form.gender}
-                    handleChange={(e:string)=>setForm({ ...form,gender: e})}
-                    keyboardType="default"
-                  />
-                  <FormInput
-                    name='weight'
-                    value={form.weight}
-                    handleChange={(e:string)=>setForm({ ...form,weight: e})}
-                    keyboardType="default"
-                  />
-                  <FormInput
-                    name='height'
-                    value={form.height}
-                    handleChange={(e:string)=>setForm({ ...form,height: e})}
-                    keyboardType="default"
-                  />
-                  <FormInput
-                    name='your activity'
-                    value={form.activity}
-                    handleChange={(e:string)=>setForm({ ...form,activity: e})}
-                    keyboardType="default"
-                  /> */}
+                <View className='flex flex-col'>
+                  <View className='w-full mt-2'style={{marginTop: 10}}>
+                    <Text className='text-subText text-detail'>date of birth</Text>
+                    <TouchableOpacity
+                      onPress={()=>{setDateModal(true)}}
+                      className='w-full h-[5vh] p-2 flex justify-center border border-primary rounded-normal'
+                    >
+                      <Text className='flex-1 text-primary text-center font-notoMedium text-heading2'>
+                        {new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(form.birth)}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  <View className='flex flex-row gap-2 h-max w-full justify-center'>
+                    <View className='w-[36%] mt-2'>
+                      <Text className='text-subText text-detail text-center'>gender</Text>
+                      <TouchableOpacity
+                        onPress={()=>{setGenderModal(true)}}
+                        className='w-fit p-2 flex flex-row justify-center items-end border border-primary rounded-normal'
+                      >
+                        <Text className='flex-1 text-primary text-center font-notoMedium text-heading2'>
+                          {form.gender ? gender.find(a => a.id === form.gender)?.gender : '-'}
+                        </Text>
+                      </TouchableOpacity>
+
+                    </View>
+                    <View className='w-[30%] mt-2'>
+                      <Text className='text-subText text-detail text-center'>weight</Text>
+                      <TouchableOpacity
+                        onPress={()=>{setWeightModal(true)}}
+                        className='w-fit p-2 flex flex-row justify-center items-end border border-primary rounded-normal'
+                      >
+                        <Text className='flex-1 text-primary text-center font-notoMedium text-heading2'>
+                          {form.weight}
+                        </Text>
+                        <Text className='text-subText -translate-y-1'>kg</Text>
+                      </TouchableOpacity>
+                    </View>
+
+                    <View className='w-[30%] mt-2'>
+                      <Text className='text-subText text-detail text-center'>height</Text>
+                      <TouchableOpacity
+                        onPress={()=>{setHeightModal(true)}}
+                        className='w-fit p-2 flex flex-row justify-center items-end border border-primary rounded-normal'
+                      >
+                        <Text className='flex-1 text-primary text-center font-notoMedium text-heading2'>
+                          {form.height}
+                        </Text>
+                        <Text className='text-subText -translate-y-1'>cm</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+
+                  <View className='w-full mt-2'style={{marginTop: 10}}>
+                    <Text className='text-subText text-detail'>your activity</Text>
+                    <TouchableOpacity
+                      onPress={()=>{setActivityModal(true)}}
+                      className='w-fit p-2 flex flex-row justify-center items-end border border-primary rounded-normal'
+                    >
+                      <Text className='flex-1 text-primary text-center font-notoMedium text-heading2'>
+                        {form.activity ? activity.find(a => a.id === form.activity)?.title : 'Select an Activity'}
+                      </Text>
+                    </TouchableOpacity>
+                    <Text className='text-subText text-detail pl-2'>
+                      {form.activity ? activity.find(a => a.id === form.activity)?.description : ''}
+                    </Text>
+                  </View>
+
+                  <BottomModal
+                    isOpen={activityModal}
+                    setIsOpen={setActivityModal}
+                  >
+                    <View className= 'w-full p-2 flex gap-2'>
+                      <View className='w-full items-center justify-center'>
+                          <Text className='text-heading2 py-2'>select your activity</Text>
+                      </View>
+                      {activity.map((activityItem) => (
+                        <TouchableOpacity
+                          key={activityItem.id}
+                          onPress={() => updateActivity(activityItem.id)}
+                          className={`${
+                            activityItem.id === form.activity ? 'border-primary' : 'border-gray'
+                          } rounded-normal border p-2`}
+                        >
+                          <Text
+                            className={`${
+                              activityItem.id === form.activity ? 'text-primary' : 'text-text'
+                            } text-heading2 font-noto h-[3vh]`}
+                          >
+                            {activityItem.title}
+                          </Text>
+                          <Text className='text-subText'>{activityItem.description}</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </BottomModal>
+
+                  <BottomModal
+                    isOpen={genderModal}
+                    setIsOpen={setGenderModal}
+                  >
+                    <View className= 'w-full p-2 flex gap-2'>
+                      <View className='w-full items-center justify-center'>
+                          <Text className='text-heading2 py-2'>select gender</Text>
+                      </View>
+                      {gender.map((activityItem) => (
+                        <TouchableOpacity
+                          key={activityItem.id}
+                          onPress={() => updateGender(activityItem.id)}
+                          className={`${
+                            activityItem.id === form.gender ? 'border-primary' : 'border-gray'
+                          } rounded-normal border p-2`}
+                        >
+                          <Text
+                            className={`${
+                              activityItem.id === form.gender ? 'text-primary' : 'text-text'
+                            } text-heading2 font-noto h-[3vh]`}
+                          >
+                            {activityItem.gender}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </BottomModal>
+
+                  <PickDateModal value={form.birth} isOpen={dateModal} setIsOpen={setDateModal} setDate={updateDate}/>
+                  <PickNumberModal setNumber={updateWeight} isOpen={weightModal} setIsOpen={setWeightModal} title={'Select Weight'} min={28} max={150} start={40} dotMax={10} />
+                  <PickNumberModal setNumber={updateHeight} isOpen={heightModal} setIsOpen={setHeightModal} title={'Select Height'} min={126} max={210} start={150} dotMax={10} />
+
                 </View>
 
               )}
             </View>
 
-            <View className='flex gap-6'>
+            <View className='flex gap-6 w-full'>
               {step === 1 ?(
-                <TouchableOpacity  onPress={()=>{setStep(2)}} className='w-fit flex flex-row items-center justify-center rounded-full p-1 px-6 bg-primary'>
-                  <Text className='w-fit text-white text-heading2 font-notoMedium'>Next</Text>
-                </TouchableOpacity>
+                <View className='w-full p-1 items-end'>
+                  <TouchableOpacity  onPress={()=>{setStep(2)}} className='will-change-contents flex flex-row items-center justify-center rounded-full p-1 px-6 bg-primary'>
+                    <Text className='w-fit text-white text-heading2 font-notoMedium'>Next</Text>
+                  </TouchableOpacity>
+                </View>
               ):(
-                <TouchableOpacity className='w-fit flex flex-row items-center justify-center rounded-full p-1 px-6 bg-primary'>
-                  <Text className='w-fit text-white text-heading2 font-notoMedium'>Register</Text>
-                </TouchableOpacity>
+                <View className='w-full flex-row p-1 justify-end'>
+                  <TouchableOpacity onPress={()=>{setStep(1)}} className='will-change-contents flex flex-row items-center justify-center rounded-full p-1 pl-2 pr-4 bg-DarkGray'>
+                    <LeftArrowIcon width={14} height={14} color={"white"} />
+                    <Text className='w-fit text-white text-heading2 font-notoMedium'>Back</Text>
+                  </TouchableOpacity>
+                  <View className='grow'></View>
+                  <TouchableOpacity className='will-change-contents flex flex-row items-center justify-center rounded-full p-1 px-6 bg-primary'>
+                    <Text className='w-fit text-white text-heading2 font-notoMedium'>Register</Text>
+                  </TouchableOpacity>
+                </View>
               )}
             </View>
 
@@ -223,5 +380,44 @@ const Register = () => {
     </SafeAreaView>
   )
 }
+
+const gender = [
+  {
+    id:1,
+    gender:'Male'
+  },
+  {
+    id:2,
+    gender:'Female'
+  },
+]
+
+const activity = [
+  {
+    id:1,
+    title:'Sedentary',
+    description:'Very little physical activity.'
+  },
+  {
+    id:2,
+    title:'Lightly Active',
+    description:'Light physical activity 1-3 days a week.'
+  },
+  {
+    id:3,
+    title:'Moderately active',
+    description:'Regular moderate exercise 3-5 days a week.'
+  },
+  {
+    id:4,
+    title:'Very active',
+    description:'Hard physical activity or exercise 6-7 days a week.'
+  },
+  {
+    id:5,
+    title:'Extra active',
+    description:'Extremely high physical activity levels, often more than once per day.'
+  },
+]
 
 export default Register
