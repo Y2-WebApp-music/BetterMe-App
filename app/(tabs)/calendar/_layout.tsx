@@ -1,11 +1,13 @@
 import { View, Text, SafeAreaView } from 'react-native'
 import React from 'react'
+import { Stack } from 'expo-router'
 
 const Calendar = () => {
   return (
-    <SafeAreaView>
-      <Text>Calendar</Text>
-    </SafeAreaView>
+    <Stack>
+      <Stack.Screen name="weekCalendar" options={{ headerShown: false }} />
+      <Stack.Screen name="monthCalendar" options={{ headerShown: false }} />
+    </Stack>
   )
 }
 

@@ -10,6 +10,9 @@ import { CloseIcon, GalleryIcon } from '../../../constants/icon';
 import 'react-native-reanimated'
 import 'react-native-gesture-handler'
 import { Skeleton } from 'moti/skeleton'
+import { router } from 'expo-router';
+
+const screenWidth = Dimensions.get('window').width;
 
 const TakePicture = () => {
   const [permission, requestPermission] = useCameraPermissions();
@@ -75,17 +78,25 @@ const TakePicture = () => {
     }, 2000);
   }
 
+  const handleAddFood = async () => {
+    setStep(1)
+    setPhoto('')
+  }
+
+  const handleComplete = async () => {
+    setStep(1)
+    setPhoto('')
+    router.replace('/(tabs)/calendar/weekCalendar');
+  }
+
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
-      <View className='w-[92%] flex items-start mt-2'>
-        {/* <BackButton/> */}
-      </View>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1, width:"100%",alignItems:'center' }}
       >
         <ScrollView
-          className='w-[92%] h-full'
+          className='w-[92%] h-auto'
           contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', marginTop:25}}
           showsVerticalScrollIndicator={false}
           keyboardDismissMode='on-drag'
@@ -97,7 +108,7 @@ const TakePicture = () => {
            */}
 
           {step === 1 &&
-            <View>
+            <View >
               <Text className='text-title font-notoSemiBold text-primary'>Take a Photo!</Text>
               <Text className='text-subText font-notoLight'>Snap a photo to identify your dishes. Learn nutritional facts and make healthier food choices every day!</Text>
               <View className='rounded-normal overflow-hidden mt-4'>
@@ -167,7 +178,7 @@ const TakePicture = () => {
             =============================
           */}
           {step === 3 && photo &&(
-            <View>
+            <View className='h-auto w-full'>
             {waiting? (
               <View className=' relative w-full h-full justify-center items-start'>
                 <View className='absolute top-[50%] z-10 w-full justify-center items-center'>
@@ -188,8 +199,19 @@ const TakePicture = () => {
                 </View>
               </View>
             ):(
-              <View>
-                <Text className='text-title text-primary font-notoMedium'>Your Result</Text>
+              <View className='h-auto'>
+                <View className='flex-row items-center'>
+                  <Text className='text-title text-primary font-notoMedium'>Your Result</Text>
+                  <View className='grow'/>
+                  <View>
+                    <TouchableOpacity
+                        onPress={handleAddFood}
+                        className='will-change-contents flex flex-row items-center justify-center p-1 px-4 rounded-full bg-gray'
+                      >
+                        <Text className='w-fit text-subText text-heading3 font-notoMedium'>Add new food</Text>
+                      </TouchableOpacity>
+                  </View>
+                </View>
                 <View className='w-full flex-row'>
                   <View className='grow'>
                     <Text className='text-heading font-noto'>กะเพราไก่</Text>
@@ -197,7 +219,7 @@ const TakePicture = () => {
                   </View>
                   <View className='flex-row gap-1 items-end'>
                     <Text className='text-title font-notoMedium text-primary'>468</Text>
-                    <Text className='font-noto -translate-y-2'>cal</Text>
+                    <Text className='font-noto' style={{transform:[{ translateY: -8 }]}}>cal</Text>
                   </View>
                 </View>
                 <View className=' relative rounded-normal overflow-hidden mt-4'>
@@ -208,28 +230,40 @@ const TakePicture = () => {
                     />
                   }
                 </View>
-                <View className='mt-2'>
+                <View className='py-2'>
                   <Text className='font-noto text-heading2'>Detail of this food</Text>
-                  <View className='flex gap-1 translate-y-2'>
-                    <View className='flex-row gap-2 items-end'>
-                      <Text className='text-body text-subText w-[16vw]'>Carbs</Text>
-                      <Text className='text-heading font-notoMedium translate-y-2 w-[8vw]'>21</Text>
-                      <Text className='text-body text-subText'>grams</Text>
+                  <View className='flex gap-1' style={{transform:[{ translateY: -8 }]}}>
+                    <View className='flex-row gap-6'>
+                      <View className='flex-row gap-2 items-end'>
+                        <Text className='text-body text-subText w-[14vw]'>Carbs</Text>
+                        <Text className='text-heading font-notoMedium w-[8vw]' style={{transform:[{ translateY: 6 }]}}>{result.nutrias.carbs}</Text>
+                        <Text className='text-body text-subText'>grams</Text>
+                      </View>
+                      <View className='flex-row gap-2 items-end'>
+                        <Text className='text-body text-subText w-[14vw]'>Protein</Text>
+                        <Text className='text-heading font-notoMedium w-[8vw]' style={{transform:[{ translateY: 6 }]}}>{result.nutrias.protein}</Text>
+                        <Text className='text-body text-subText'>grams</Text>
+                      </View>
                     </View>
                     <View className='flex-row gap-2 items-end'>
-                      <Text className='text-body text-subText w-[16vw]'>Protein</Text>
-                      <Text className='text-heading font-notoMedium translate-y-2 w-[8vw]'>21</Text>
-                      <Text className='text-body text-subText'>grams</Text>
-                    </View>
-                    <View className='flex-row gap-2 items-end'>
-                      <Text className='text-body text-subText w-[16vw]'>Fat</Text>
-                      <Text className='text-heading font-notoMedium translate-y-2 w-[8vw]'>21</Text>
+                      <Text className='text-body text-subText w-[14vw]'>Fat</Text>
+                      <Text className='text-heading font-notoMedium w-[8vw]' style={{transform:[{ translateY: 6 }]}}>{result.nutrias.fat}</Text>
                       <Text className='text-body text-subText'>grams</Text>
                     </View>
                   </View>
                 </View>
+                <View className='pt-4'>
+                  <TouchableOpacity
+                    onPress={handleComplete}
+                    className='will-change-contents flex flex-row items-center justify-center rounded-full p-1 px-10 bg-primary'
+                  >
+                    <Text className='w-fit text-white text-heading font-notoMedium'>Done</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-            )}</View>)
+            )}
+            </View>
+            )
           }
         </ScrollView>
       </KeyboardAvoidingView>
@@ -237,7 +271,17 @@ const TakePicture = () => {
   )
 }
 
-const screenWidth = Dimensions.get('window').width;
+const result = {
+  menu:'กะเพราไก่',
+  portion:'พิเศษ เพิ่มไข่ดาว',
+  calorie:124,
+  photo:'',
+  nutrias:{
+    carbs:45,
+    protein:12,
+    fat:9
+  },
+}
 
 const styles = StyleSheet.create({
   container: {
