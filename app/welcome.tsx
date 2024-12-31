@@ -87,6 +87,7 @@ export default function Welcome() {
               <View className='w-full flex items-end mt-1'>
                 <Link href="/(auth)/forgetPassword" relativeToDirectory className='text-subText'>forget password?</Link>
               </View>
+              {err && <Text className='text-detail text-red'>{err}</Text>}
             </View>
 
             <View className='flex gap-6 mt-6'>
