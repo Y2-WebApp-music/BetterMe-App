@@ -3,6 +3,7 @@ import React from "react";
 import Svg, { SvgProps } from 'react-native-svg';
 import { Text, View } from "react-native";
 import { CalendarIcon, CaptureIcon, CommunityIcon, HomeIcon, MenuIcon } from "../../constants/icon";
+import Calendar from "./calendar/_layout";
 
 interface TabIconProps {
   icon: React.FC<SvgProps>;
@@ -23,8 +24,8 @@ const TabIcon: React.FC<TabIconProps> = ({ icon: Icon, color, name, focused }) =
 };
 const CameraIcon: React.FC<TabIconProps> = ({ icon: Icon, color, focused }) => {
   return (
-    <View className="flex items-center justify-center w-[58px] h-[58px] rounded-[24px] p-1 bg-primary -translate-y-1">
-      <Icon width={40} height={40} color={"white"} />
+    <View className={`${focused? 'w-[64px] h-[64px] bg-white border-4 border-primary':'w-[58px] h-[58px] bg-primary'} flex items-center justify-center rounded-[24px] p-1 -translate-y-1`}>
+      <Icon width={40} height={40} color={(focused ? color : 'white')} />
     </View>
   );
 };
