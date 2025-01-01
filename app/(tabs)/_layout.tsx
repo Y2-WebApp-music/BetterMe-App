@@ -48,7 +48,8 @@ const TabsLayout = () => {
             shadowOpacity: 0.1,
             shadowRadius: 3,
             elevation: 5,
-          }
+          },
+          animation:'shift',
         }}
       >
         <Tabs.Screen

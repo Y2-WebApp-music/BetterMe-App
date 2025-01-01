@@ -1,13 +1,13 @@
-import { View, Text } from 'react-native'
-import React from 'react'
-import { useAuth } from '../../../context/authContext';
+import React from 'react';
+import { Stack } from 'expo-router';
 
-const Menu = () => {
+const MenuLayout = () => {
   return (
-    <View>
-      <Text>Menu</Text>
-    </View>
-  )
-}
+    <Stack>
+      <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="account" options={{ headerShown: false }} />
+    </Stack>
+  );
+};
 
-export default Menu
+export default MenuLayout;
