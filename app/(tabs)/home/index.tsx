@@ -1,10 +1,19 @@
 import { View, Text, ScrollView, SafeAreaView, StyleSheet, Dimensions } from 'react-native'
 import React from 'react'
 import { Image } from 'expo-image'
+import { User } from 'firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from '../../../context/authContext';
 
 const screenWidth = Dimensions.get('window').width;
 
+type UserData = User & {
+}
+
 const Home = () => {
+
+  const { user } = useAuth();
+
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
       <ScrollView
@@ -23,8 +32,8 @@ const Home = () => {
               />
             </View>
             <View className='grow'>
-              <Text className='text-heading2 font-notoMedium'>Chotanansub Sophaken</Text>
-              <Text className='text-subText font-noto'>maybesomeone.567.gmail.com</Text>
+              <Text className='text-heading2 font-notoMedium'>{user?.displayName}</Text>
+              <Text className='text-subText font-noto'>{user?.email}</Text>
             </View>
           </View>
         </ScrollView>
