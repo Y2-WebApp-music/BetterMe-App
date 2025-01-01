@@ -1,27 +1,13 @@
-import { View, Text, SafeAreaView, TouchableOpacity } from 'react-native'
-import React from 'react'
-import { useAuth } from '../../../context/authContext';
+import React from 'react';
+import { Stack } from 'expo-router';
 
-const Menu = () => {
-
-  const { signOut } = useAuth(); // Access signOut function
-
-  const handleSignOut = async () => {
-    await signOut();
-  };
-
-
+const MenuLayout = () => {
   return (
-    <SafeAreaView>
-      <Text>Menu</Text>
-      <TouchableOpacity
-                onPress={handleSignOut}
-                className="flex flex-row items-center justify-center rounded-full p-1 px-4 bg-red-500 mt-6"
-              >
-                <Text className="text-white text-heading2 font-notoMedium">Sign Out</Text>
-              </TouchableOpacity>
-    </SafeAreaView>
-  )
-}
+    <Stack>
+      <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="account" options={{ headerShown: false }} />
+    </Stack>
+  );
+};
 
-export default Menu
+export default MenuLayout;
