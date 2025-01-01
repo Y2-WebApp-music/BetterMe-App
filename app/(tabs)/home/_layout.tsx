@@ -1,12 +1,12 @@
-import { View, Text, SafeAreaView } from 'react-native'
-import React from 'react'
+import React from 'react';
+import { Stack } from 'expo-router';
 
-const Home = () => {
+const HomeLayout = () => {
   return (
-    <SafeAreaView>
-      <Text> Home Screen</Text>
-    </SafeAreaView>
-  )
-}
+    <Stack>
+      <Stack.Screen name="index" options={{ headerShown: false }} />
+    </Stack>
+  );
+};
 
-export default Home
+export default HomeLayout;
