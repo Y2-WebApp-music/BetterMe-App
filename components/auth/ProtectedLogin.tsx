@@ -35,8 +35,8 @@ const ProtectedLogin: React.FC<Props> = ({ children }) => {
   useEffect(() => {
     if (!loading) {
       if (!user) {
-        // router.replace('/welcome');
-        router.replace('/(tabs)/home');
+        router.replace('/welcome');
+        // router.replace('/(tabs)/home');
       } else {
         router.replace('/(tabs)/home');
       }
