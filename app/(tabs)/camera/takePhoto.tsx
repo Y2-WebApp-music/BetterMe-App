@@ -219,7 +219,9 @@ const TakePicture = () => {
                   </View>
                   <View className='flex-row gap-1 items-end'>
                     <Text className='text-title font-notoMedium text-primary'>468</Text>
-                    <Text className='font-noto' style={{transform:[{ translateY: -8 }]}}>cal</Text>
+                    <View style={{transform:[{ translateY: -8 }]}}>
+                      <Text className='font-noto'>cal</Text>
+                    </View>
                   </View>
                 </View>
                 <View className=' relative rounded-normal overflow-hidden mt-4'>
@@ -236,18 +238,24 @@ const TakePicture = () => {
                     <View className='flex-row gap-6'>
                       <View className='flex-row gap-2 items-end'>
                         <Text className='text-body text-subText w-[14vw]'>Carbs</Text>
-                        <Text className='text-heading font-notoMedium w-[8vw]' style={{transform:[{ translateY: 6 }]}}>{result.nutrias.carbs}</Text>
+                        <View style={{transform:[{ translateY: 6 }]}}>
+                          <Text className='text-heading font-notoMedium w-[8vw]'>{result.nutrias.carbs}</Text>
+                        </View>
                         <Text className='text-body text-subText'>grams</Text>
                       </View>
                       <View className='flex-row gap-2 items-end'>
                         <Text className='text-body text-subText w-[14vw]'>Protein</Text>
-                        <Text className='text-heading font-notoMedium w-[8vw]' style={{transform:[{ translateY: 6 }]}}>{result.nutrias.protein}</Text>
+                        <View style={{transform:[{ translateY: 6 }]}}>
+                          <Text className='text-heading font-notoMedium w-[8vw]'>{result.nutrias.protein}</Text>
+                        </View>
                         <Text className='text-body text-subText'>grams</Text>
                       </View>
                     </View>
                     <View className='flex-row gap-2 items-end'>
                       <Text className='text-body text-subText w-[14vw]'>Fat</Text>
-                      <Text className='text-heading font-notoMedium w-[8vw]' style={{transform:[{ translateY: 6 }]}}>{result.nutrias.fat}</Text>
+                      <View style={{transform:[{ translateY: 6 }]}}>
+                        <Text className='text-heading font-notoMedium w-[8vw]'>{result.nutrias.fat}</Text>
+                      </View>
                       <Text className='text-body text-subText'>grams</Text>
                     </View>
                   </View>
