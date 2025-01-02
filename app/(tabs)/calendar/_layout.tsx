@@ -2,13 +2,13 @@ import { View, Text } from 'react-native'
 import React from 'react'
 import { Stack } from 'expo-router'
 
-const Calendar = () => {
+const CalendarLayout = () => {
   return (
     <Stack>
-      <Stack.Screen name="monthCalendar" options={{ headerShown: false }} />
+      <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name="weekCalendar" options={{ headerShown: false }} />
     </Stack>
   )
 }
 
-export default Calendar
+export default CalendarLayout

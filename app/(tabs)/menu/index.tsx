@@ -1,12 +1,16 @@
-import { View, Text, SafeAreaView, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Dimensions } from 'react-native'
+import { View, Text, SafeAreaView, TouchableOpacity, ScrollView, StyleSheet, Dimensions } from 'react-native'
 import React from 'react'
 import { router } from 'expo-router'
 import { ForwardIcon, UserIcon } from '../../../constants/icon'
 import { Image } from 'expo-image';
+import { useAuth } from '../../../context/authContext';
 
 const screenWidth = Dimensions.get('window').width;
 
 const Menu = () => {
+
+  const { user } = useAuth();
+
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
       <ScrollView
@@ -17,8 +21,8 @@ const Menu = () => {
         >
           <View className='mb-4 flex flex-row gap-2 items-center'>
             <View className='grow'>
-              <Text className='text-heading2 font-notoMedium'>Chotanansub Sophaken</Text>
-              <Text className='text-subText font-noto'>maybesomeone.567.gmail.com</Text>
+              <Text className='text-heading2 font-notoMedium'>{user?.displayName}</Text>
+              <Text className='text-subText font-noto'>{user?.email}</Text>
             </View>
             <View className='overflow-hidden rounded-full'>
               <Image
@@ -30,7 +34,7 @@ const Menu = () => {
             </View>
           </View>
           <TouchableOpacity
-            onPress={()=>{router.replace('./account')}}
+            onPress={()=>{router.replace('/menu/account')}}
             className="flex flex-row gap-2 items-center justify-center rounded-normal border border-gray p-2 px-4 bg-red-500"
           >
             <UserIcon width={30} height={30} color={'#626262'}/>

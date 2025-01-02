@@ -26,7 +26,8 @@ module.exports = {
         "heading3": "1.2rem",
         "heading2": "1.35rem",
         "heading": "1.625rem",
-        "title": "2.3rem"
+        "subTitle": "2rem",
+        "title": "2.3rem",
       },
       fontFamily: {
         notoThin: ["NotoSansThai_100Thin", "sans-serif"],
