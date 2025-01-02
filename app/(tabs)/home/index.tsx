@@ -1,16 +1,16 @@
 import { View, Text, ScrollView, SafeAreaView, StyleSheet, Dimensions, TouchableOpacity } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { Image } from 'expo-image'
-import { User } from 'firebase/auth';
+import { User, UserCredential } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../../../context/authContext';
 import { AddIcon } from '../../../constants/icon';
 import { router } from 'expo-router';
+import PickDateModal from '../../../components/modal/PickDateModal';
+
+// Hi test a review
 
 const screenWidth = Dimensions.get('window').width;
-
-type UserData = User & {
-}
 
 const Home = () => {
 
