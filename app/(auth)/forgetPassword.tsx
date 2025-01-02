@@ -5,7 +5,7 @@ import BackButton from '../../components/Back'
 const forgetPassword = () => {
   return (
     <SafeAreaView>
-      <BackButton/>
+      <BackButton goto={'/welcome'}/>
       <Text>forgetPassword</Text>
     </SafeAreaView>
   )
