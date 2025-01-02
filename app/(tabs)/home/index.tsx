@@ -8,6 +8,8 @@ import { AddIcon } from '../../../constants/icon';
 import { router } from 'expo-router';
 import PickDateModal from '../../../components/modal/PickDateModal';
 
+// Hi test a review
+
 const screenWidth = Dimensions.get('window').width;
 
 const Home = () => {
