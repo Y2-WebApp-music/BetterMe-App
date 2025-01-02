@@ -14,7 +14,7 @@ interface TabIconProps {
 
 const TabIcon: React.FC<TabIconProps> = ({ icon: Icon, color, name, focused }) => {
   return (
-    <View className="flex items-center justify-center w-[74px] p-1">
+    <View className="flex items-center justify-center w-[80px] p-1">
       <Icon width={30} height={30} color={color || (focused ? 'blue' : 'gray')} />
       <Text className={`${focused?"text-primary":"text-nonFocus"} text-sm w-max`}>
         {name}
@@ -102,7 +102,7 @@ const TabsLayout = () => {
         />
         <Tabs.Screen
           name="menu"
-          options={{ headerShown: false, tabBarIcon:({color,focused})=>(
+          options={{ href:'/menu',headerShown: false, tabBarIcon:({color,focused})=>(
             <TabIcon
               icon={MenuIcon}
               color={color}

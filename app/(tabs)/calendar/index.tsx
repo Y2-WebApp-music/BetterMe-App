@@ -1,7 +1,7 @@
 import { View, Text, SafeAreaView, ScrollView } from 'react-native'
 import React from 'react'
 
-const WeekCalendar = () => {
+const MonthCalendar = () => {
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
       <ScrollView
@@ -10,11 +10,11 @@ const WeekCalendar = () => {
           showsVerticalScrollIndicator={false}
         >
           <View className='mb-4 flex flex-row gap-2 items-center'>
-            <Text>Week Calendar</Text>
+            <Text>Month Calendar</Text>
           </View>
         </ScrollView>
     </SafeAreaView>
   )
 }
 
-export default WeekCalendar
+export default MonthCalendar

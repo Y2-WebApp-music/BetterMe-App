@@ -2,8 +2,13 @@ import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { LeftArrowIcon } from '../constants/icon';
+import { router } from 'expo-router';
 
-const BackButton = () => {
+type BackButtonProp = {
+  goto:string
+}
+
+const BackButton = ({goto}:BackButtonProp) => {
   const navigation = useNavigation();
 
   const handleBackPress = () => {
@@ -11,7 +16,7 @@ const BackButton = () => {
   };
 
   return (
-    <TouchableOpacity onPress={handleBackPress} className=" will-change-contents w-fit flex flex-row items-center justify-start">
+    <TouchableOpacity onPress={()=>{router.replace(goto)}} className=" will-change-contents w-fit flex flex-row items-center justify-start">
       <View>
         <LeftArrowIcon width={14} height={14} color={"black"} />
       </View>

@@ -187,7 +187,7 @@ const Register = () => {
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
       <View className='w-[92%] flex items-start mt-4'>
-        <BackButton/>
+        <BackButton goto={'/welcome'}/>
       </View>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}

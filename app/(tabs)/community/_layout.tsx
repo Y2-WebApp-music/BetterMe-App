@@ -1,12 +1,13 @@
 import { View, Text, SafeAreaView } from 'react-native'
 import React from 'react'
+import { Stack } from 'expo-router'
 
-const Community = () => {
+const CommunityLayout = () => {
   return (
-    <SafeAreaView>
-      <Text>Community</Text>
-    </SafeAreaView>
+    <Stack>
+      <Stack.Screen name="index" options={{ headerShown: false }} />
+    </Stack>
   )
 }
 
-export default Community
+export default CommunityLayout
