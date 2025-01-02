@@ -3,7 +3,8 @@ import React from 'react'
 
 const forgetPassword = () => {
   return (
-    <View>
+    <SafeAreaView>
+      <BackButton goto={'/welcome'}/>
       <Text>forgetPassword</Text>
     </View>
   )
