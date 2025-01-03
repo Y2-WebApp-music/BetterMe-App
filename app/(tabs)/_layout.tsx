@@ -102,7 +102,7 @@ const TabsLayout = () => {
         />
         <Tabs.Screen
           name="menu"
-          options={{ href:'/menu',headerShown: false, tabBarIcon:({color,focused})=>(
+          options={{ headerShown: false, tabBarIcon:({color,focused})=>(
             <TabIcon
               icon={MenuIcon}
               color={color}

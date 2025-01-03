@@ -7,8 +7,6 @@ import * as MediaLibrary from 'expo-media-library';
 import * as ImagePicker from 'expo-image-picker';
 import FormInput from '../../../components/FormInput';
 import { CloseIcon, GalleryIcon } from '../../../constants/icon';
-import 'react-native-reanimated'
-import 'react-native-gesture-handler'
 import { Skeleton } from 'moti/skeleton'
 import { router } from 'expo-router';
 
@@ -86,7 +84,7 @@ const TakePicture = () => {
   const handleComplete = async () => {
     setStep(1)
     setPhoto('')
-    router.replace('/(tabs)/calendar/weekCalendar');
+    router.push('/(tabs)/calendar/weekCalendar');
   }
 
   return (
@@ -185,7 +183,7 @@ const TakePicture = () => {
                   <Text className=' text-primary text-title font-notoMedium animate-pulse'>Waiting for Result</Text>
                 </View>
                 <View className=' opacity-40'>
-                  <Skeleton.Group show={waiting}>
+                  {/* <Skeleton.Group show={waiting}>
                     <View className='flex flex-row'>
                       <Skeleton colorMode={'light'} radius={12} height={65} width={screenWidth * 0.52}/>
                       <View className='grow'/>
@@ -195,7 +193,7 @@ const TakePicture = () => {
                       <Skeleton colorMode={'light'} radius={12} height={screenWidth * 0.92} width={screenWidth * 0.92}/>
                     </View>
                     <Skeleton colorMode={'light'} radius={12} height={120} width={screenWidth * 0.62}/>
-                  </Skeleton.Group>
+                  </Skeleton.Group> */}
                 </View>
               </View>
             ):(

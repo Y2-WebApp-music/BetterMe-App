@@ -34,7 +34,7 @@ const Menu = () => {
             </View>
           </View>
           <TouchableOpacity
-            onPress={()=>{router.replace('/menu/account')}}
+            onPress={()=>{router.push('/menu/account')}}
             className="flex flex-row gap-2 items-center justify-center rounded-normal border border-gray p-2 px-4 bg-red-500"
           >
             <UserIcon width={30} height={30} color={'#626262'}/>
