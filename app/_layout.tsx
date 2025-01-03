@@ -14,6 +14,10 @@ import {
 import { SplashScreen, Stack } from "expo-router";
 import React, { useEffect } from "react";
 import "../global.css";
+import ProtectedLogin from '../components/auth/ProtectedLogin';
+import { AuthProvider } from '../context/authContext';
+import 'react-native-reanimated'
+import 'react-native-gesture-handler'
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
