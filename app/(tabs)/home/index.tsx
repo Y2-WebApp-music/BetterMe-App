@@ -1,20 +1,42 @@
-import { View, Text, ScrollView, SafeAreaView, StyleSheet, Dimensions, TouchableOpacity } from 'react-native'
-import React, { useState } from 'react'
-import { Image } from 'expo-image'
-import { User, UserCredential } from 'firebase/auth';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useAuth } from '../../../context/authContext';
-import { AddIcon } from '../../../constants/icon';
+import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import PickDateModal from '../../../components/modal/PickDateModal';
-
-// Hi test a review
+import React, { useCallback, useEffect, useState } from 'react';
+import { Dimensions, RefreshControl, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import HomeGoalCard from '../../../components/goal/homeGoalCard';
+import { AddIcon } from '../../../constants/icon';
+import { useAuth } from '../../../context/authContext';
+import { goalDataDummy } from '../../../types/goal';
 
 const screenWidth = Dimensions.get('window').width;
 
 const Home = () => {
 
   const { user } = useAuth();
+
+  const sortedGoalData = [
+    ...goalDataDummy
+      .filter((goal) => goal.length_task !== goal.complete_task)
+      .sort((a, b) => {
+        const dateA = new Date(a.end_date).setHours(0, 0, 0, 0);
+        const dateB = new Date(b.end_date).setHours(0, 0, 0, 0);
+        return dateA - dateB;
+      }),
+    ...goalDataDummy
+      .filter((goal) => goal.length_task === goal.complete_task)
+      .sort((a, b) => {
+        const dateA = new Date(a.end_date).setHours(0, 0, 0, 0);
+        const dateB = new Date(b.end_date).setHours(0, 0, 0, 0);
+        return dateA - dateB;
+      }),
+  ];
+
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
 
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
@@ -23,7 +45,11 @@ const Home = () => {
           contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', marginTop:14}}
           showsVerticalScrollIndicator={false}
           keyboardDismissMode='on-drag'
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
         >
+
           {/*
           =============================
           ======== User Title ========
@@ -73,10 +99,10 @@ const Home = () => {
             <View className='flex flex-row gap-2 items-center'>
               <View className='grow'>
                 <Text className='text-heading2 font-noto'>Goals Today</Text>
-                <Text className='text-body font-noto'>3 inprogress</Text>
+                <Text className='text-body font-noto text-subText'>3 goals todo</Text>
               </View>
               <View>
-                <TouchableOpacity onPress={()=>{router.replace('/home/createGoal')}} className=' bg-primary flex-row gap-2 p-2 px-4 justify-center items-center rounded-full'>
+                <TouchableOpacity onPress={()=>{router.push('/home/createGoal')}} className=' bg-primary flex-row gap-2 p-1 px-4 justify-center items-center rounded-full'>
                   <Text className='text-heading2 text-white font-notoMedium'>New Goal</Text>
                   <AddIcon width={26} height={26} color={'white'}/>
                 </TouchableOpacity>
@@ -84,13 +110,11 @@ const Home = () => {
             </View>
 
             <View className='mt-2 flex-col gap-2'>
-              {goalData.map((data,i)=>(
-                <View key={i} className='h-32 w-full bg-white rounded-normal border border-gray p-2 justify-center items-center'>
-                  <Text>Goal Card</Text>
-                </View>
+              {sortedGoalData.map((data,i)=>(
+                <HomeGoalCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} end_date={data.end_date} length_task={data.length_task} complete_task={data.complete_task}/>
               ))}
               <View className='flex-1 justify-center items-center'>
-                <TouchableOpacity onPress={()=>{router.replace('/home/yourGoal')}} className=' bg-primary flex-row gap-2 p-2 px-4 justify-center items-center rounded-full'>
+                <TouchableOpacity onPress={()=>{router.push('/home/yourGoal')}} className=' bg-primary flex-row gap-2 p-2 px-4 justify-center items-center rounded-full'>
                   <Text className='text-body text-white font-notoMedium'>View all goals</Text>
                 </TouchableOpacity>
               </View>
@@ -110,26 +134,5 @@ const styles = StyleSheet.create({
     alignContent:'center',
   },
 });
-
-const goalData = [
-  {
-    goalName:'title',
-    endDate:new Date(),
-    task:12,
-    currentTask:3,
-  },
-  {
-    goalName:'title',
-    endDate:new Date(),
-    task:12,
-    currentTask:3,
-  },
-  {
-    goalName:'title',
-    endDate:new Date(),
-    task:12,
-    currentTask:3,
-  },
-]
 
 export default Home
