@@ -19,7 +19,7 @@ const CreateGoal = () => {
                 <Text className='text-subTitle text-primary font-notoMedium'>Create Goal</Text>
               </View>
               <View>
-                <TouchableOpacity onPress={()=>{router.replace('/home/createGoal')}} className=' bg-primary flex-row gap-2 p-2 px-4 justify-center items-center rounded-full'>
+                <TouchableOpacity onPress={()=>{router.push('/home/createGoal')}} className=' bg-primary flex-row gap-2 p-2 px-4 justify-center items-center rounded-full'>
                   <Text className='text-body text-white font-notoMedium'>Create your own</Text>
                   <AddIcon width={22} height={22} color={'white'}/>
                 </TouchableOpacity>
