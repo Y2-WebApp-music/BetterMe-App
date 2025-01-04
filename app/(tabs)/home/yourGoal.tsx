@@ -1,5 +1,5 @@
-import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, Platform, KeyboardAvoidingView } from 'react-native'
-import React, { useState } from 'react'
+import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, Platform, KeyboardAvoidingView, RefreshControl } from 'react-native'
+import React, { useCallback, useState } from 'react'
 import { router } from 'expo-router'
 import { AddIcon, LeftArrowIcon } from '../../../constants/icon'
 import { useAuth } from '../../../context/authContext'
@@ -23,18 +23,46 @@ const YourGoal = () => {
       })
   ];
 
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
+
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
+      <View className='w-[92%] mt-4'>
+        <View className='w-full'>
+          <View className='max-w-[14vw]'>
+            <BackButton goto={'/home'}/>
+          </View>
+        </View>
+        <View className='flex flex-row gap-2 items-center'>
+          <View className='grow'>
+            <Text className='text-subTitle text-primary font-notoMedium'>Your goal</Text>
+          </View>
+          <View>
+            <TouchableOpacity onPress={()=>{router.push('/home/createGoal')}} className=' bg-primary flex-row gap-2 p-2 px-4 justify-center items-center rounded-full'>
+              <Text className='text-body text-white font-notoMedium'>New Goal</Text>
+              <AddIcon width={22} height={22} color={'white'}/>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1, width:"100%",alignItems:'center' }}
       >
         <ScrollView
           className='w-[92%] h-auto pb-20'
-          contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', marginTop:20}}
+          contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', marginTop:0}}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
         >
-          <BackButton goto={'/home'}/>
           <View className='mt-2'>
 
             {/*
@@ -43,17 +71,6 @@ const YourGoal = () => {
             =============================
             */}
             <View className=''>
-              <View className='flex flex-row gap-2 items-center'>
-                <View className='grow'>
-                  <Text className='text-subTitle text-primary font-notoMedium'>Your goal</Text>
-                </View>
-                <View>
-                  <TouchableOpacity onPress={()=>{router.push('/home/createGoal')}} className=' bg-primary flex-row gap-2 p-2 px-4 justify-center items-center rounded-full'>
-                    <Text className='text-body text-white font-notoMedium'>New Goal</Text>
-                    <AddIcon width={22} height={22} color={'white'}/>
-                  </TouchableOpacity>
-                </View>
-              </View>
               <View className='mt-3 w-full flex-row gap-2 items-center justify-center'>
                 <View className='flex-col p-1 px-4 rounded-normal bg-white border border-gray items-center justify-center'>
                   <Text className='font-noto text-body text-subText'>complete</Text>
