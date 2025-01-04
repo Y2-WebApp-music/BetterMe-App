@@ -7,22 +7,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Animated, { useAnimatedProps, useSharedValue, withTiming } from 'react-native-reanimated';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import axios from 'axios';
-
-type Task = {
-  task_name: string;
-  task_status: boolean;
-};
-
-type GoalData = {
-  goal_id: string;
-  goal_name: string;
-  description: string;
-  start_date: Date;
-  end_date: Date;
-  task: Task[];
-  length_task: number;
-  complete_task: number;
-};
+import { GoalData, Task } from '../../../../types/goal';
 
 const { width } = Dimensions.get('window');
 const circle_length = width * 0.62;
@@ -102,7 +87,6 @@ export default function GoalScreen() {
   const progress = useSharedValue(0);
 
   useEffect(() => {
-    console.log('=== useEffect progress.value use ===');
     progress.value = withTiming(percent / 100, { duration: 1000 });
   }, [percent]);
 

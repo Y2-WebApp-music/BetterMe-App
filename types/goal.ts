@@ -1,10 +1,30 @@
-export type homeGoalCardProp = {
+type goal = {
   goal_id:string
   goal_name:string
   end_date:Date
   length_task:number
+}
+export type homeGoalCardProp = goal & {
   complete_task:number
 }
+
+export type GoalCreateCardProp = goal & {
+  start_date:Date
+  create_by:string
+}
+
+export type Task = {
+  task_name: string;
+  task_status: boolean;
+};
+
+export type GoalData = goal & {
+  description: string;
+  start_date: Date;
+  task: Task[];
+  complete_task: number;
+};
+
 
 export const goalDataDummy:homeGoalCardProp[] = [
   {
@@ -29,16 +49,6 @@ export const goalDataDummy:homeGoalCardProp[] = [
     complete_task:3,
   },
 ]
-
-export type GoalCreateCardProp = {
-  goal_id:string
-  goal_name:string
-  start_date:Date
-  end_date:Date
-  length_task:number
-  create_by:string
-}
-
 export const goalCreateDataDummy:GoalCreateCardProp[] = [
   {
     goal_id:'1',
