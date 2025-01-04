@@ -8,9 +8,12 @@ type PickDateModalProp = {
   isOpen:boolean
   setIsOpen:(isOpen:boolean) => void
   setDate:(value:Date) => void
+  maximumDate:boolean
 }
 
-const PickDateModal = ({value, isOpen, setIsOpen, setDate}:PickDateModalProp) => {
+const PickDateModal = ({value, isOpen, setIsOpen, setDate, maximumDate}:PickDateModalProp) => {
+
+  const lockDate = maximumDate? new Date() : new Date(new Date().setDate(new Date().getDate() + 10000));
 
   const handleDateChange = (event: any, selectedDate: Date | undefined) => {
     if (selectedDate) {
@@ -28,7 +31,7 @@ const PickDateModal = ({value, isOpen, setIsOpen, setDate}:PickDateModalProp) =>
           display="spinner"
           mode="date"
           value={value}
-          maximumDate={new Date()}
+          maximumDate={lockDate}
           onChange={handleDateChange}
           style={{}}
           locale="en-Gn"
