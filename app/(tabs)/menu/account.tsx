@@ -26,7 +26,11 @@ const AccountSetting = () => {
               showsVerticalScrollIndicator={false}
               keyboardDismissMode='on-drag'
             >
-              <BackButton goto={'/menu'}/>
+              <View className='w-full'>
+                <View className='max-w-[14vw]'>
+                  <BackButton goto={'/menu'}/>
+                </View>
+              </View>
               <TouchableOpacity
                 onPress={handleSignOut}
                 className="flex flex-row items-center justify-center rounded-normal border border-gray p-1 px-4 bg-red-500 mt-6"
