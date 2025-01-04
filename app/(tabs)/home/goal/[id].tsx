@@ -6,11 +6,22 @@ import Svg, { Circle, Rect } from 'react-native-svg';
 import { useEffect, useMemo, useState } from 'react';
 import Animated, { useAnimatedProps, useSharedValue, withTiming } from 'react-native-reanimated';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
-
+import axios from 'axios';
 
 type Task = {
   task_name: string;
   task_status: boolean;
+};
+
+type GoalData = {
+  goal_id: string;
+  goal_name: string;
+  description: string;
+  start_date: Date;
+  end_date: Date;
+  task: Task[];
+  length_task: number;
+  complete_task: number;
 };
 
 const { width } = Dimensions.get('window');
@@ -22,7 +33,7 @@ const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 export default function GoalScreen() {
   const { id } = useLocalSearchParams();
 
-  const [goalData,setGoalData] = useState({
+  const [goalData,setGoalData] = useState<GoalData>({
     goal_id:'1',
     goal_name:'First Line test text inline style Second Line',
     description:'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean quis placerat ex. Fusce sapien velit,',
@@ -39,7 +50,7 @@ export default function GoalScreen() {
       },
       {
         task_name:'Test Task',
-        task_status:false
+        task_status:true
       },
       {
         task_name:'Test Task',
@@ -50,9 +61,38 @@ export default function GoalScreen() {
     complete_task:9
   })
 
-  useEffect(()=>{
-    console.log('goalData',goalData);
-  },[])
+  const [isLoad, setIsLoad] = useState(true)
+  const [err, setErr] = useState<string | null>('')
+
+  // Fetch Data Here
+  const fetchGoalData = async () => {
+    try {
+      const response = await axios.get('https://localhost:3000/.....');
+      const data = response.data;
+
+      const transformedData: GoalData = {
+        goal_id: data.goal_id,
+        goal_name: data.goal_name,
+        description: data.description,
+        start_date: new Date(data.start_date),
+        end_date: new Date(data.end_date),
+        task: data.task,
+        length_task: data.task.length,
+        complete_task: data.task.filter((task: Task) => task.task_status).length,
+      };
+
+      setGoalData(transformedData);
+    } catch (err) {
+      console.error('Failed to fetch data:', err);
+      setErr('Unable to fetch data. Please try again later.');
+    } finally {
+      setIsLoad(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchGoalData();
+  }, []);
 
   const percent = useMemo(() => Math.round((goalData.complete_task / goalData.length_task) * 100), [
     goalData
@@ -62,7 +102,7 @@ export default function GoalScreen() {
   const progress = useSharedValue(0);
 
   useEffect(() => {
-    // console.log('=== useEffect progress.value use ===');
+    console.log('=== useEffect progress.value use ===');
     progress.value = withTiming(percent / 100, { duration: 1000 });
   }, [percent]);
 
@@ -72,7 +112,6 @@ export default function GoalScreen() {
 
   const [isOptionsVisible, setOptionsVisible] = useState(false);
 
-  // Toggle function to show/hide options
   const toggleOptions = () => {
     setOptionsVisible(!isOptionsVisible);
   };
@@ -83,32 +122,20 @@ export default function GoalScreen() {
   const [isEnabled, setIsEnabled] = useState(false);
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
 
-  const updateGoalProgress = (updatedTasks: Task[]): void => {
-    const totalTasks = updatedTasks.length;
-    const completedTasks = updatedTasks.filter((task) => task.task_status).length;
-
-    // console.log('totalTasks ',totalTasks);
-    // console.log('completedTasks ',completedTasks);
-    // console.log('updatedTasks ',updatedTasks);
-
-    setGoalData((prevData) => ({
-      ...prevData,
-      task: updatedTasks,
-      length_task: totalTasks,
-      complete_task: completedTasks,
-    }));
-  };
-
-  // Function to handle checkbox toggle
   const handleToggleTask = (index: number): void => {
     setGoalData((prevData) => {
       const updatedTasks = [...prevData.task];
       updatedTasks[index].task_status = !updatedTasks[index].task_status;
 
-      // Update goal progress
-      updateGoalProgress(updatedTasks);
+      const totalTasks = updatedTasks.length;
+      const completedTasks = updatedTasks.filter((task) => task.task_status).length;
 
-      return { ...prevData };
+      return {
+        ...prevData,
+        task: updatedTasks,
+        length_task: totalTasks,
+        complete_task: completedTasks,
+      };
     });
   };
 
@@ -215,6 +242,7 @@ export default function GoalScreen() {
                       textContainerStyle={{ marginLeft:20 }}
                       iconStyle={{ borderColor: "#0DC47C", borderRadius:6 }}
                       innerIconStyle={{ borderWidth: 2, borderRadius:6, borderColor:'#E8E8E8' }}
+                      isChecked={data.task_status}
                       onPress={() => handleToggleTask(i)}
                     />
                   ))}
