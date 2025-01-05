@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     fontSize: 16,
     color: '#333',
-    textAlignVertical: 'top', // Ensures text starts from the top
+    textAlignVertical: 'top',
   },
   center: {
     alignItems: 'center',

@@ -125,16 +125,16 @@ export default function GoalScreen() {
 
 
   return (
-    <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto" >
+    <SafeAreaView className="w-full h-full justify-start items-center bg-Background font-noto" >
       <TouchableWithoutFeedback onPress={closeOptions}>
-        <View>
-          <View className='w-[92%] mt-4'>
+        <View className='w-[92%]'>
+          <View className='w-full mt-4'>
             <View className='w-full flex-row'>
               <View className='max-w-[14vw]'>
                 <BackButton goto={'/home'}/>
               </View>
               <View className='grow relative'>
-              <TouchableOpacity className='items-end' onPress={toggleOptions}>
+                <TouchableOpacity className='items-end' onPress={toggleOptions}>
                   <OptionIcon width={22} height={22} color={'#626262'}/>
                 </TouchableOpacity>
                 {isOptionsVisible && (
@@ -154,67 +154,103 @@ export default function GoalScreen() {
                     <Text className='font-noto text-heading3 text-subText'>delete this goal</Text>
                   </TouchableOpacity>
                 </View>
-              )}
+                )}
               </View>
             </View>
 
-            <View className='flex gap-1 items-start justify-center mt-2'>
-              <View className='flex-row items-center'>
-                <View className='grow w-[200px]'>
-                  <Text className='text-heading text-primary font-notoMedium'>{goalData.goal_name}</Text>
+            <View className='w-full flex gap-1 items-start justify-center mt-2'>
+              <View className=' w-full flex-row items-center gap-1'>
+              {isLoad?(
+                <View className='w-full flex-row gap-2'>
+                  <View className='w-[73%] flex-col gap-2'>
+                    <View className='grow h-8 bg-DarkGray animate-pulse rounded-normal'/>
+                    <View className='grow h-8 bg-DarkGray animate-pulse rounded-normal'/>
+                  </View>
+                  <View className={`w-[27%] h-28 bg-DarkGray animate-pulse rounded-full`}></View>
                 </View>
-                <View className='justify-center items-center'>
-                  <Svg width={circle_length/2.8} height={circle_length/2.8} style={{ transform: [{ rotate: '270deg' }] }} >
-                    <Circle
-                      cx={circle_length/5.6}
-                      cy={circle_length/5.6}
-                      r={r}
-                      fill="#E8E8E8"
-                      stroke={'#E8E8E8'}
-                      strokeWidth={6}
-                    />
-                    <AnimatedCircle
-                      cx={circle_length/5.6}
-                      cy={circle_length/5.6}
-                      r={r}
-                      fill="#E8E8E8"
-                      stroke={color}
-                      strokeWidth={8}
-                      strokeLinecap="round"
-                      strokeDasharray={circle_length}
-                      animatedProps={animatedProps}
-                    />
-                    <Circle
-                      cx={circle_length/5.6}
-                      cy={circle_length/5.6}
-                      r={r-5}
-                      fill="#FBFFFF"
-                      stroke='none'
-                    />
-                  </Svg>
-                  <Text style={{color:color}} className=' absolute text-heading font-notoSemiBold'>{percent}%</Text>
+              ):(
+                <>
+                  <View className='grow max-w-[80%]'>
+                    <Text className='text-heading text-primary font-notoMedium'>{goalData.goal_name}</Text>
+                  </View>
+                  <View className='justify-center items-center'>
+                    <Svg width={circle_length/2.8} height={circle_length/2.8} style={{ transform: [{ rotate: '270deg' }] }} >
+                      <Circle
+                        cx={circle_length/5.6}
+                        cy={circle_length/5.6}
+                        r={r}
+                        fill="#E8E8E8"
+                        stroke={'#E8E8E8'}
+                        strokeWidth={6}
+                      />
+                      <AnimatedCircle
+                        cx={circle_length/5.6}
+                        cy={circle_length/5.6}
+                        r={r}
+                        fill="#E8E8E8"
+                        stroke={color}
+                        strokeWidth={8}
+                        strokeLinecap="round"
+                        strokeDasharray={circle_length}
+                        animatedProps={animatedProps}
+                      />
+                      <Circle
+                        cx={circle_length/5.6}
+                        cy={circle_length/5.6}
+                        r={r-5}
+                        fill="#FBFFFF"
+                        stroke='none'
+                      />
+                    </Svg>
+                    <Text style={{color:color}} className=' absolute text-heading font-notoSemiBold'>{percent}%</Text>
+                  </View>
+                </>
+              )}
+              </View>
+              {isLoad?(
+                <View className=''>
+                  {/* <View className='w-full bg-DarkGray h-20 mt-2 rounded-normal'/>
+                  <View className='w-[40%] bg-DarkGray h-6 rounded-normal'/>
+                  <View className='w-[40%] bg-DarkGray h-6 rounded-normal'>
+                  </View> */}
+                  <View className='w-full flex-row justify-between mt-1'>
+                    <View className='w-[20%] bg-DarkGray h-8 rounded-normal'/>
+                    <View className='w-[40%] bg-DarkGray h-8 rounded-normal'/>
+                  </View>
                 </View>
-              </View>
-              <View className='w-full'>
-                <Text className='text-subText font-noto text-body'>{goalData.description}</Text>
-                <View className='flex-col pl-1'>
-                  <Text className='text-subText font-notoLight text-[1rem]'>Create : {new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(goalData.start_date)}</Text>
-                  <Text className='text-subText font-notoLight text-[1rem]'>End : {new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(goalData.end_date)}</Text>
-                </View>
-              </View>
-              <View className='flex-row justify-start items-center mt-1'>
-                <Text className='grow text-heading3'>Task List</Text>
-                <Text className='text-subText font-noto'>{goalData.complete_task}/{goalData.length_task} completed</Text>
-              </View>
+              ):(
+                <>
+                  <View className='w-full'>
+                    <Text className='text-subText font-noto text-body'>{goalData.description}</Text>
+                    <View className='flex-col pl-1'>
+                      <Text className='text-subText font-notoLight text-[1rem]'>Create : {new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(goalData.start_date)}</Text>
+                      <Text className='text-subText font-notoLight text-[1rem]'>End : {new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(goalData.end_date)}</Text>
+                    </View>
+                  </View>
+                  <View className='flex-row justify-start items-center mt-1'>
+                    <Text className='grow text-heading3'>Task List</Text>
+                    <Text className='text-subText font-noto'>{goalData.complete_task}/{goalData.length_task} completed</Text>
+                  </View>
+                </>
+              )}
               <View className='h-[2px] w-full bg-gray rounded-full'/>
             </View>
           </View>
           <ScrollView
-            className='w-[92%] h-auto pb-20 mt-2'
+            className='w-full h-auto pb-20 mt-2'
             contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', marginTop:0}}
             showsVerticalScrollIndicator={false}
           >
-              <View className='w-[100%] justify-center items-center pb-20'>
+            <View className='w-[100%] justify-center items-center pb-20'>
+              {isLoad?(
+                <View className='w-[100%] mt-2 flex-col gap-4'>
+                  <View className='w-full h-12 bg-DarkGray animate-pulse rounded-normal'/>
+                  <View className='w-full h-12 bg-DarkGray animate-pulse rounded-normal'/>
+                  <View className='w-full h-12 bg-DarkGray animate-pulse rounded-normal'/>
+                  <View className='w-full h-12 bg-DarkGray animate-pulse rounded-normal'/>
+                  <View className='w-full h-12 bg-DarkGray animate-pulse rounded-normal'/>
+                </View>
+              ):(
                 <View className='w-[95%] mt-2 flex-col gap-4'>
                   {goalData.task.map((data,i)=>(
                     <BouncyCheckbox
@@ -231,7 +267,8 @@ export default function GoalScreen() {
                     />
                   ))}
                 </View>
-              </View>
+              )}
+            </View>
           </ScrollView>
         </View>
       </TouchableWithoutFeedback>
