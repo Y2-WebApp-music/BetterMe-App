@@ -9,14 +9,9 @@ type BackButtonProp = {
 }
 
 const BackButton = ({goto}:BackButtonProp) => {
-  const navigation = useNavigation();
-
-  const handleBackPress = () => {
-    navigation.goBack();
-  };
 
   return (
-    <TouchableOpacity onPress={()=>{router.dismissTo(goto)}} className='will-change-contents w-fit flex flex-row items-center justify-start'>
+    <TouchableOpacity onPress={()=>{router.back()}} className='will-change-contents w-fit flex flex-row items-center justify-start'>
       <View>
         <LeftArrowIcon width={14} height={14} color={"black"} />
       </View>

@@ -1,16 +1,20 @@
 type goal = {
   goal_id:string
   goal_name:string
-  end_date:Date
   length_task:number
 }
 export type homeGoalCardProp = goal & {
+  complete_task:number
+  end_date:Date
+}
+export type calendarGoalCardProp = goal & {
   complete_task:number
 }
 
 export type GoalCreateCardProp = goal & {
   start_date:Date
   create_by:string
+  end_date:Date
 }
 
 export type Task = {
@@ -19,6 +23,7 @@ export type Task = {
 };
 
 export type GoalData = goal & {
+  end_date:Date
   description: string;
   start_date: Date;
   task: Task[];
