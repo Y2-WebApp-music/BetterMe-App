@@ -1,9 +1,9 @@
 import { View, Text, TouchableOpacity, Animated } from 'react-native'
 import React, { useEffect, useRef } from 'react'
 import { router } from 'expo-router'
-import { homeGoalCardProp } from '../../types/goal'
+import { calendarGoalCardProp } from '../../types/goal'
 
-const HomeGoalCard = ({goal_id, goal_name, end_date, length_task, complete_task}:homeGoalCardProp) => {
+const CalendarGoalCard = ({goal_id, goal_name, length_task, complete_task}:calendarGoalCardProp) => {
 
   const percent = length_task > 0 ? Math.round((complete_task / length_task) * 100) : 0;
 
@@ -45,7 +45,6 @@ const HomeGoalCard = ({goal_id, goal_name, end_date, length_task, complete_task}
             </View>
           </View>
           <View className='flex-row w-full'>
-            <Text className='text-detail font-noto text-subText grow'>end : {new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(end_date)}</Text>
             <Text className='text-detail font-noto text-subText'>{complete_task}/{length_task} completed</Text>
           </View>
         </View>
@@ -67,4 +66,4 @@ const HomeGoalCard = ({goal_id, goal_name, end_date, length_task, complete_task}
   )
 }
 
-export default HomeGoalCard
+export default CalendarGoalCard

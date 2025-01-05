@@ -1,13 +1,18 @@
 import { View, Text, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native'
 import React, { useState } from "react";
 import { Calendar, toDateId, CalendarTheme } from "@marceloterreiro/flash-calendar";
-import { ArrowIcon, BackwardIcon, ForwardIcon } from '../../../constants/icon';
+import { AddIcon, ArrowIcon, BackwardIcon, ForwardIcon } from '../../../constants/icon';
+import { router } from 'expo-router';
+import CalendarGoalCard from '../../../components/goal/calendarGoalCard';
+import MealCard from '../../../components/food/mealCard';
 
 const MonthCalendar = () => {
 
   const today = toDateId(new Date());
   const [selectedDate, setSelectedDate] = useState(today);
   const [currentMonth, setCurrentMonth] = useState(new Date());
+
+  const [viewMeal, setViewMeal] = useState(true)
 
   const goToToday = () => {
     setCurrentMonth(new Date());
@@ -86,15 +91,72 @@ const MonthCalendar = () => {
             <Text className='font-noto text-heading3'>{new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(selectedDate))}</Text>
             <View className='h-28 w-full rounded-normal border border-gray bg-white'></View>
             <View className='h-28 w-full rounded-normal border border-gray bg-white'></View>
-            <Text className='text-subText font-noto'>Meal in this day</Text>
-            <View className='h-28 w-full rounded-normal border border-gray bg-white'></View>
-            <View className='h-28 w-full rounded-normal border border-gray bg-white'></View>
-            <View className='h-28 w-full rounded-normal border border-gray bg-white'></View>
+            <Text className='text-subText font-noto text-body mt-2'>In this day</Text>
+            <View className='flex-row justify-start items-center gap-4'>
+              <TouchableOpacity onPress={()=>setViewMeal(true)} className={`p-1 px-2 ${viewMeal? 'bg-primary':'bg-transparent'} rounded-normal`}>
+                <Text className={`${viewMeal? 'text-white':'text-subText'} text-heading2 font-notoMedium`}>Meals</Text>
+              </TouchableOpacity>
+              <View className='h-full w-[1px] bg-subText rounded-full'/>
+              <TouchableOpacity onPress={()=>setViewMeal(false)} className={`p-1 px-2 ${!viewMeal? 'bg-primary':'bg-transparent'} rounded-normal`}>
+                <Text className={`${!viewMeal? 'text-white':'text-subText'} text-heading2 font-notoMedium`}>Goals</Text>
+              </TouchableOpacity>
+              <View className='grow'/>
+              {viewMeal?(
+                <TouchableOpacity onPress={()=>{router.push('/camera')}} className='rounded-full p-1 px-4 bg-primary flex-row items-center justify-center gap-1'>
+                  <Text className='text-white font-noto text-heading3'>add meal</Text>
+                  <AddIcon width={22} height={22} color={'#fff'}/>
+                </TouchableOpacity>
+              ):(
+                <></>
+              )
+              }
+            </View>
+            {viewMeal? (
+              <View className='w-full justify-center items-center gap-2 mt-2 pb-16'>
+
+                <MealCard/>
+
+              </View>
+            ):(
+              <View className='w-full justify-center items-center gap-2 mt-2 pb-16'>
+                {goalDataDummy.map((data,i)=>(
+                  <CalendarGoalCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} length_task={data.length_task} complete_task={data.complete_task}/>
+                ))}
+              </View>
+
+            )}
           </View>
         </ScrollView>
     </SafeAreaView>
   )
 }
+
+const goalDataDummy = [
+  {
+    goal_id:'1',
+    goal_name:'Title Test 1',
+    length_task:8,
+    complete_task:3,
+  },
+  {
+    goal_id:'2',
+    goal_name:'Title Test 2',
+    length_task:8,
+    complete_task:3,
+  },
+  {
+    goal_id:'3',
+    goal_name:'Title Test 3',
+    length_task:8,
+    complete_task:3,
+  },
+  {
+    goal_id:'4',
+    goal_name:'Title Test 4',
+    length_task:8,
+    complete_task:3,
+  },
+]
 
 const linearAccent = "#1C60DE";
 
