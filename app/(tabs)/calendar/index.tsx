@@ -1,7 +1,7 @@
-import { View, Text, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native'
+import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, Switch, TouchableWithoutFeedback } from 'react-native'
 import React, { useState } from "react";
 import { Calendar, toDateId, CalendarTheme } from "@marceloterreiro/flash-calendar";
-import { AddIcon, ArrowIcon, BackwardIcon, ForwardIcon } from '../../../constants/icon';
+import { AddIcon, ArrowIcon, BackwardIcon, ForwardIcon, GridIcon, MenuIcon } from '../../../constants/icon';
 import { router } from 'expo-router';
 import CalendarGoalCard from '../../../components/goal/calendarGoalCard';
 import MealCard from '../../../components/food/mealCard';
@@ -30,18 +30,14 @@ const MonthCalendar = () => {
   const monthName = currentMonth.toLocaleString("en-US", { month: "long" });
   const year = currentMonth.getFullYear();
 
+  const [openOption, setOpenOption] = useState(false)
+
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
       <View className='w-full relative px-2 h-auto mt-3 flex-row items-center'>
         <View className={`absolute top-3 left-4 border ${selectedDate === today?'border-primary':'border-gray'} p-1 px-2 rounded-normal`}>
           <TouchableOpacity onPress={goToToday}>
-            <Text
-              className={`text-body font-noto ${
-                selectedDate === today ? 'text-primary' : 'text-subText'
-              }`}
-            >
-              Today
-            </Text>
+            <Text className={`text-detail font-noto ${selectedDate === today ? 'text-primary' : 'text-subText'}`}>Today</Text>
           </TouchableOpacity>
         </View>
         <View className='grow flex-row gap-4 items-center justify-center'>
@@ -56,10 +52,22 @@ const MonthCalendar = () => {
             <ForwardIcon color={'#1C60DE'}/>
           </TouchableOpacity>
         </View>
-        <View className='absolute top-3 right-2 p-1 px-2 rounded-normal flex-row gap-1 items-center'>
+        <TouchableOpacity onPress={()=>setOpenOption(!openOption)} className='absolute top-3 right-2 p-1 px-2 rounded-normal flex-row gap-1 items-center'>
           <Text className='text-subText font-noto text-body'>Month</Text>
-          <ArrowIcon width={16} height={16} color={'#626262'}/>
-        </View>
+          <ArrowIcon width={16} height={16} color={'#626262'} style={{transform:[openOption?{rotate:'180deg'}:{rotate:'0deg'}]}}/>
+        </TouchableOpacity>
+        {openOption && (
+          <View className='absolute z-20 right-2 top-12 min-h-24 min-w-32 bg-white rounded-normal border border-gray p-4 flex-col gap-2'>
+            <TouchableOpacity className='p-2 px-4 border border-primary rounded-normal flex-row gap-2 justify-center items-center'>
+              <MenuIcon width={22} height={22} color={'#1C60DE'}/>
+              <Text className='grow font-noto text-heading3 text-primary'>month</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={()=>{router.replace('/calendar/weekCalendar')}} className='p-2 px-4 border border-gray rounded-normal flex-row gap-2 justify-center items-center'>
+              <GridIcon width={22} height={22} color={'#626262'}/>
+              <Text className='grow font-noto text-heading3 text-subText'>week</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
       <ScrollView
           className='w-[92%] h-auto'
@@ -113,9 +121,9 @@ const MonthCalendar = () => {
             </View>
             {viewMeal? (
               <View className='w-full justify-center items-center gap-2 mt-2 pb-16'>
-
-                <MealCard/>
-
+                {mealListDummy.map((data,i)=>(
+                  <MealCard key={i} meal_id={data.meal_id} meal_date={data.meal_date} food_name={data.food_name} calorie={data.calorie} ai_create={data.ai_create}/>
+                ))}
               </View>
             ):(
               <View className='w-full justify-center items-center gap-2 mt-2 pb-16'>
@@ -150,11 +158,22 @@ const goalDataDummy = [
     length_task:8,
     complete_task:3,
   },
+]
+
+const mealListDummy = [
   {
-    goal_id:'4',
-    goal_name:'Title Test 4',
-    length_task:8,
-    complete_task:3,
+    meal_id:'1',
+    food_name:'กะเพราไก่',
+    meal_date:new Date(),
+    calorie:273,
+    ai_create:true,
+  },
+  {
+    meal_id:'2',
+    food_name:'ไก่ย่าง ข้าวเหนียว',
+    meal_date:new Date(),
+    calorie:234,
+    ai_create:false,
   },
 ]
 

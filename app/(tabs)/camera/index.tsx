@@ -212,8 +212,8 @@ const TakePicture = () => {
                 </View>
                 <View className='w-full flex-row'>
                   <View className='grow'>
-                    <Text className='text-heading font-noto'>กะเพราไก่</Text>
-                    <Text className='text-subText font-noto -translate-y-1'>พิเศษ เพิ่มไข่ดาว</Text>
+                    <Text className='text-heading font-noto'>{result.food_name}</Text>
+                    <Text className='text-subText font-noto -translate-y-1'>{result.portion}</Text>
                   </View>
                   <View className='flex-row gap-1 items-end'>
                     <Text className='text-title font-notoMedium text-primary'>468</Text>
@@ -237,14 +237,14 @@ const TakePicture = () => {
                       <View className='flex-row gap-2 items-end'>
                         <Text className='text-body text-subText w-[14vw]'>Carbs</Text>
                         <View style={{transform:[{ translateY: 6 }]}}>
-                          <Text className='text-heading font-notoMedium w-[8vw]'>{result.nutrias.carbs}</Text>
+                          <Text className='text-heading font-notoMedium w-[8vw]'>{result.carbs}</Text>
                         </View>
                         <Text className='text-body text-subText'>grams</Text>
                       </View>
                       <View className='flex-row gap-2 items-end'>
                         <Text className='text-body text-subText w-[14vw]'>Protein</Text>
                         <View style={{transform:[{ translateY: 6 }]}}>
-                          <Text className='text-heading font-notoMedium w-[8vw]'>{result.nutrias.protein}</Text>
+                          <Text className='text-heading font-notoMedium w-[8vw]'>{result.protein}</Text>
                         </View>
                         <Text className='text-body text-subText'>grams</Text>
                       </View>
@@ -252,7 +252,7 @@ const TakePicture = () => {
                     <View className='flex-row gap-2 items-end'>
                       <Text className='text-body text-subText w-[14vw]'>Fat</Text>
                       <View style={{transform:[{ translateY: 6 }]}}>
-                        <Text className='text-heading font-notoMedium w-[8vw]'>{result.nutrias.fat}</Text>
+                        <Text className='text-heading font-notoMedium w-[8vw]'>{result.fat}</Text>
                       </View>
                       <Text className='text-body text-subText'>grams</Text>
                     </View>
@@ -278,15 +278,13 @@ const TakePicture = () => {
 }
 
 const result = {
-  menu:'กะเพราไก่',
+  food_name:'กะเพราไก่',
   portion:'พิเศษ เพิ่มไข่ดาว',
   calorie:124,
-  photo:'',
-  nutrias:{
-    carbs:45,
-    protein:12,
-    fat:9
-  },
+  image:'',
+  carbs:45,
+  protein:12,
+  fat:9
 }
 
 const styles = StyleSheet.create({
