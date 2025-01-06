@@ -33,7 +33,7 @@ const FormInput:React.FC<TextInputProp> = ({name, value, handleChange, keyboardT
         ]}
       >
         <TextInput
-          className='flex-1 text-primary text-heading2'
+          className='flex-1 text-primary text-heading2 font-noto'
           style={{
             height: 40,
             width:"94%",
