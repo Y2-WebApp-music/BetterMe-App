@@ -1,22 +1,25 @@
-import { View, Text, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native'
+import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, StyleSheet } from 'react-native'
 import React, { useState } from 'react'
 import { AddIcon, ArrowIcon, BackwardIcon, ForwardIcon, GridIcon, MenuIcon } from '../../../constants/icon'
 import { router } from 'expo-router'
 import MealCard from '../../../components/food/mealCard'
 import CalendarGoalCard from '../../../components/goal/calendarGoalCard'
+import { subDays, addDays, startOfWeek, addWeeks, addDays as addDaysToDate } from 'date-fns';
+import PagerView from 'react-native-pager-view';
+import DateSlider from '../../../components/DateSlider'
 
 const WeekCalendar = () => {
-
   const [viewMeal, setViewMeal] = useState(true)
-
-
   const [openOption, setOpenOption] = useState(false)
 
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
-      <View className='w-full relative px-2 h-auto mt-3 flex-row items-center'>
-        <View className='grow flex-row gap-4 items-center justify-center'>
-
+      <View className='w-[92%] relative h-auto mt-3 flex-row items-center'>
+        <View className='grow flex-row gap-4 items-center justify-start'>
+          <View className="w-[26vw] flex-col justify-center items-start">
+            <Text className="text-heading2 font-notoMedium">September</Text>
+            <Text className="text-body text-nonFocus">2024</Text>
+          </View>
         </View>
         <TouchableOpacity onPress={()=>setOpenOption(!openOption)} className=' p-1 px-2 rounded-normal flex-row gap-1 items-center'>
           <Text className='text-subText font-noto text-body'>Week</Text>
@@ -35,15 +38,13 @@ const WeekCalendar = () => {
           </View>
         )}
       </View>
+      <DateSlider/>
 
       <ScrollView
           className='w-[92%] h-auto'
           contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', marginTop:0}}
           showsVerticalScrollIndicator={false}
         >
-          <View className="flex gap-2 items-center">
-
-          </View>
           <View className='flex-col gap-2'>
             {/* <Text className='font-noto text-heading3'>{new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(selectedDate))}</Text> */}
             <View className='h-28 w-full rounded-normal border border-gray bg-white'></View>
