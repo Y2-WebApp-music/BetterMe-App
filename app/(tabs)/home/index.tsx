@@ -15,14 +15,14 @@ const Home = () => {
 
   const sortedGoalData = [
     ...goalDataDummy
-      .filter((goal) => goal.length_task !== goal.complete_task)
+      .filter((goal) => goal.total_task !== goal.complete_task)
       .sort((a, b) => {
         const dateA = new Date(a.end_date).setHours(0, 0, 0, 0);
         const dateB = new Date(b.end_date).setHours(0, 0, 0, 0);
         return dateA - dateB;
       }),
     ...goalDataDummy
-      .filter((goal) => goal.length_task === goal.complete_task)
+      .filter((goal) => goal.total_task === goal.complete_task)
       .sort((a, b) => {
         const dateA = new Date(a.end_date).setHours(0, 0, 0, 0);
         const dateB = new Date(b.end_date).setHours(0, 0, 0, 0);
@@ -111,7 +111,7 @@ const Home = () => {
 
             <View className='mt-2 flex-col gap-2'>
               {sortedGoalData.map((data,i)=>(
-                <HomeGoalCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} end_date={data.end_date} length_task={data.length_task} complete_task={data.complete_task}/>
+                <HomeGoalCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} end_date={data.end_date} total_task={data.total_task} complete_task={data.complete_task}/>
               ))}
               <View className='flex-1 justify-center items-center'>
                 <TouchableOpacity onPress={()=>{router.push('/home/yourGoal')}} className=' bg-primary flex-row gap-2 p-2 px-4 justify-center items-center rounded-full'>

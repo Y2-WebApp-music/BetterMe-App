@@ -3,9 +3,9 @@ import React, { useEffect, useRef } from 'react'
 import { router } from 'expo-router'
 import { calendarGoalCardProp } from '../../types/goal'
 
-const CalendarGoalCard = ({goal_id, goal_name, length_task, complete_task}:calendarGoalCardProp) => {
+const CalendarGoalCard = ({goal_id, goal_name, total_task, complete_task}:calendarGoalCardProp) => {
 
-  const percent = length_task > 0 ? Math.round((complete_task / length_task) * 100) : 0;
+  const percent = total_task > 0 ? Math.round((complete_task / total_task) * 100) : 0;
 
   const color = percent === 100? "#0dc47c" : "#FBA742"
 
@@ -45,7 +45,7 @@ const CalendarGoalCard = ({goal_id, goal_name, length_task, complete_task}:calen
             </View>
           </View>
           <View className='flex-row w-full'>
-            <Text className='text-detail font-noto text-subText'>{complete_task}/{length_task} completed</Text>
+            <Text className='text-detail font-noto text-subText'>{complete_task}/{total_task} completed</Text>
           </View>
         </View>
         <View className='h-[20%] relative'>

@@ -52,7 +52,7 @@ const CreateGoal = () => {
 
           <View className='mt-2 flex-col gap-2 justify-center items-start w-full'>
             {goalCreateDataDummy.map((data,i)=>(
-              <GoalCreateCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} start_date={data.start_date} end_date={data.end_date} length_task={data.length_task} create_by={data.create_by}/>
+              <GoalCreateCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} start_date={data.start_date} end_date={data.end_date} total_task={data.total_task} create_by={data.create_by}/>
             ))}
           </View>
         </ScrollView>
