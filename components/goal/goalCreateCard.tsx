@@ -18,7 +18,7 @@ export const calculateDuration = (start_date: Date, end_date: Date) => {
 };
 
 
-const GoalCreateCard = ({goal_id, goal_name, start_date, end_date, length_task, create_by}:GoalCreateCardProp) => {
+const GoalCreateCard = ({goal_id, goal_name, start_date, end_date, total_task, create_by}:GoalCreateCardProp) => {
 
   const duration = calculateDuration(start_date, end_date)
 
@@ -36,7 +36,7 @@ const GoalCreateCard = ({goal_id, goal_name, start_date, end_date, length_task, 
           </Text>
         </View>
         <Text className='text-detail text-subText font-noto'>create by : {create_by}</Text>
-        <Text className='text-detail text-subText font-noto'>{length_task} Task duration : {duration}</Text>
+        <Text className='text-detail text-subText font-noto'>{total_task} Task duration : {duration}</Text>
       </View>
       <View style={{width:'10%', height:'100%'}} className=' justify-center items-end'>
         <AddIcon color={'#1C60DE'}/>
