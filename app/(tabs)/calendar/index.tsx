@@ -34,7 +34,7 @@ const MonthCalendar = () => {
 
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
-      <View className='w-full relative px-2 h-auto mt-3 flex-row items-center'>
+      <View className='w-[98%] relative px-2 h-auto mt-3 flex-row items-center'>
         <View className={`absolute top-3 left-4 border ${selectedDate === today?'border-primary':'border-gray'} p-1 px-2 rounded-normal`}>
           <TouchableOpacity onPress={goToToday}>
             <Text className={`text-detail font-noto ${selectedDate === today ? 'text-primary' : 'text-subText'}`}>Today</Text>
@@ -75,7 +75,7 @@ const MonthCalendar = () => {
           showsVerticalScrollIndicator={false}
         >
           <View style={{ transform: [{ translateY: -24 }] }} className="flex gap-2 items-center">
-            <View className='h-[38vh]'>
+            <View className='max-h-[42vh]'>
               <Calendar
                 calendarActiveDateRanges={[
                   {
@@ -85,7 +85,8 @@ const MonthCalendar = () => {
                 ]}
                 calendarFirstDayOfWeek="sunday"
                 calendarDayHeight={40}
-                calendarRowVerticalSpacing={10}
+                calendarRowVerticalSpacing={0}
+                calendarRowHorizontalSpacing={0}
                 onCalendarDayPress={setSelectedDate}
                 calendarMonthId={toDateId(currentMonth)}
                 theme={linearTheme}
