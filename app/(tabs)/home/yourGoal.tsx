@@ -15,7 +15,7 @@ const YourGoal = () => {
 
   const sortedGoalData = [
     ...goalDataDummy
-      .filter((goal) => goal.length_task !== goal.complete_task)
+      .filter((goal) => goal.total_task !== goal.complete_task)
       .sort((a, b) => {
         const dateA = new Date(a.end_date).setHours(0, 0, 0, 0);
         const dateB = new Date(b.end_date).setHours(0, 0, 0, 0);
@@ -100,7 +100,7 @@ const YourGoal = () => {
 
               <View className='mt-2 flex-col gap-2'>
                 {sortedGoalData.map((data,i)=>(
-                  <HomeGoalCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} end_date={data.end_date} length_task={data.length_task} complete_task={data.complete_task}/>
+                  <HomeGoalCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} end_date={data.end_date} total_task={data.total_task} complete_task={data.complete_task}/>
                 ))}
               </View>
             </View>
@@ -122,7 +122,7 @@ const YourGoal = () => {
             />
             <View className='mt-3 flex-col gap-2'>
               {allGoalDataDummy.map((data,i)=>(
-                <HomeGoalCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} end_date={data.end_date} length_task={data.length_task} complete_task={data.complete_task}/>
+                <HomeGoalCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} end_date={data.end_date} total_task={data.total_task} complete_task={data.complete_task}/>
               ))}
             </View>
           </View>
@@ -137,63 +137,63 @@ export const allGoalDataDummy = [
     goal_id:'1',
     goal_name:'Title 1 Line test text inline style Second Line First Line test text inline style Second Line First Line test text inline style Second Line',
     end_date:new Date(),
-    length_task:12,
+    total_task:12,
     complete_task:12,
   },
   {
     goal_id:'2',
     goal_name:'Title 2',
     end_date:new Date(new Date().setDate(new Date().getDate() + 45)),
-    length_task:6,
+    total_task:6,
     complete_task:2,
   },
   {
     goal_id:'3',
     goal_name:'Title 3',
     end_date:new Date(new Date().setDate(new Date().getDate() + 10)),
-    length_task:6,
+    total_task:6,
     complete_task:3,
   },
   {
     goal_id:'4',
     goal_name:'Title 1 Line test text inline style Second Line First Line test text inline style Second Line First Line test text inline style Second Line',
     end_date:new Date(),
-    length_task:12,
+    total_task:12,
     complete_task:12,
   },
   {
     goal_id:'5',
     goal_name:'Title 2',
     end_date:new Date(new Date().setDate(new Date().getDate() + 45)),
-    length_task:6,
+    total_task:6,
     complete_task:2,
   },
   {
     goal_id:'6',
     goal_name:'Title 3',
     end_date:new Date(new Date().setDate(new Date().getDate() + 10)),
-    length_task:6,
+    total_task:6,
     complete_task:3,
   },
   {
     goal_id:'7',
     goal_name:'Title 1 Line test text inline style Second Line First Line test text inline style Second Line First Line test text inline style Second Line',
     end_date:new Date(),
-    length_task:12,
+    total_task:12,
     complete_task:12,
   },
   {
     goal_id:'8',
     goal_name:'Title 2',
     end_date:new Date(new Date().setDate(new Date().getDate() + 45)),
-    length_task:6,
+    total_task:6,
     complete_task:2,
   },
   {
     goal_id:'9',
     goal_name:'Title 3',
     end_date:new Date(new Date().setDate(new Date().getDate() + 10)),
-    length_task:6,
+    total_task:6,
     complete_task:3,
   },
 ]

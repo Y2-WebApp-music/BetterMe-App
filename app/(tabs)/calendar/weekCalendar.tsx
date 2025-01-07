@@ -78,7 +78,7 @@ const WeekCalendar = () => {
             ):(
               <View className='w-full justify-center items-center gap-2 mt-2 pb-16'>
                 {goalDataDummy.map((data,i)=>(
-                  <CalendarGoalCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} length_task={data.length_task} complete_task={data.complete_task}/>
+                  <CalendarGoalCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} total_task={data.total_task} complete_task={data.complete_task}/>
                 ))}
               </View>
 
@@ -93,19 +93,19 @@ const goalDataDummy = [
   {
     goal_id:'1',
     goal_name:'Title Test 1',
-    length_task:8,
+    total_task:8,
     complete_task:3,
   },
   {
     goal_id:'2',
     goal_name:'Title Test 2',
-    length_task:8,
+    total_task:8,
     complete_task:3,
   },
   {
     goal_id:'3',
     goal_name:'Title Test 3',
-    length_task:8,
+    total_task:8,
     complete_task:3,
   },
 ]

@@ -42,7 +42,7 @@ export default function GoalScreen() {
         task_status:false
       },
     ],
-    length_task:12,
+    total_task:12,
     complete_task:9
   })
 
@@ -62,7 +62,7 @@ export default function GoalScreen() {
         start_date: new Date(data.start_date),
         end_date: new Date(data.end_date),
         task: data.task,
-        length_task: data.task.length,
+        total_task: data.task.length,
         complete_task: data.task.filter((task: Task) => task.task_status).length,
       };
 
@@ -79,7 +79,7 @@ export default function GoalScreen() {
     fetchGoalData();
   }, []);
 
-  const percent = useMemo(() => Math.round((goalData.complete_task / goalData.length_task) * 100), [
+  const percent = useMemo(() => Math.round((goalData.complete_task / goalData.total_task) * 100), [
     goalData
   ]);
   const color = percent === 100 ? '#0dc47c' : '#FBA742';
@@ -117,7 +117,7 @@ export default function GoalScreen() {
       return {
         ...prevData,
         task: updatedTasks,
-        length_task: totalTasks,
+        total_task: totalTasks,
         complete_task: completedTasks,
       };
     });
@@ -229,7 +229,7 @@ export default function GoalScreen() {
                   </View>
                   <View className='flex-row justify-start items-center mt-1'>
                     <Text className='grow text-heading3'>Task List</Text>
-                    <Text className='text-subText font-noto'>{goalData.complete_task}/{goalData.length_task} completed</Text>
+                    <Text className='text-subText font-noto'>{goalData.complete_task}/{goalData.total_task} completed</Text>
                   </View>
                 </>
               )}
