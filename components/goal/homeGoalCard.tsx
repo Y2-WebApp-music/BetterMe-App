@@ -3,9 +3,9 @@ import React, { useEffect, useRef } from 'react'
 import { router } from 'expo-router'
 import { homeGoalCardProp } from '../../types/goal'
 
-const HomeGoalCard = ({goal_id, goal_name, end_date, length_task, complete_task}:homeGoalCardProp) => {
+const HomeGoalCard = ({goal_id, goal_name, end_date, total_task, complete_task}:homeGoalCardProp) => {
 
-  const percent = length_task > 0 ? Math.round((complete_task / length_task) * 100) : 0;
+  const percent = total_task > 0 ? Math.round((complete_task / total_task) * 100) : 0;
 
   const color = percent === 100? "#0dc47c" : "#FBA742"
 
@@ -46,7 +46,7 @@ const HomeGoalCard = ({goal_id, goal_name, end_date, length_task, complete_task}
           </View>
           <View className='flex-row w-full'>
             <Text className='text-detail font-noto text-subText grow'>end : {new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(end_date)}</Text>
-            <Text className='text-detail font-noto text-subText'>{complete_task}/{length_task} completed</Text>
+            <Text className='text-detail font-noto text-subText'>{complete_task}/{total_task} completed</Text>
           </View>
         </View>
         <View className='h-[20%] relative'>
