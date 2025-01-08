@@ -6,6 +6,7 @@ import HomeGoalCard from '../../../components/goal/homeGoalCard';
 import { AddIcon } from '../../../constants/icon';
 import { useAuth } from '../../../context/authContext';
 import { goalDataDummy } from '../../../types/goal';
+import SleepGoal from '../../../components/sleep/sleepGoal';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -85,9 +86,7 @@ const Home = () => {
             <View className='h-28 w-full bg-white rounded-normal border border-gray p-2 justify-center items-center'>
               <Text>Food Today Card</Text>
             </View>
-            <View className='h-28 w-full bg-white rounded-normal border border-gray p-2 justify-center items-center'>
-              <Text>Sleep last night Card</Text>
-            </View>
+            <SleepGoal />
           </View>
 
           {/*
