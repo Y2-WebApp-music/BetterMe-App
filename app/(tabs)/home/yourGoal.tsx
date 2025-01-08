@@ -72,18 +72,18 @@ const YourGoal = () => {
             */}
             <View className=''>
               <View className='mt-3 w-full flex-row gap-2 items-center justify-center'>
-                <View className='flex-col p-1 px-4 rounded-normal bg-white border border-gray items-center justify-center'>
+                <TouchableOpacity onPress={()=>{router.push('/home/goal/complete')}} className='flex-col p-1 px-4 rounded-normal bg-white border border-gray items-center justify-center'>
                   <Text className='font-noto text-body text-subText'>complete</Text>
                   <Text className='text-heading font-notoMedium text-green'>333</Text>
-                </View>
-                <View className='flex-col p-1 px-4 rounded-normal bg-white border border-gray items-center justify-center'>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={()=>{router.push('/home/goal/inprogress')}} className='flex-col p-1 px-4 rounded-normal bg-white border border-gray items-center justify-center'>
                   <Text className='font-noto text-body text-subText'>in progress</Text>
                   <Text className='text-heading font-notoMedium text-yellow'>333</Text>
-                </View>
-                <View className='flex-col p-1 px-4 rounded-normal bg-white border border-gray items-center justify-center'>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={()=>{router.push('/home/goal/fail')}} className='flex-col p-1 px-4 rounded-normal bg-white border border-gray items-center justify-center'>
                   <Text className='font-noto text-body text-subText'>failed</Text>
                   <Text className='text-heading font-notoMedium text-red'>333</Text>
-                </View>
+                </TouchableOpacity>
               </View>
             </View>
 
