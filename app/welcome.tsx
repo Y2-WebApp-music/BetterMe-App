@@ -23,6 +23,8 @@ export default function Welcome() {
     androidClientId: CLIENT_ID_Android,
   });
 
+  // Have to make function to call user data from database if not router.replace('/(auth)/googleRegis')
+
   useEffect(() => {
     if (response?.type === 'success') {
       const { id_token } = response.params;

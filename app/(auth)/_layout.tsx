@@ -7,6 +7,7 @@ const AuthLayout = () => {
     <Stack>
       <Stack.Screen name="forgetPassword" options={{ headerShown: false }} />
       <Stack.Screen name="register" options={{ headerShown: false }} />
+      <Stack.Screen name="googleRegis" options={{ headerShown: false }} />
     </Stack>
   )
 }
