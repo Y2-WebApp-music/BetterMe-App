@@ -5,7 +5,7 @@ import { LeftArrowIcon } from '../constants/icon';
 import { router } from 'expo-router';
 
 type BackButtonProp = {
-  goto:string
+  goto?:string
 }
 
 const BackButton = ({goto}:BackButtonProp) => {
