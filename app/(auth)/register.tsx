@@ -8,7 +8,7 @@ import PickDateModal from '../../components/modal/PickDateModal'
 import PickNumberModal from '../../components/modal/PickNumberModal'
 import { LeftArrowIcon } from '../../constants/icon'
 
-import { SEVER_URL } from '@env'
+import { SERVER_URL } from '@env'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import axios from 'axios'
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
@@ -167,7 +167,7 @@ const Register = () => {
         const userId = user.uid;
         console.log('userId :', userId);
 
-        const response = await axios.post(`${SEVER_URL}/user/register`, {
+        const response = await axios.post(`${SERVER_URL}/user/register`, {
           firebase_uid: user.uid,
           birth_date: form.birth,
           gender: form.gender,

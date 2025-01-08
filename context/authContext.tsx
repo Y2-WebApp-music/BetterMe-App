@@ -1,4 +1,4 @@
-import { SEVER_URL } from '@env';
+import { SERVER_URL } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { router } from 'expo-router';
@@ -53,7 +53,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const fetchUserDetails = async (firebaseUser: User) => {
       try {
-        const response = await axios.get(`${SEVER_URL}/user/${firebaseUser.uid}`);
+        const response = await axios.get(`${SERVER_URL}/user/${firebaseUser.uid}`);
         const userData = response.data;
 
         if (userData.message === "User not found"){
