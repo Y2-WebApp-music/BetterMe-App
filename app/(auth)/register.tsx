@@ -1,17 +1,19 @@
-import { View, Text, SafeAreaView, KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity, Animated, StyleSheet } from 'react-native'
+import { router } from 'expo-router'
 import React, { useEffect, useRef, useState } from 'react'
-import FormInput from '../../components/FormInput'
-import { Link, router } from 'expo-router'
+import { Animated, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, Text, TouchableOpacity, View } from 'react-native'
 import BackButton from '../../components/Back'
-import { LeftArrowIcon } from '../../constants/icon'
+import FormInput from '../../components/FormInput'
+import BottomModal from '../../components/modal/BottomModal'
 import PickDateModal from '../../components/modal/PickDateModal'
 import PickNumberModal from '../../components/modal/PickNumberModal'
-import BottomModal from '../../components/modal/BottomModal'
+import { LeftArrowIcon } from '../../constants/icon'
 
-import { doc, setDoc } from 'firebase/firestore'
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
-import { auth, firebaseDB } from '../../components/auth/firebaseConfig'
+import { SEVER_URL } from '@env'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import axios from 'axios'
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
+import { auth } from '../../components/auth/firebaseConfig'
+import { useAuth, UserData } from '../../context/authContext'
 
 type UserProp = {
   username:string,
@@ -26,6 +28,8 @@ type UserProp = {
 }
 
 const Register = () => {
+
+  const { setUser } = useAuth()
 
   const [form, setForm] = useState<UserProp>({
     username: "",
@@ -163,16 +167,19 @@ const Register = () => {
         const userId = user.uid;
         console.log('userId :', userId);
 
-        await setDoc(doc(firebaseDB, 'userData', userId), {
-          photoUser: '',
-          birth:form.birth,
-          gender:form.gender,
-          weight:form.weight,
-          height:form.height,
-          activity:form.activity,
-        })
-        console.log("User registered and data saved!");
+        const response = await axios.post(`${SEVER_URL}/user/register`, {
+          firebase_uid: user.uid,
+          birth_date: form.birth,
+          gender: form.gender,
+          weight: form.weight,
+          height: form.height,
+          activity: form.activity,
+        });
 
+        const res = response.data;
+        const extendedUser: UserData = { ...user, ...res };
+        setUser(extendedUser)
+        await AsyncStorage.setItem('@user', JSON.stringify(extendedUser));
         router.replace('/(tabs)/home');
       } catch (error: any) {
         const errorMessage = error.message.replace('Firebase: ', '')
@@ -182,7 +189,6 @@ const Register = () => {
       setErr('please complete form')
     }
   }
-
 
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">

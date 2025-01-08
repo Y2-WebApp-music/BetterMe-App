@@ -32,7 +32,6 @@ const ProtectedLogin: React.FC<Props> = ({ children }) => {
     checkLocalUser();
   }, []);
 
-  // Have to make function to call user data from database if not router.replace('/(auth)/googleRegis')
   useEffect(() => {
     if (!loading) {
       if (!user) {

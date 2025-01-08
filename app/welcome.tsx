@@ -1,16 +1,17 @@
-import { Link, router } from 'expo-router';
-import { KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import FormInput from '../components/FormInput';
-import { useEffect, useState } from 'react';
-import { GoogleIcon } from '../constants/icon';
+import { CLIENT_ID_Android, CLIENT_ID_IOS } from '@env';
 import * as Google from "expo-auth-session/providers/google";
-import * as WebBrowser from 'expo-web-browser';
-import { GoogleAuthProvider, onAuthStateChanged, signInWithCredential, signInWithEmailAndPassword, User } from 'firebase/auth';
+import { Link } from 'expo-router';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { useEffect, useState } from 'react';
+import { KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { auth } from '../components/auth/firebaseConfig';
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { CLIENT_ID_IOS, CLIENT_ID_Android } from '@env';
+import FormInput from '../components/FormInput';
+import { GoogleIcon } from '../constants/icon';
+import { useAuth } from '../context/authContext';
 
 export default function Welcome() {
+
+  const { loginWithGoogle } = useAuth()
 
   const [form,setForm]= useState({
     username:'',
@@ -23,24 +24,11 @@ export default function Welcome() {
     androidClientId: CLIENT_ID_Android,
   });
 
-  // Have to make function to call user data from database if not router.replace('/(auth)/googleRegis')
-
   useEffect(() => {
     if (response?.type === 'success') {
       const { id_token } = response.params;
 
-      const credential = GoogleAuthProvider.credential(id_token);
-      signInWithCredential(auth, credential)
-        .then(async (userCredential) => {
-
-          await AsyncStorage.setItem('@user', JSON.stringify(userCredential.user));
-
-          router.replace('/(tabs)/home');
-        })
-        .catch((error) => {
-          console.error(error);
-          setError('Google login failed. Please try again.');
-        });
+      loginWithGoogle(id_token)
     }
   }, [response]);
 
@@ -48,7 +36,6 @@ export default function Welcome() {
   const handleSubmit = async () => {
     try {
       await signInWithEmailAndPassword(auth, form.username, form.password)
-      router.replace('/(tabs)/home');
     } catch (error) {
       setErr('Email or password is wrong. Please try again.')
     }
