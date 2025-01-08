@@ -19,7 +19,7 @@ export default function GoalCreatePage() {
         task_name:''
       },
     ],
-    isPublic:true
+    public_goal:true
   })
 
   const { id } = useLocalSearchParams();
