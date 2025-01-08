@@ -1,10 +1,22 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { onAuthStateChanged, signInWithCredential, GoogleAuthProvider, User, signOut, UserMetadata, UserInfo, IdTokenResult } from 'firebase/auth';
-import { auth } from '../components/auth/firebaseConfig';
+import { SEVER_URL } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { router } from 'expo-router';
+import { GoogleAuthProvider, IdTokenResult, onAuthStateChanged, signInWithCredential, signOut, User, UserInfo, UserMetadata } from 'firebase/auth';
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { auth } from '../components/auth/firebaseConfig';
 
+export type UserData = User & {
+  birth_date: Date
+  gender: number
+  weight: number,
+  height: number,
+  activity: number,
+  calorie_need: number,
+}
 type AuthContextType = {
-  user: User | null;
+  user: UserData | null;
+  setUser: React.Dispatch<React.SetStateAction<UserData | null>>;
   loginWithGoogle: (id_token: string) => Promise<void>;
   signOut: () => Promise<void>;
 };
@@ -20,16 +32,16 @@ export const useAuth = () => {
 };
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserData | null>(null);
 
   // Check local user and Firebase auth state
   const checkLocalUser = async () => {
     try {
       const userJSON = await AsyncStorage.getItem('@user');
-      const userData = userJSON ? JSON.parse(userJSON) : null;
-      console.log(userData);
-      if (userData) {
-        setUser(userData);
+      const localUser = userJSON ? JSON.parse(userJSON) : null;
+      console.log(localUser);
+      if (localUser) {
+        setUser(localUser);
       }
     } catch (e) {
       console.error('Error fetching user from AsyncStorage', e);
@@ -39,15 +51,31 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   useEffect(() => {
     checkLocalUser();
 
+    const fetchUserDetails = async (firebaseUser: User) => {
+      try {
+        const response = await axios.get(`${SEVER_URL}/user/${firebaseUser.uid}`);
+        const userData = response.data;
+
+        if (userData.message === "User not found"){
+          router.replace('/(auth)/googleRegis');
+        } else {
+          const extendedUser: UserData = { ...firebaseUser, ...userData };
+          setUser(extendedUser);
+          await AsyncStorage.setItem('@user', JSON.stringify(extendedUser));
+        }
+      } catch (error) {
+        console.error('Can not get user data:', error);
+      }
+    };
+
     const unsub = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
-        setUser(firebaseUser);
-        AsyncStorage.setItem('@user', JSON.stringify(firebaseUser));
+        fetchUserDetails(firebaseUser)
       } else {
-        setUser(dummyUser);
-        AsyncStorage.setItem('@user', JSON.stringify(dummyUser));
-        // setUser(null);
-        // AsyncStorage.removeItem('@user');
+        // setUser(dummyUser);
+        // AsyncStorage.setItem('@user', JSON.stringify(dummyUser));
+        setUser(null);
+        AsyncStorage.removeItem('@user');
       }
     });
 
@@ -72,17 +100,23 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
 
   return (
-    <AuthContext.Provider value={{ user, loginWithGoogle, signOut: handleSignOut }}>
+    <AuthContext.Provider value={{ user, setUser, loginWithGoogle, signOut: handleSignOut }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-const dummyUser: User = {
+const dummyUser: UserData = {
   uid: "dummyUid123",
   email: "dummyuser@example.com",
   emailVerified: true,
   displayName: "Dummy User",
+  birth_date: new Date(),
+  gender: 1,
+  weight: 65.8,
+  height: 172.9,
+  activity: 3,
+  calorie_need: 2648,
   isAnonymous: false,
   phoneNumber: null,
   photoURL: null,

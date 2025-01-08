@@ -5,6 +5,12 @@ import BackButton from '../../components/Back'
 import BottomModal from '../../components/modal/BottomModal'
 import PickDateModal from '../../components/modal/PickDateModal'
 import PickNumberModal from '../../components/modal/PickNumberModal'
+import { onAuthStateChanged, User } from 'firebase/auth'
+import { auth } from '../../components/auth/firebaseConfig'
+import axios from 'axios'
+import { DATABASE_URL } from '@env'
+import { useAuth, UserData } from '../../context/authContext'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 
 type UserProp = {
@@ -16,6 +22,8 @@ type UserProp = {
 }
 
 const Register = () => {
+
+  const { setUser } = useAuth();
 
   const [form, setForm] = useState<UserProp>({
     birth: new Date(),
@@ -99,20 +107,38 @@ const Register = () => {
 
   const [err, setErr] = useState<string>('')
 
-  // Create User and Upload data to Firebase
+  // Upload data to DB
   const handleSubmit = async () => {
-    if (form.gender && form.weight && form.height && form.activity != 0){
+    if (form.gender && form.weight && form.height && form.activity !== 0) {
       try {
+        const firebaseUser:User = await new Promise((resolve, reject) => {
+          onAuthStateChanged(auth, (user) => {
+            if (user) resolve(user);
+            else reject('No user authenticated');
+          });
+        });
 
+        const response = await axios.post(`${DATABASE_URL}/user/register`, {
+          firebase_uid: firebaseUser.uid,
+          birth_date: form.birth,
+          gender: form.gender,
+          weight: form.weight,
+          height: form.height,
+          activity: form.activity,
+        });
+
+        const res = response.data;
+        const extendedUser: UserData = { ...firebaseUser, ...res };
+        setUser(extendedUser)
+        await AsyncStorage.setItem('@user', JSON.stringify(extendedUser));
         router.replace('/(tabs)/home');
       } catch (error: any) {
-        const errorMessage = error.message.replace('Firebase: ', '')
-        setErr(errorMessage)
+        setErr(error.message.replace('Firebase: ', ''));
       }
     } else {
-      setErr('please complete form')
+      setErr('Please complete the form');
     }
-  }
+  };
 
 
   return (
