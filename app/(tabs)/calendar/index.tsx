@@ -111,7 +111,7 @@ const MonthCalendar = () => {
               </TouchableOpacity>
               <View className='grow'/>
               {viewMeal?(
-                <TouchableOpacity onPress={()=>{router.push('/camera')}} className='rounded-full p-1 px-4 bg-primary flex-row items-center justify-center gap-1'>
+                <TouchableOpacity onPress={()=>{router.push('/calendar/addMeal')}} className='rounded-full p-1 px-4 bg-primary flex-row items-center justify-center gap-1'>
                   <Text className='text-white font-noto text-heading3'>add meal</Text>
                   <AddIcon width={22} height={22} color={'#fff'}/>
                 </TouchableOpacity>
