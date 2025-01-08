@@ -8,9 +8,9 @@ import PickNumberModal from '../../components/modal/PickNumberModal'
 import { onAuthStateChanged, User } from 'firebase/auth'
 import { auth } from '../../components/auth/firebaseConfig'
 import axios from 'axios'
-import { DATABASE_URL } from '@env'
 import { useAuth, UserData } from '../../context/authContext'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { SERVER_URL } from '@env'
 
 
 type UserProp = {
@@ -118,7 +118,7 @@ const Register = () => {
           });
         });
 
-        const response = await axios.post(`${DATABASE_URL}/user/register`, {
+        const response = await axios.post(`${SERVER_URL}/user/register`, {
           firebase_uid: firebaseUser.uid,
           birth_date: form.birth,
           gender: form.gender,
