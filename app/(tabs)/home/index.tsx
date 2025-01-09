@@ -1,12 +1,15 @@
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Dimensions, RefreshControl, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import HomeGoalCard from '../../../components/goal/homeGoalCard';
 import { AddIcon } from '../../../constants/icon';
 import { useAuth } from '../../../context/authContext';
-import { goalDataDummy } from '../../../types/goal';
+import { goalDataDummy, homeGoalCardProp } from '../../../types/goal';
 import SleepGoal from '../../../components/sleep/sleepGoal';
+import FoodGoal from '../../../components/food/foodGoal';
+import { SERVER_URL } from '@env';
+import axios from 'axios';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -14,29 +17,44 @@ const Home = () => {
 
   const { user } = useAuth();
 
-  const sortedGoalData = [
-    ...goalDataDummy
+  const [todayGoal, setTodayGoal] = useState<homeGoalCardProp[] | null>(null)
+
+  const getTodayGoal = async () => {
+    try {
+      const response = await axios.get(`${SERVER_URL}/goal/today/${user?.uid}`);
+      const data = response.data // homeGoalCardProp[]
+      setTodayGoal(data)
+    } catch (error: any){
+      console.error(error)
+    }
+  }
+
+  useMemo(()=>{
+    getTodayGoal()
+  },[])
+
+  const sortedGoalData = todayGoal?
+  [
+    ...todayGoal
       .filter((goal) => goal.total_task !== goal.complete_task)
       .sort((a, b) => {
         const dateA = new Date(a.end_date).setHours(0, 0, 0, 0);
         const dateB = new Date(b.end_date).setHours(0, 0, 0, 0);
         return dateA - dateB;
       }),
-    ...goalDataDummy
+    ...todayGoal
       .filter((goal) => goal.total_task === goal.complete_task)
       .sort((a, b) => {
         const dateA = new Date(a.end_date).setHours(0, 0, 0, 0);
         const dateB = new Date(b.end_date).setHours(0, 0, 0, 0);
         return dateA - dateB;
       }),
-  ];
+  ] : [];
 
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000);
+    getTodayGoal().finally(() => setRefreshing(false));
   }, []);
 
   return (
@@ -83,9 +101,7 @@ const Home = () => {
                 {new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date())}
               </Text>
             </View>
-            <View className='h-28 w-full bg-white rounded-normal border border-gray p-2 justify-center items-center'>
-              <Text>Food Today Card</Text>
-            </View>
+            <FoodGoal />
             <SleepGoal />
           </View>
 
@@ -109,7 +125,10 @@ const Home = () => {
             </View>
 
             <View className='mt-2 flex-col gap-2'>
-              {sortedGoalData.map((data,i)=>(
+              {/* {sortedGoalData.map((data,i)=>(
+                <HomeGoalCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} end_date={data.end_date} total_task={data.total_task} complete_task={data.complete_task}/>
+              ))} */}
+              {goalDataDummy.map((data,i)=>(
                 <HomeGoalCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} end_date={data.end_date} total_task={data.total_task} complete_task={data.complete_task}/>
               ))}
               <View className='flex-1 justify-center items-center'>
