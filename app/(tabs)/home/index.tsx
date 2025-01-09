@@ -60,7 +60,7 @@ const Home = () => {
             <View className='overflow-hidden rounded-full'>
               <Image
                 style={styles.image}
-                source={require('../../../assets/maleAvatar.png')}
+                source={user?.photoURL ? user?.photoURL : user?.gender === 1 ? require('../../../assets/maleAvatar.png') : require('../../../assets/femaleAvatar.png')}
                 contentFit="cover"
                 transition={1000}
               />
