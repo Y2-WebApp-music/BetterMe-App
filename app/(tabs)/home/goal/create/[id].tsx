@@ -6,8 +6,12 @@ import FormInput from '../../../../../components/FormInput';
 import PickDateModal from '../../../../../components/modal/PickDateModal';
 import { calculateDuration } from '../../../../../components/goal/goalCreateCard';
 import { AddIcon, CloseIcon } from '../../../../../constants/icon';
+import { useAuth } from '../../../../../context/authContext';
 
 export default function GoalCreatePage() {
+
+  const { id } = useLocalSearchParams();
+  const { user } = useAuth()
 
   const [form, setForm] = useState({
     goal_name:'',
@@ -16,13 +20,13 @@ export default function GoalCreatePage() {
     end_date:new Date(),
     task:[
       {
-        task_name:''
+        task_name:'',
+        status:false
       },
     ],
-    public_goal:true
+    create_by:user?.uid,
+    public_goal:true,
   })
-
-  const { id } = useLocalSearchParams();
 
   const [startDateModal,setStartDateModal] = useState(false)
   const updateStartDate = (date: Date) => {
@@ -47,7 +51,7 @@ export default function GoalCreatePage() {
   const addTask = () => {
     setForm((prevState) => ({
       ...prevState,
-      task: [...prevState.task, { task_name: '' }],
+      task: [...prevState.task, { task_name: '', status: false }],
     }));
   };
 
