@@ -19,7 +19,7 @@ export type GoalCreateCardProp = goal & {
 
 export type Task = {
   task_name: string;
-  task_status: boolean;
+  status: boolean;
 };
 
 export type GoalData = goal & {

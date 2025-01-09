@@ -27,19 +27,19 @@ export default function GoalScreen() {
     task : [
       {
         task_name:'Test Task',
-        task_status:false
+        status:false
       },
       {
         task_name:'Test Task',
-        task_status:false
+        status:false
       },
       {
         task_name:'Test Task',
-        task_status:true
+        status:true
       },
       {
         task_name:'Test Task',
-        task_status:false
+        status:false
       },
     ],
     total_task:12,
@@ -63,7 +63,7 @@ export default function GoalScreen() {
         end_date: new Date(data.end_date),
         task: data.task,
         total_task: data.task.length,
-        complete_task: data.task.filter((task: Task) => task.task_status).length,
+        complete_task: data.task.filter((task: Task) => task.status).length,
       };
 
       setGoalData(transformedData);
@@ -109,10 +109,10 @@ export default function GoalScreen() {
   const handleToggleTask = (index: number): void => {
     setGoalData((prevData) => {
       const updatedTasks = [...prevData.task];
-      updatedTasks[index].task_status = !updatedTasks[index].task_status;
+      updatedTasks[index].status = !updatedTasks[index].status;
 
       const totalTasks = updatedTasks.length;
-      const completedTasks = updatedTasks.filter((task) => task.task_status).length;
+      const completedTasks = updatedTasks.filter((task) => task.status).length;
 
       return {
         ...prevData,
@@ -258,11 +258,11 @@ export default function GoalScreen() {
                       size={25}
                       fillColor="#0DC47C"
                       unFillColor="#FFFFFF"
-                      textComponent={<TextCheckBox taskName={data.task_name} isChecked={data.task_status} />}
+                      textComponent={<TextCheckBox taskName={data.task_name} isChecked={data.status} />}
                       textContainerStyle={{ marginLeft:20 }}
                       iconStyle={{ borderColor: "#0DC47C", borderRadius:6 }}
                       innerIconStyle={{ borderWidth: 2, borderRadius:6, borderColor:'#E8E8E8' }}
-                      isChecked={data.task_status}
+                      isChecked={data.status}
                       onPress={() => handleToggleTask(i)}
                     />
                   ))}
