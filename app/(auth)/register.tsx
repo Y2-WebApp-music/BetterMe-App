@@ -1,19 +1,23 @@
-import { router } from 'expo-router'
-import React, { useEffect, useRef, useState } from 'react'
-import { Animated, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, Text, TouchableOpacity, View } from 'react-native'
-import BackButton from '../../components/Back'
-import FormInput from '../../components/FormInput'
-import BottomModal from '../../components/modal/BottomModal'
-import PickDateModal from '../../components/modal/PickDateModal'
-import PickNumberModal from '../../components/modal/PickNumberModal'
-import { LeftArrowIcon } from '../../constants/icon'
+import { router } from 'expo-router';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Dimensions, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import BackButton from '../../components/Back';
+import FormInput from '../../components/FormInput';
+import BottomModal from '../../components/modal/BottomModal';
+import PickDateModal from '../../components/modal/PickDateModal';
+import PickNumberModal from '../../components/modal/PickNumberModal';
+import { LeftArrowIcon } from '../../constants/icon';
 
-import { SERVER_URL } from '@env'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import axios from 'axios'
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
-import { auth } from '../../components/auth/firebaseConfig'
-import { useAuth, UserData } from '../../context/authContext'
+import { Asset } from 'expo-asset';
+import * as FileSystem from 'expo-file-system';
+
+import { SERVER_URL } from '@env';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { auth, firebaseStorage } from '../../components/auth/firebaseConfig';
+import { useAuth, UserData } from '../../context/authContext';
 
 type UserProp = {
   username:string,
@@ -26,6 +30,8 @@ type UserProp = {
   height:number,
   activity:number,
 }
+
+const screenWidth = Dimensions.get('window').width;
 
 const Register = () => {
 
@@ -147,9 +153,13 @@ const Register = () => {
     }
   }
 
-  // Create User and Upload data to Firebase
+  // Create User and Upload photo to Firebase
   const handleSubmit = async () => {
     if (form.gender && form.weight && form.height && form.activity != 0){
+      let downloadURL:string | null = null;
+      const metadata = {
+        contentType: 'image/jpeg',
+      }
       try {
         const userCredential = await createUserWithEmailAndPassword(
           auth,
@@ -158,14 +168,34 @@ const Register = () => {
         )
         const user = userCredential.user
 
+        const imageAsset = Asset.fromModule(
+          form.gender === 1
+            ? require('../../assets/maleAvatar.png')
+            : require('../../assets/femaleAvatar.png')
+        );
+        await imageAsset.downloadAsync();
+
+        const imagePath = imageAsset.localUri;
+
+        // Check if the image is available
+        if (imagePath) {
+          // Read the file as Base64
+          const fileUri = await FileSystem.readAsStringAsync(imagePath, { encoding: FileSystem.EncodingType.Base64 });
+          const fileBlob = await fetch(`data:image/png;base64,${fileUri}`).then((res) => res.blob());
+
+          const storageRef = ref(firebaseStorage, `avatar/${user.uid}.png`);
+          const uploadTask = await uploadBytes(storageRef, fileBlob, metadata);
+          downloadURL = await getDownloadURL(uploadTask.ref);
+          console.log('Upload Complete', downloadURL);
+        }
+
         await updateProfile(user, {
           displayName:form.username,
-          photoURL: null,
+          photoURL: downloadURL || null,
         })
-        await AsyncStorage.setItem('@user', JSON.stringify(userCredential.user));
+        console.log('updateProfile Complete');
 
-        const userId = user.uid;
-        console.log('userId :', userId);
+        await AsyncStorage.setItem('@user', JSON.stringify(userCredential.user));
 
         const response = await axios.post(`${SERVER_URL}/user/register`, {
           firebase_uid: user.uid,
@@ -209,10 +239,21 @@ const Register = () => {
             <View className='w-full'>
               <Text className='text-[40px] text-primary font-notoMedium'>Better Me</Text>
               <Text className='text-heading2 text-primary font-noto -translate-y-2'>ชีวิตดีๆที่ลงตัว</Text>
+
+              <View className='overflow-hidden rounded-full'>
+                {/* <Image
+                  style={styles.image}
+                  source={photo}
+                  contentFit="cover"
+                  transition={1000}
+                /> */}
+              </View>
+
             </View>
 
             <View className='w-full mt-10' style={{paddingBottom: 20}} >
               <Text className='text-heading text-primary font-notoMedium'>Welcome to our app</Text>
+
 
               <View className='w-full flex flex-row justify-end items-end gap-2 mt-2'>
                 <TouchableOpacity  onPress={()=>{setStep(1)}} className='flex justify-center items-center'>
@@ -442,6 +483,16 @@ const Register = () => {
     </SafeAreaView>
   )
 }
+
+const styles = StyleSheet.create({
+  image: {
+    flex: 1,
+    justifyContent: 'center',
+    width:screenWidth * 0.2,
+    height:screenWidth * 0.2,
+    alignContent:'center',
+  },
+});
 
 const gender = [
   {
