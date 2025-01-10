@@ -1,5 +1,5 @@
 import { useLocalSearchParams } from 'expo-router';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView, TextInput, Switch } from 'react-native';
 import BackButton from '../../../../../components/Back';
 import { useState } from 'react';
 import FormInput from '../../../../../components/FormInput';
@@ -24,10 +24,14 @@ export default function GoalCreatePage() {
         status:false
       },
     ],
-    create_by:user?.uid,
+    create_by:{
+      firebase_uid:user?.uid,
+      username:user?.displayName,
+    },
     public_goal:true,
   })
 
+  
   const [startDateModal,setStartDateModal] = useState(false)
   const updateStartDate = (date: Date) => {
     setForm((prevForm) => ({
@@ -70,6 +74,11 @@ export default function GoalCreatePage() {
     setForm({ ...form, task: updatedTasks });
   };
 
+  const handleCreateGoal = async () => {
+    console.log(form);
+  
+  }
+
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
       <View className='w-[92%] mt-4'>
@@ -84,7 +93,7 @@ export default function GoalCreatePage() {
               <Text className='text-subTitle text-primary font-notoMedium'>Create Goal</Text>
             </View>
             <View>
-              <TouchableOpacity className=' bg-primary flex-row gap-2 p-2 px-6 justify-center items-center rounded-full'>
+              <TouchableOpacity onPress={handleCreateGoal} className=' bg-primary flex-row gap-2 p-2 px-6 justify-center items-center rounded-full'>
                 <Text className='text-heading2 text-white font-notoMedium'>Confirm</Text>
               </TouchableOpacity>
             </View>
@@ -192,6 +201,21 @@ export default function GoalCreatePage() {
                 </View>
               </View>
             </View>
+
+            <View className='min-h-24 min-w-32 p-4 flex-col gap-2'>
+              <TouchableOpacity onPress={()=>{setForm((prev) => ({...prev,public_goal: !prev.public_goal}))}} className='p-2 px-4 border border-gray rounded-normal flex-row gap-2 justify-center items-center'>
+                <Switch
+                  trackColor={{false: '#fff', true: '#0DC47C'}}
+                  thumbColor={form.public_goal ? '#FFF' : '#fff'}
+                  ios_backgroundColor="#FBFFFF"
+                  onValueChange={()=>{setForm((prev) => ({...prev,public_goal: !prev.public_goal}))}}
+                  value={form.public_goal}
+                />
+                <Text className='font-noto text-heading3 text-subText'>public this goal</Text>
+              </TouchableOpacity>
+            </View>
+
+
           </View>
         </ScrollView>
     </SafeAreaView>

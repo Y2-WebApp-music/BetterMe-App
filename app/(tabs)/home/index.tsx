@@ -19,19 +19,19 @@ const Home = () => {
 
   const [todayGoal, setTodayGoal] = useState<homeGoalCardProp[] | null>(null)
 
-  const getTodayGoal = async () => {
-    try {
-      const response = await axios.get(`${SERVER_URL}/goal/today/${user?.uid}`);
-      const data = response.data // homeGoalCardProp[]
-      setTodayGoal(data)
-    } catch (error: any){
-      console.error(error)
-    }
-  }
+  // const getTodayGoal = async () => {
+  //   try {
+  //     const response = await axios.get(`${SERVER_URL}/goal/today/${user?.uid}`);
+  //     const data = response.data // homeGoalCardProp[]
+  //     setTodayGoal(data)
+  //   } catch (error: any){
+  //     console.error(error)
+  //   }
+  // }
 
-  useMemo(()=>{
-    getTodayGoal()
-  },[])
+  // useMemo(()=>{
+  //   getTodayGoal()
+  // },[])
 
   const sortedGoalData = todayGoal?
   [
@@ -54,7 +54,7 @@ const Home = () => {
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    getTodayGoal().finally(() => setRefreshing(false));
+    // getTodayGoal().finally(() => setRefreshing(false));
   }, []);
 
   return (
