@@ -53,13 +53,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const fetchUserDetails = async (firebaseUser: User) => {
       try {
-        const response = await axios.get(`${SERVER_URL}/user/${firebaseUser.uid}`);
+        const response = await axios.post(`${SERVER_URL}/user/login`,{
+          firebase_uid:firebaseUser.uid
+        });
         const userData = response.data;
+
+        console.log('userData : ',userData);
 
         if (userData.message === "User not found"){
           router.replace('/(auth)/googleRegis');
         } else {
-          const extendedUser: UserData = { ...firebaseUser, ...userData };
+          const { birth_date, gender, weight, height, activity, calorie_need } = response.data.user;
+          const extendedUser: UserData = {
+            ...firebaseUser,
+            birth_date,
+            gender,
+            weight,
+            height,
+            activity,
+            calorie_need,
+          };
           setUser(extendedUser);
           await AsyncStorage.setItem('@user', JSON.stringify(extendedUser));
         }
@@ -72,10 +85,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (firebaseUser) {
         fetchUserDetails(firebaseUser)
       } else {
-        setUser(dummyUser);
-        AsyncStorage.setItem('@user', JSON.stringify(dummyUser));
-        // setUser(null);
-        // AsyncStorage.removeItem('@user');
+        // setUser(dummyUser);
+        // AsyncStorage.setItem('@user', JSON.stringify(dummyUser));
+        setUser(null);
+        AsyncStorage.removeItem('@user');
       }
     });
 

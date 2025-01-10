@@ -120,6 +120,9 @@ const Register = () => {
 
         const response = await axios.post(`${SERVER_URL}/user/register`, {
           firebase_uid: firebaseUser.uid,
+          email: firebaseUser.email,
+          username: firebaseUser.displayName,
+          profile_img: firebaseUser.photoURL,
           birth_date: form.birth,
           gender: form.gender,
           weight: form.weight,
@@ -127,8 +130,20 @@ const Register = () => {
           activity: form.activity,
         });
 
-        const res = response.data;
-        const extendedUser: UserData = { ...firebaseUser, ...res };
+        const { birth_date, gender, weight, height, activity, calorie_need } = response.data.user;
+
+        const extendedUser: UserData = {
+          ...firebaseUser,
+          birth_date,
+          gender,
+          weight,
+          height,
+          activity,
+          calorie_need,
+        };
+
+        // const res = response.data;
+        // const extendedUser: UserData = { ...firebaseUser, ...res };
         setUser(extendedUser)
         await AsyncStorage.setItem('@user', JSON.stringify(extendedUser));
         router.replace('/(tabs)/home');
