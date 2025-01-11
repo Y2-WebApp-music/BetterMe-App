@@ -17,21 +17,25 @@ const Home = () => {
 
   const { user } = useAuth();
 
-  const [todayGoal, setTodayGoal] = useState<homeGoalCardProp[] | null>(null)
+  const [todayGoal, setTodayGoal] = useState<homeGoalCardProp[]>([])
 
-  // const getTodayGoal = async () => {
-  //   try {
-  //     const response = await axios.get(`${SERVER_URL}/goal/today/${user?.uid}`);
-  //     const data = response.data // homeGoalCardProp[]
-  //     setTodayGoal(data)
-  //   } catch (error: any){
-  //     console.error(error)
-  //   }
-  // }
+  const getTodayGoal = async () => {
+    try {
+      const response = await axios.get(`${SERVER_URL}/goal/today/677f63f501337ea283f7c8fc`);
+      const data = response.data // homeGoalCardProp[]
+      console.log('data \n',data);
+      console.log('typeof Date \n',typeof data[0].end_date);
 
-  // useMemo(()=>{
-  //   getTodayGoal()
-  // },[])
+      setTodayGoal(data)
+    } catch (error: any){
+      console.error(error)
+    }
+  }
+
+  useMemo(()=>{
+    getTodayGoal()
+  },[])
+
 
   const sortedGoalData = todayGoal?
   [
@@ -54,7 +58,7 @@ const Home = () => {
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    // getTodayGoal().finally(() => setRefreshing(false));
+    getTodayGoal().finally(() => setRefreshing(false));
   }, []);
 
   return (
@@ -125,12 +129,16 @@ const Home = () => {
             </View>
 
             <View className='mt-2 flex-col gap-2'>
-              {/* {sortedGoalData.map((data,i)=>(
-                <HomeGoalCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} end_date={data.end_date} total_task={data.total_task} complete_task={data.complete_task}/>
-              ))} */}
-              {goalDataDummy.map((data,i)=>(
-                <HomeGoalCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} end_date={data.end_date} total_task={data.total_task} complete_task={data.complete_task}/>
-              ))}
+              {sortedGoalData.length != 0 &&
+                sortedGoalData.map((data,i)=>(
+                  <HomeGoalCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} end_date={data.end_date} total_task={data.total_task} complete_task={data.complete_task}/>
+                ))
+              }
+              {/* {todayGoal.length != 0 &&
+                todayGoal.map((data,i)=>(
+                  <HomeGoalCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} end_date={data.end_date} total_task={data.total_task} complete_task={data.complete_task}/>
+                ))
+              } */}
               <View className='flex-1 justify-center items-center'>
                 <TouchableOpacity onPress={()=>{router.push('/home/yourGoal')}} className=' bg-primary flex-row gap-2 p-2 px-4 justify-center items-center rounded-full'>
                   <Text className='text-body text-white font-notoMedium'>View all goals</Text>
