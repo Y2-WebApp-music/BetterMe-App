@@ -1,34 +1,91 @@
 import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, Platform, KeyboardAvoidingView, RefreshControl } from 'react-native'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { router } from 'expo-router'
 import { AddIcon, LeftArrowIcon } from '../../../constants/icon'
 import { useAuth } from '../../../context/authContext'
 import BackButton from '../../../components/Back'
 import HomeGoalCard from '../../../components/goal/homeGoalCard'
-import { goalDataDummy } from '../../../types/goal'
+import { goalDataDummy, homeGoalCardProp } from '../../../types/goal'
 import SearchInput from '../../../components/SearchInput'
+import axios from 'axios'
+import { SERVER_URL } from '@env'
 
 const YourGoal = () => {
 
   const { user } = useAuth()
   const [search, setSearch] = useState('')
 
-  const sortedGoalData = [
-    ...goalDataDummy
+  const [noGoal, setNoGoal] = useState(false)
+  const [allGoal, setAllGoal] = useState<homeGoalCardProp[]>([])
+
+  const [isNoTodayGoal, setIsNoTodayGoal] = useState(false)
+  const [todayGoal, setTodayGoal] = useState<homeGoalCardProp[]>([])
+
+  const getTodayGoal = async () => {
+    try {
+      const response = await axios.get(`${SERVER_URL}/goal/today/${user?._id}`);
+      const data = response.data // homeGoalCardProp[]
+
+      console.log('getTodayGoal response \n',response.data);
+
+      if (data.message === "No goals for today") {
+        setIsNoTodayGoal(true)
+      } else {
+        setTodayGoal(data)
+      }
+
+    } catch (error: any){
+      console.error(error)
+    }
+  }
+
+  const getAllGoal = async () => {
+    try {
+      const response = await axios.get(`${SERVER_URL}/goal/all`);
+      const data = response.data // homeGoalCardProp[]
+
+      console.log('getAllGoal response \n',response.data);
+
+      if (data.message === "No goal") {
+        setNoGoal(true)
+      } else {
+        setAllGoal(data)
+      }
+
+    } catch (error: any){
+      console.error(error)
+    }
+  }
+
+  useMemo(()=>{
+    getTodayGoal()
+    getAllGoal()
+  },[])
+
+  const sortedGoalData = todayGoal?
+  [
+    ...todayGoal
       .filter((goal) => goal.total_task !== goal.complete_task)
       .sort((a, b) => {
         const dateA = new Date(a.end_date).setHours(0, 0, 0, 0);
         const dateB = new Date(b.end_date).setHours(0, 0, 0, 0);
         return dateA - dateB;
-      })
-  ];
+      }),
+    ...todayGoal
+      .filter((goal) => goal.total_task === goal.complete_task)
+      .sort((a, b) => {
+        const dateA = new Date(a.end_date).setHours(0, 0, 0, 0);
+        const dateB = new Date(b.end_date).setHours(0, 0, 0, 0);
+        return dateA - dateB;
+      }),
+  ] : [];
 
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000);
+    getTodayGoal().finally(() => setRefreshing(false));
+    setRefreshing(true);
+    getAllGoal().finally(() => setRefreshing(false));
   }, []);
 
   return (
@@ -95,13 +152,20 @@ const YourGoal = () => {
             <View className='mt-3'>
               <View className='flex flex-row gap-2 items-center'>
                 <Text className='text-heading3 font-noto grow'>Goals Today</Text>
-                <Text className='text-body font-noto text-subText'>3 goals todo</Text>
+                <Text className='text-body font-noto text-subText'>{sortedGoalData.length} goals todo</Text>
               </View>
 
               <View className='mt-2 flex-col gap-2'>
-                {sortedGoalData.map((data,i)=>(
-                  <HomeGoalCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} end_date={data.end_date} total_task={data.total_task} complete_task={data.complete_task}/>
-                ))}
+                {isNoTodayGoal? (
+                  <View className='flex-1 justify-center items-center p-6 pt-20'>
+                    <Text className='font-noto text-subText text-heading3'>No goal Today</Text>
+                  </View>
+                ):(
+                  sortedGoalData.length != 0 &&
+                    sortedGoalData.map((data,i)=>(
+                      <HomeGoalCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} end_date={data.end_date} total_task={data.total_task} complete_task={data.complete_task}/>
+                    ))
+                )}
               </View>
             </View>
           </View>
@@ -121,9 +185,15 @@ const YourGoal = () => {
               handleChange={(e:string)=>setSearch(e)}
             />
             <View className='mt-3 flex-col gap-2'>
-              {allGoalDataDummy.map((data,i)=>(
-                <HomeGoalCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} end_date={data.end_date} total_task={data.total_task} complete_task={data.complete_task}/>
-              ))}
+              {noGoal? (
+                  <View className='flex-1 justify-center items-center p-6 pt-20'>
+                    <Text className='font-noto text-subText text-heading3'>No goal</Text>
+                  </View>
+                ):(
+                  allGoal.map((data,i)=>(
+                    <HomeGoalCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} end_date={data.end_date} total_task={data.total_task} complete_task={data.complete_task}/>
+                  ))
+                )}
             </View>
           </View>
         </ScrollView>
@@ -136,63 +206,63 @@ export const allGoalDataDummy = [
   {
     goal_id:'1',
     goal_name:'Title 1 Line test text inline style Second Line First Line test text inline style Second Line First Line test text inline style Second Line',
-    end_date:new Date(),
+    end_date:new Date().toDateString(),
     total_task:12,
     complete_task:12,
   },
   {
     goal_id:'2',
     goal_name:'Title 2',
-    end_date:new Date(new Date().setDate(new Date().getDate() + 45)),
+    end_date:new Date(new Date().setDate(new Date().getDate() + 45)).toDateString(),
     total_task:6,
     complete_task:2,
   },
   {
     goal_id:'3',
     goal_name:'Title 3',
-    end_date:new Date(new Date().setDate(new Date().getDate() + 10)),
+    end_date:new Date(new Date().setDate(new Date().getDate() + 10)).toDateString(),
     total_task:6,
     complete_task:3,
   },
   {
     goal_id:'4',
     goal_name:'Title 1 Line test text inline style Second Line First Line test text inline style Second Line First Line test text inline style Second Line',
-    end_date:new Date(),
+    end_date:new Date().toDateString(),
     total_task:12,
     complete_task:12,
   },
   {
     goal_id:'5',
     goal_name:'Title 2',
-    end_date:new Date(new Date().setDate(new Date().getDate() + 45)),
+    end_date:new Date(new Date().setDate(new Date().getDate() + 45)).toDateString(),
     total_task:6,
     complete_task:2,
   },
   {
     goal_id:'6',
     goal_name:'Title 3',
-    end_date:new Date(new Date().setDate(new Date().getDate() + 10)),
+    end_date:new Date(new Date().setDate(new Date().getDate() + 10)).toDateString(),
     total_task:6,
     complete_task:3,
   },
   {
     goal_id:'7',
     goal_name:'Title 1 Line test text inline style Second Line First Line test text inline style Second Line First Line test text inline style Second Line',
-    end_date:new Date(),
+    end_date:new Date().toDateString(),
     total_task:12,
     complete_task:12,
   },
   {
     goal_id:'8',
     goal_name:'Title 2',
-    end_date:new Date(new Date().setDate(new Date().getDate() + 45)),
+    end_date:new Date(new Date().setDate(new Date().getDate() + 45)).toDateString(),
     total_task:6,
     complete_task:2,
   },
   {
     goal_id:'9',
     goal_name:'Title 3',
-    end_date:new Date(new Date().setDate(new Date().getDate() + 10)),
+    end_date:new Date(new Date().setDate(new Date().getDate() + 10)).toDateString(),
     total_task:6,
     complete_task:3,
   },

@@ -28,6 +28,8 @@ export type GoalData = goal & {
   start_date: string;
   task: Task[];
   complete_task: number;
+  public_goal:boolean;
+  create_by:string;
 };
 
 

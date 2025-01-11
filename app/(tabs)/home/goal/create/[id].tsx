@@ -26,11 +26,7 @@ export default function GoalCreatePage() {
         status:false
       },
     ],
-    create_by:user?.uid,
-    // create_by:{
-    //   firebase_uid:user?.uid,
-    //   username:user?.displayName,
-    // },
+    create_by:user?._id,
     public_goal:true,
   })
 
@@ -92,9 +88,6 @@ export default function GoalCreatePage() {
         console.log('Task at least one is empty please complete it');
         return setErr('Task at least one is empty please complete it');
       }
-      console.log('Will post to DB');
-      console.log('=======> form Data <======= \n',form);
-
 
       let counter = 3;
       setCountdown(counter)
@@ -127,23 +120,22 @@ export default function GoalCreatePage() {
 
   const postToDB = async () => {
     try {
-      // const response = await axios.post(`${SERVER_URL}/goal/create`,{
-      //   goal_name:form.goal_name,
-      //   description:form.description,
-      //   start_date:form.start_date,
-      //   end_date:form.end_date,
-      //   create_by:form.create_by,
-      //   tasks:form.task,
-      //   public_goal:form.public_goal
-      // });
-      // const data = response.data;
-      // console.log('userData : ',data);
+      const response = await axios.post(`${SERVER_URL}/goal/create`,{
+        goal_name:form.goal_name,
+        description:form.description,
+        start_date:form.start_date,
+        end_date:form.end_date,
+        tasks:form.task,
+        public_goal:form.public_goal
+      });
+      const data = response.data;
+      // console.log('=============== ::: userData ::: ===============\n',data);
 
-      // if (data.message === "At least 1 task is required to create a goal") {
-      //   return setErr('At least 1 task is required to create a goal')
-      // }
+      if (data.message === "At least 1 task is required to create a goal") {
+        return setErr('At least 1 task is required to create a goal')
+      }
 
-      router.replace(`home/goal/[id]`)
+      router.replace(`home/goal/${data.goal._id}`)
 
     } catch (error) {
       console.error('Can not create goal:', error);

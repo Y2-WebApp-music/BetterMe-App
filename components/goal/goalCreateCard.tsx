@@ -4,7 +4,7 @@ import { AddIcon } from '../../constants/icon'
 import { GoalCreateCardProp } from '../../types/goal'
 import { router } from 'expo-router'
 
-export const calculateDuration = (start_date: string, end_date: string) => {
+export const calculateDuration = (start_date: string | Date, end_date: string | Date) => {
   const start = new Date(start_date);
   const end = new Date(end_date);
 
