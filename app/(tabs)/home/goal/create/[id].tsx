@@ -1,4 +1,4 @@
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView, TextInput, Switch } from 'react-native';
 import BackButton from '../../../../../components/Back';
 import { useState } from 'react';
@@ -7,6 +7,8 @@ import PickDateModal from '../../../../../components/modal/PickDateModal';
 import { calculateDuration } from '../../../../../components/goal/goalCreateCard';
 import { AddIcon, CloseIcon } from '../../../../../constants/icon';
 import { useAuth } from '../../../../../context/authContext';
+import axios from 'axios';
+import { SERVER_URL } from '@env';
 
 export default function GoalCreatePage() {
 
@@ -24,14 +26,14 @@ export default function GoalCreatePage() {
         status:false
       },
     ],
-    create_by:{
-      firebase_uid:user?.uid,
-      username:user?.displayName,
-    },
+    create_by:user?.uid,
+    // create_by:{
+    //   firebase_uid:user?.uid,
+    //   username:user?.displayName,
+    // },
     public_goal:true,
   })
 
-  
   const [startDateModal,setStartDateModal] = useState(false)
   const updateStartDate = (date: Date) => {
     setForm((prevForm) => ({
@@ -74,13 +76,84 @@ export default function GoalCreatePage() {
     setForm({ ...form, task: updatedTasks });
   };
 
+  const [countdown, setCountdown] = useState(3);
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [err, setErr] = useState('')
+  const [countdownInterval, setCountdownInterval] = useState<NodeJS.Timeout | null>(null);
+
   const handleCreateGoal = async () => {
-    console.log(form);
-  
+
+    if ( form.goal_name != '' && form.description != ''){
+      if (form.task.length === 0) {
+        console.log('At least one task is required');
+        return setErr('At least one task is required');
+      }
+      if (form.task.some(task => task.task_name === '')){
+        console.log('Task at least one is empty please complete it');
+        return setErr('Task at least one is empty please complete it');
+      }
+      console.log('Will post to DB');
+      console.log('=======> form Data <======= \n',form);
+
+
+      let counter = 3;
+      setCountdown(counter)
+      setIsConfirming(true);
+
+      const interval = setInterval(() => {
+        counter -= 1;
+        setCountdown(counter);
+
+        if (counter <= 0) {
+          clearInterval(interval);
+          postToDB()
+        }
+      }, 1000);
+
+      setCountdownInterval(interval)
+    } else {
+      console.log('goal_name or description is empty');
+    }
+  }
+
+  const handleCancel = () => {
+    if (countdownInterval) {
+      clearInterval(countdownInterval);
+      setCountdown(3);
+      setIsConfirming(false);
+      console.log('Goal creation canceled');
+    }
+  };
+
+  const postToDB = async () => {
+    try {
+      // const response = await axios.post(`${SERVER_URL}/goal/create`,{
+      //   goal_name:form.goal_name,
+      //   description:form.description,
+      //   start_date:form.start_date,
+      //   end_date:form.end_date,
+      //   create_by:form.create_by,
+      //   tasks:form.task,
+      //   public_goal:form.public_goal
+      // });
+      // const data = response.data;
+      // console.log('userData : ',data);
+
+      // if (data.message === "At least 1 task is required to create a goal") {
+      //   return setErr('At least 1 task is required to create a goal')
+      // }
+
+      router.replace(`home/goal/[id]`)
+
+    } catch (error) {
+      console.error('Can not create goal:', error);
+    }
   }
 
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
+      {!isConfirming?(
+      <>
       <View className='w-[92%] mt-4'>
         <View className='w-full'>
           <View className='max-w-[14vw]'>
@@ -218,6 +291,16 @@ export default function GoalCreatePage() {
 
           </View>
         </ScrollView>
+        </>
+        ):(
+          <View className='flex-1 justify-center items-center'>
+            <Text className='font-notoMedium text-title text-primary'>{countdown}</Text>
+            <Text className='font-notoMedium text-subTitle animate-pulse text-primary'>Creating</Text>
+            <TouchableOpacity onPress={handleCancel} className='mt-12 p-1 px-4 rounded-full bg-nonFocus justify-center items-center'>
+              <Text className='text-white font-noto text-heading2'>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        )}
     </SafeAreaView>
   )
 }
