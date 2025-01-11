@@ -2,6 +2,8 @@ import { View, Text, TouchableOpacity, Animated } from 'react-native'
 import React, { useEffect, useRef } from 'react'
 import { router } from 'expo-router'
 import { homeGoalCardProp } from '../../types/goal'
+import { format } from 'date-fns'
+
 
 const HomeGoalCard = ({goal_id, goal_name, end_date, total_task, complete_task}:homeGoalCardProp) => {
 
@@ -45,7 +47,7 @@ const HomeGoalCard = ({goal_id, goal_name, end_date, total_task, complete_task}:
             </View>
           </View>
           <View className='flex-row w-full'>
-            <Text className='text-detail font-noto text-subText grow'>end : {new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(end_date)}</Text>
+            <Text className='text-detail font-noto text-subText grow'>end : {format(end_date, 'd MMMM yyyy')}</Text>
             <Text className='text-detail font-noto text-subText'>{complete_task}/{total_task} completed</Text>
           </View>
         </View>

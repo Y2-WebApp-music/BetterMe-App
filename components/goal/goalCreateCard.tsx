@@ -4,8 +4,11 @@ import { AddIcon } from '../../constants/icon'
 import { GoalCreateCardProp } from '../../types/goal'
 import { router } from 'expo-router'
 
-export const calculateDuration = (start_date: Date, end_date: Date) => {
-  const diffInMs = end_date.getTime() - start_date.getTime();
+export const calculateDuration = (start_date: string, end_date: string) => {
+  const start = new Date(start_date);
+  const end = new Date(end_date);
+
+  const diffInMs = end.getTime() - start.getTime();
   const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
 
   if (diffInDays < 30) {
