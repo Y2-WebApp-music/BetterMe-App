@@ -1,12 +1,15 @@
+import { SERVER_URL } from '@env';
+import axios from 'axios';
+import { format } from 'date-fns';
 import { useLocalSearchParams } from 'expo-router';
-import { View, Text, SafeAreaView, Dimensions, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Switch } from 'react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Dimensions, RefreshControl, SafeAreaView, ScrollView, Switch, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import BouncyCheckbox from "react-native-bouncy-checkbox";
+import Animated, { useAnimatedProps, useSharedValue, withTiming } from 'react-native-reanimated';
+import Svg, { Circle } from 'react-native-svg';
 import BackButton from '../../../../components/Back';
 import { DeleteIcon, OptionIcon } from '../../../../constants/icon';
-import Svg, { Circle, Rect } from 'react-native-svg';
-import { useEffect, useMemo, useState } from 'react';
-import Animated, { useAnimatedProps, useSharedValue, withTiming } from 'react-native-reanimated';
-import BouncyCheckbox from "react-native-bouncy-checkbox";
-import axios from 'axios';
+import { useAuth } from '../../../../context/authContext';
 import { GoalData, Task } from '../../../../types/goal';
 
 const { width } = Dimensions.get('window');
@@ -16,32 +19,23 @@ const r = circle_length / (2 * Math.PI);
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 export default function GoalScreen() {
+  const { user } = useAuth()
   const { id } = useLocalSearchParams();
 
-  const [goalData,setGoalData] = useState<GoalData>({
+  const [goalData, setGoalData] = useState<GoalData>({
     goal_id:'1',
-    goal_name:'First Line test text inline style Second Line',
-    description:'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean quis placerat ex. Fusce sapien velit,',
-    start_date:new Date(),
-    end_date:new Date(new Date().setDate(new Date().getDate() + 10)),
+    goal_name:'goal_name',
+    description:'description',
+    start_date:new Date().toDateString(),
+    end_date:new Date(new Date().setDate(new Date().getDate() + 10)).toDateString(),
     task : [
       {
-        task_name:'Test Task',
-        status:false
-      },
-      {
-        task_name:'Test Task',
-        status:false
-      },
-      {
-        task_name:'Test Task',
-        status:true
-      },
-      {
-        task_name:'Test Task',
+        task_name:'Task 1',
         status:false
       },
     ],
+    public_goal:true,
+    create_by:'b3drtknfbxfd5oitw45ngjdkx',
     total_task:12,
     complete_task:9
   })
@@ -52,18 +46,20 @@ export default function GoalScreen() {
   // Fetch Data Here
   const fetchGoalData = async () => {
     try {
-      const response = await axios.get('https://localhost:3000/.....');
+      const response = await axios.get(`${SERVER_URL}/goal/detail/${id}`);
       const data = response.data;
 
       const transformedData: GoalData = {
         goal_id: data.goal_id,
         goal_name: data.goal_name,
         description: data.description,
-        start_date: new Date(data.start_date),
-        end_date: new Date(data.end_date),
+        start_date: new Date(data.start_date).toDateString(),
+        end_date: new Date(data.end_date).toDateString(),
         task: data.task,
         total_task: data.task.length,
         complete_task: data.task.filter((task: Task) => task.status).length,
+        public_goal: data.public_goal,
+        create_by: data.create_by
       };
 
       setGoalData(transformedData);
@@ -79,37 +75,69 @@ export default function GoalScreen() {
     fetchGoalData();
   }, []);
 
-  const percent = useMemo(() => Math.round((goalData.complete_task / goalData.total_task) * 100), [
-    goalData
-  ]);
-  const color = percent === 100 ? '#0dc47c' : '#FBA742';
+  // useEffect(()=>{
+  //   console.log('========================================================================');
+  //   goalData.task.map(data => {
+  //     console.log(data);
+  //   })
+  // },[goalData])
 
+  const percent = useMemo(() => Math.round((goalData.complete_task / goalData.total_task) * 100), [ goalData ]);
+  const color = percent === 100 ? '#0dc47c' : '#FBA742';
   const progress = useSharedValue(0);
 
   useEffect(() => {
     progress.value = withTiming(percent / 100, { duration: 1000 });
   }, [percent]);
-
   const animatedProps = useAnimatedProps(() => ({
     strokeDashoffset: circle_length * (1 - progress.value),
   }));
 
   const [isOptionsVisible, setOptionsVisible] = useState(false);
+  const toggleOptions = () => { setOptionsVisible(!isOptionsVisible) };
+  const closeOptions = () => { setOptionsVisible(false) };
 
-  const toggleOptions = () => {
-    setOptionsVisible(!isOptionsVisible);
-  };
-  const closeOptions = () => {
-    setOptionsVisible(false);
-  };
+  const toggleSwitch = async () => {
+    try {
+      const response = await axios.put(`${SERVER_URL}/goal/public/${goalData.goal_id}`,{
+        public_goal:!goalData.public_goal
+      })
 
-  const [isEnabled, setIsEnabled] = useState(false);
-  const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+      const data = response.data
+      setGoalData((prev) => ({
+        ...prev,
+        public_goal:data.public_goal
+      }));
+    } catch(error){
+      console.error('Failed to update public_goal:', err);
+      setErr('Failed to update public_goal');
+    }
+  }
 
-  const handleToggleTask = (index: number): void => {
+  const handleToggleTask = async (index: number) => {
+    let data:any = null;
+
+    try {
+      const response = await axios.put(`${SERVER_URL}/goal/${id}/task-status`,{
+        task_index: index,
+        status: !goalData.task[index].status
+      });
+
+      data = response.data
+
+      // console.log(data.message);
+      // console.log(data.goal,' ',data.task);
+
+    } catch (err) {
+      console.error('Failed to update task-status:', err);
+      setErr('Failed to update task-status');
+    } finally {
+      setIsLoad(false);
+    }
+
     setGoalData((prevData) => {
       const updatedTasks = [...prevData.task];
-      updatedTasks[index].status = !updatedTasks[index].status;
+      updatedTasks[index] = data.task
 
       const totalTasks = updatedTasks.length;
       const completedTasks = updatedTasks.filter((task) => task.status).length;
@@ -121,11 +149,29 @@ export default function GoalScreen() {
         complete_task: completedTasks,
       };
     });
+
+    // console.log('task_index ',index);
+    // console.log('task current status == ',goalData.task[index]);
+    // console.log('set new task status to => ',!goalData.task[index].status);
   };
 
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchGoalData().finally(() => setRefreshing(false));
+    // console.log('Fetch New data');
+  }, []);
 
   return (
     <SafeAreaView className="w-full h-full justify-start items-center bg-Background font-noto" >
+      <ScrollView
+            className='w-full h-auto pb-20'
+            contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start',alignItems:'center', marginTop:0}}
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+          >
       <TouchableWithoutFeedback onPress={closeOptions}>
         <View className='w-[92%]'>
           <View className='w-full mt-4'>
@@ -142,10 +188,10 @@ export default function GoalScreen() {
                   <TouchableOpacity onPress={toggleSwitch} className='p-2 px-4 border border-gray rounded-normal flex-row gap-2 justify-center items-center'>
                     <Switch
                       trackColor={{false: '#fff', true: '#0DC47C'}}
-                      thumbColor={isEnabled ? '#FFF' : '#fff'}
+                      thumbColor={goalData.public_goal ? '#FFF' : '#fff'}
                       ios_backgroundColor="#FBFFFF"
                       onValueChange={toggleSwitch}
-                      value={isEnabled}
+                      value={goalData.public_goal}
                     />
                     <Text className='font-noto text-heading3 text-subText'>public this goal</Text>
                   </TouchableOpacity>
@@ -223,8 +269,8 @@ export default function GoalScreen() {
                   <View className='w-full'>
                     <Text className='text-subText font-noto text-body'>{goalData.description}</Text>
                     <View className='flex-col pl-1'>
-                      <Text className='text-subText font-notoLight text-[1rem]'>Create : {new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(goalData.start_date)}</Text>
-                      <Text className='text-subText font-notoLight text-[1rem]'>End : {new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(goalData.end_date)}</Text>
+                      <Text className='text-subText font-notoLight text-[1rem]'>Create :{format(goalData.start_date,'d MMMM yyyy')}</Text>
+                      <Text className='text-subText font-notoLight text-[1rem]'>End : {format(goalData.end_date,'d MMMM yyyy')}</Text>
                     </View>
                   </View>
                   <View className='flex-row justify-start items-center mt-1'>
@@ -272,6 +318,7 @@ export default function GoalScreen() {
           </ScrollView>
         </View>
       </TouchableWithoutFeedback>
+      </ScrollView>
     </SafeAreaView>
   );
 }

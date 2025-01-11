@@ -17,16 +17,22 @@ const Home = () => {
 
   const { user } = useAuth();
 
+  const [isNoGoal, setIsNoGoal] = useState(false)
   const [todayGoal, setTodayGoal] = useState<homeGoalCardProp[]>([])
-
   const getTodayGoal = async () => {
     try {
-      const response = await axios.get(`${SERVER_URL}/goal/today/677f63f501337ea283f7c8fc`);
+      const response = await axios.get(`${SERVER_URL}/goal/today/${user?._id}`);
       const data = response.data // homeGoalCardProp[]
-      console.log('data \n',data);
-      console.log('typeof Date \n',typeof data[0].end_date);
 
-      setTodayGoal(data)
+      console.log('response \n',response.data);
+
+      if (data.message === "No goals for today") {
+        setIsNoGoal(true)
+      } else {
+
+        setTodayGoal(data)
+      }
+
     } catch (error: any){
       console.error(error)
     }
@@ -129,11 +135,16 @@ const Home = () => {
             </View>
 
             <View className='mt-2 flex-col gap-2'>
-              {sortedGoalData.length != 0 &&
-                sortedGoalData.map((data,i)=>(
-                  <HomeGoalCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} end_date={data.end_date} total_task={data.total_task} complete_task={data.complete_task}/>
-                ))
-              }
+              {isNoGoal? (
+                <View className='flex-1 justify-center items-center p-6 pt-20'>
+                  <Text className='font-noto text-subText text-heading3'>No goal Today</Text>
+                </View>
+              ):(
+                sortedGoalData.length != 0 &&
+                  sortedGoalData.map((data,i)=>(
+                    <HomeGoalCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} end_date={data.end_date} total_task={data.total_task} complete_task={data.complete_task}/>
+                  ))
+              )}
               {/* {todayGoal.length != 0 &&
                 todayGoal.map((data,i)=>(
                   <HomeGoalCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} end_date={data.end_date} total_task={data.total_task} complete_task={data.complete_task}/>

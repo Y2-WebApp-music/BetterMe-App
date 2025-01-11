@@ -7,6 +7,8 @@ import React, { createContext, ReactNode, useContext, useEffect, useState } from
 import { auth } from '../components/auth/firebaseConfig';
 
 export type UserData = User & {
+  _id:string
+  serverToken:string
   birth_date: Date
   gender: number
   weight: number,
@@ -63,9 +65,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         if (userData.message === "User not found"){
           router.replace('/(auth)/googleRegis');
         } else {
-          const { birth_date, gender, weight, height, activity, calorie_need } = response.data.user;
+          const { _id,birth_date, gender, weight, height, activity, calorie_need } = response.data.user;
+          const serverToken = response.data.token;
           const extendedUser: UserData = {
             ...firebaseUser,
+            _id,
+            serverToken,
             birth_date,
             gender,
             weight,
@@ -120,6 +125,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 };
 
 const dummyUser: UserData = {
+  _id:'23nioqabngsrntgkl',
+  serverToken:'eyencjwe21m3f.ewf32fsdf4gdfbf5dhg',
   uid: "dummyUid123",
   email: "dummyuser@example.com",
   emailVerified: true,
