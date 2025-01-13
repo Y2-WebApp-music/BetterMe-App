@@ -36,6 +36,16 @@ type UserProp = {
 }
 
 const screenWidth = Dimensions.get('window').width;
+import { Image } from 'expo-image';
+import { ArrowIcon } from '../../../constants/icon';
+
+
+
+
+
+
+const screenWidth = Dimensions.get('window').width;
+
 
 const AccountSetting = () => {
 
