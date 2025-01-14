@@ -30,8 +30,7 @@ const CreateGoal = () => {
       if (data.message === "Goal not found") {
         setIsNoGoal(true)
       } else {
-        setGoal((prev) => [
-          ...prev,
+        setGoal([
           ...data.map((goal: any) => ({
             goal_id: goal.goal_id,
             goal_name: goal.goal_name,
@@ -54,9 +53,10 @@ const CreateGoal = () => {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
+    getSearchGoal()
     setTimeout(() => {
       setRefreshing(false);
-    }, 2000);
+    }, 500);
   }, []);
 
   const [search, setSearch] = useState('')

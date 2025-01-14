@@ -50,8 +50,7 @@ const YourGoal = () => {
       if (data.message === "No goal") {
         setNoGoal(true)
       } else {
-        setAllGoal((prev) => [
-          ...prev,
+        setAllGoal([
           ...data.map((goal: any) => ({
             goal_id:goal.goal_id,
             goal_name:goal.goal_name,
