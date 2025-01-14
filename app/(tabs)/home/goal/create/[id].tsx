@@ -9,6 +9,7 @@ import { AddIcon, CloseIcon } from '../../../../../constants/icon';
 import { useAuth } from '../../../../../context/authContext';
 import axios from 'axios';
 import { SERVER_URL } from '@env';
+import { FlashList } from '@shopify/flash-list';
 
 export default function GoalCreatePage() {
 
@@ -221,37 +222,41 @@ export default function GoalCreatePage() {
               <View className='mt-2 flex-col gap-2 pb-20'>
                 <Text>Task</Text>
 
-                {form.task.map((task, index) => (
-                  <View key={index} className="flex-row gap-1 items-center">
-                    <View className="rounded-full h-3 w-3 bg-primary"></View>
-                    <View
-                      className="grow flex justify-center border border-gray focus:border-primary rounded-normal"
-                      style={{ height: 40 }}
-                    >
-                      <TextInput
-                        className="flex-1 px-2 text-primary text-heading2 flex-wrap"
-                        style={{
-                          height: 40,
-                          width: '100%',
-                          textAlignVertical: 'center',
-                        }}
-                        placeholder="Task name..."
-                        placeholderTextColor="#CFCFCF"
-                        multiline={true}
-                        numberOfLines={4}
-                        value={task.task_name}
-                        onChangeText={(value) => handleTaskChange(index, value)}
-                        onContentSizeChange={(e) => {
-                          const height = Math.min(4 * 20, e.nativeEvent.contentSize.height);
-                          e.target.setNativeProps({ style: { height } });
-                        }}
-                      />
+                <FlashList
+                    data={form.task}
+                    renderItem={({ item, index }) =>
+                    <View key={index} className="flex-row gap-1 items-center">
+                      <View className="rounded-full h-3 w-3 bg-primary"></View>
+                      <View
+                        className="grow flex justify-center border border-gray focus:border-primary rounded-normal"
+                        style={{ height: 40 }}
+                      >
+                        <TextInput
+                          className="flex-1 px-2 text-primary text-heading2 flex-wrap"
+                          style={{
+                            height: 40,
+                            width: '100%',
+                            textAlignVertical: 'center',
+                          }}
+                          placeholder="Task name..."
+                          placeholderTextColor="#CFCFCF"
+                          multiline={true}
+                          numberOfLines={4}
+                          value={item.task_name}
+                          onChangeText={(value) => handleTaskChange(index, value)}
+                          onContentSizeChange={(e) => {
+                            const height = Math.min(4 * 20, e.nativeEvent.contentSize.height);
+                            e.target.setNativeProps({ style: { height } });
+                          }}
+                        />
+                      </View>
+                      <TouchableOpacity onPress={() => removeTask(index)}>
+                        <CloseIcon width={26} height={26} color="#CFCFCF" />
+                      </TouchableOpacity>
                     </View>
-                    <TouchableOpacity onPress={() => removeTask(index)}>
-                      <CloseIcon width={26} height={26} color="#CFCFCF" />
-                    </TouchableOpacity>
-                  </View>
-                ))}
+                    }
+                    estimatedItemSize={200}
+                  />
 
                 <View className="flex-1 justify-center items-center">
                   <TouchableOpacity

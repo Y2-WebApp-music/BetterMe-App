@@ -18,7 +18,7 @@ const MealCard = ({meal_id, meal_date, food_name, calorie, ai_create}:MealCardPr
   const AICreate = ai_create? '#1c60de':'#0dc47c'
 
   return (
-    <TouchableOpacity onPress={()=>{router.push(`/calendar/meal/${meal_id}`)}} style={{padding:12, paddingHorizontal:20, width:'100%'}} className='rounded-normal border border-gray bg-white flex-row items-center justify-center'>
+    <TouchableOpacity onPress={()=>{router.push(`/calendar/meal/${meal_id}`)}} style={{padding:12, paddingHorizontal:20, marginBottom: 8, width:'100%'}} className='rounded-normal border border-gray bg-white flex-row items-center justify-center'>
       <View style={{width:'80%'}} className='max-w-[64vw] grow'>
         <View className='flex-row gap-1 items-center'>
           <View style={{width:12, height:12,backgroundColor:AICreate}} className={`rounded-full flex justify-center items-center`}>

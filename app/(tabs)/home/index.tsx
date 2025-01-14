@@ -10,6 +10,7 @@ import SleepGoal from '../../../components/sleep/sleepGoal';
 import FoodGoal from '../../../components/food/foodGoal';
 import { SERVER_URL } from '@env';
 import axios from 'axios';
+import { FlashList } from "@shopify/flash-list";
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -124,7 +125,7 @@ const Home = () => {
             <View className='flex flex-row gap-2 items-center'>
               <View className='grow'>
                 <Text className='text-heading2 font-noto'>Goals Today</Text>
-                <Text className='text-body font-noto text-subText'>3 goals todo</Text>
+                <Text className='text-body font-noto text-subText'>{sortedGoalData.length} goals todo</Text>
               </View>
               <View>
                 <TouchableOpacity onPress={()=>{router.push('/home/createGoal')}} className=' bg-primary flex-row gap-2 p-1 px-4 justify-center items-center rounded-full'>
@@ -141,9 +142,13 @@ const Home = () => {
                 </View>
               ):(
                 sortedGoalData.length != 0 &&
-                  sortedGoalData.map((data,i)=>(
-                    <HomeGoalCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} end_date={data.end_date} total_task={data.total_task} complete_task={data.complete_task}/>
-                  ))
+                  <FlashList
+                    data={sortedGoalData}
+                    renderItem={({ item }) =>
+                      <HomeGoalCard goal_id={item.goal_id} goal_name={item.goal_name} end_date={item.end_date} total_task={item.total_task} complete_task={item.complete_task}/>
+                    }
+                    estimatedItemSize={200}
+                  />
               )}
               {/* {todayGoal.length != 0 &&
                 todayGoal.map((data,i)=>(

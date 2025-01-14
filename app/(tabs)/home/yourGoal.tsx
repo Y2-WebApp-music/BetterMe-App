@@ -9,6 +9,7 @@ import { goalDataDummy, homeGoalCardProp } from '../../../types/goal'
 import SearchInput from '../../../components/SearchInput'
 import axios from 'axios'
 import { SERVER_URL } from '@env'
+import { FlashList } from "@shopify/flash-list";
 
 const YourGoal = () => {
 
@@ -162,9 +163,13 @@ const YourGoal = () => {
                   </View>
                 ):(
                   sortedGoalData.length != 0 &&
-                    sortedGoalData.map((data,i)=>(
-                      <HomeGoalCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} end_date={data.end_date} total_task={data.total_task} complete_task={data.complete_task}/>
-                    ))
+                    <FlashList
+                      data={sortedGoalData}
+                      renderItem={({ item }) =>
+                        <HomeGoalCard goal_id={item.goal_id} goal_name={item.goal_name} end_date={item.end_date} total_task={item.total_task} complete_task={item.complete_task}/>
+                      }
+                      estimatedItemSize={200}
+                    />
                 )}
               </View>
             </View>
@@ -190,9 +195,13 @@ const YourGoal = () => {
                     <Text className='font-noto text-subText text-heading3'>No goal</Text>
                   </View>
                 ):(
-                  allGoal.map((data,i)=>(
-                    <HomeGoalCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} end_date={data.end_date} total_task={data.total_task} complete_task={data.complete_task}/>
-                  ))
+                  <FlashList
+                    data={allGoal}
+                    renderItem={({ item }) =>
+                      <HomeGoalCard goal_id={item.goal_id} goal_name={item.goal_name} end_date={item.end_date} total_task={item.total_task} complete_task={item.complete_task}/>
+                    }
+                    estimatedItemSize={200}
+                  />
                 )}
             </View>
           </View>

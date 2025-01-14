@@ -5,6 +5,7 @@ import { AddIcon, ArrowIcon, BackwardIcon, ForwardIcon, GridIcon, MenuIcon } fro
 import { router } from 'expo-router';
 import CalendarGoalCard from '../../../components/goal/calendarGoalCard';
 import MealCard from '../../../components/food/mealCard';
+import { FlashList } from '@shopify/flash-list';
 
 const MonthCalendar = () => {
 
@@ -74,6 +75,7 @@ const MonthCalendar = () => {
           contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', marginTop:0}}
           showsVerticalScrollIndicator={false}
         >
+
           <View style={{ transform: [{ translateY: -24 }] }} className="flex gap-2 items-center">
             <View className='max-h-[42vh]'>
               <Calendar
@@ -122,15 +124,27 @@ const MonthCalendar = () => {
             </View>
             {viewMeal? (
               <View className='w-full justify-center items-center gap-2 mt-2 pb-16'>
-                {mealListDummy.map((data,i)=>(
-                  <MealCard key={i} meal_id={data.meal_id} meal_date={data.meal_date} food_name={data.food_name} calorie={data.calorie} ai_create={data.ai_create}/>
-                ))}
+                <View className='w-full'>
+                  <FlashList
+                    data={mealListDummy}
+                    renderItem={({ item }) =>
+                      <MealCard meal_id={item.meal_id} meal_date={item.meal_date} food_name={item.food_name} calorie={item.calorie} ai_create={item.ai_create}/>
+                    }
+                    estimatedItemSize={200}
+                  />
+                </View>
               </View>
             ):(
               <View className='w-full justify-center items-center gap-2 mt-2 pb-16'>
-                {goalDataDummy.map((data,i)=>(
-                  <CalendarGoalCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} total_task={data.total_task} complete_task={data.complete_task}/>
-                ))}
+                <View className='w-full'>
+                  <FlashList
+                    data={goalDataDummy}
+                    renderItem={({ item }) =>
+                      <CalendarGoalCard goal_id={item.goal_id} goal_name={item.goal_name} total_task={item.total_task} complete_task={item.complete_task}/>
+                    }
+                    estimatedItemSize={200}
+                  />
+                </View>
               </View>
 
             )}

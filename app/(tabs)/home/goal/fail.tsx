@@ -3,6 +3,7 @@ import React, { useCallback, useState } from 'react'
 import BackButton from '../../../../components/Back'
 import { goalDataDummy } from '../../../../types/goal';
 import HomeGoalCard from '../../../../components/goal/homeGoalCard';
+import { FlashList } from '@shopify/flash-list';
 
 const Fail = () => {
 
@@ -52,9 +53,13 @@ const Fail = () => {
               </View>
 
               <View className='mt-2 flex-col gap-2'>
-                {sortedGoalData.map((data,i)=>(
-                  <HomeGoalCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} end_date={data.end_date} total_task={data.total_task} complete_task={data.complete_task}/>
-                ))}
+                <FlashList
+                  data={sortedGoalData}
+                  renderItem={({ item }) =>
+                  <HomeGoalCard goal_id={item.goal_id} goal_name={item.goal_name} end_date={item.end_date} total_task={item.total_task} complete_task={item.complete_task}/>
+                  }
+                  estimatedItemSize={200}
+                />
               </View>
             </View>
       </ScrollView>
