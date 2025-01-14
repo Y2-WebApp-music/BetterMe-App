@@ -27,7 +27,7 @@ const YourGoal = () => {
       const response = await axios.get(`${SERVER_URL}/goal/today/${user?._id}`);
       const data = response.data // homeGoalCardProp[]
 
-      console.log('getTodayGoal response \n',response.data);
+      // console.log('getTodayGoal response \n',response.data);
 
       if (data.message === "No goals for today") {
         setIsNoTodayGoal(true)
@@ -42,7 +42,7 @@ const YourGoal = () => {
 
   const getAllGoal = async () => {
     try {
-      const response = await axios.get(`${SERVER_URL}/goal/all`);
+      const response = await axios.get(`${SERVER_URL}/goal/user/${user?._id}`);
       const data = response.data // homeGoalCardProp[]
 
       console.log('getAllGoal response \n',response.data);
@@ -50,7 +50,16 @@ const YourGoal = () => {
       if (data.message === "No goal") {
         setNoGoal(true)
       } else {
-        setAllGoal(data)
+        setAllGoal((prev) => [
+          ...prev,
+          ...data.map((goal: any) => ({
+            goal_id:goal.goal_id,
+            goal_name:goal.goal_name,
+            total_task:goal.total_task,
+            complete_task:goal.complete_task,
+            end_date:goal.end_date,
+          })),
+        ])
       }
 
     } catch (error: any){
@@ -59,6 +68,7 @@ const YourGoal = () => {
   }
 
   useMemo(()=>{
+    console.log(' Refresh data');
     getTodayGoal()
     getAllGoal()
   },[])
@@ -109,6 +119,27 @@ const YourGoal = () => {
           </View>
         </View>
       </View>
+        {/*
+        =============================
+        ======== Goal Summary ========
+        =============================
+        */}
+        <View className='flex w-full justify-center'>
+          <View className='mt-3 w-full flex-row gap-2 items-center justify-center'>
+            <TouchableOpacity onPress={()=>{router.push('/home/goal/complete')}} className='flex-col p-1 px-4 rounded-normal bg-white border border-gray items-center justify-center'>
+              <Text className='font-noto text-body text-subText'>complete</Text>
+              <Text className='text-heading font-notoMedium text-green'>333</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={()=>{router.push('/home/goal/inprogress')}} className='flex-col p-1 px-4 rounded-normal bg-white border border-gray items-center justify-center'>
+              <Text className='font-noto text-body text-subText'>in progress</Text>
+              <Text className='text-heading font-notoMedium text-yellow'>333</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={()=>{router.push('/home/goal/fail')}} className='flex-col p-1 px-4 rounded-normal bg-white border border-gray items-center justify-center'>
+              <Text className='font-noto text-body text-subText'>failed</Text>
+              <Text className='text-heading font-notoMedium text-red'>333</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1, width:"100%",alignItems:'center' }}
@@ -123,27 +154,6 @@ const YourGoal = () => {
         >
           <View className='mt-2'>
 
-            {/*
-            =============================
-            ======== Goal Summary ========
-            =============================
-            */}
-            <View className=''>
-              <View className='mt-3 w-full flex-row gap-2 items-center justify-center'>
-                <TouchableOpacity onPress={()=>{router.push('/home/goal/complete')}} className='flex-col p-1 px-4 rounded-normal bg-white border border-gray items-center justify-center'>
-                  <Text className='font-noto text-body text-subText'>complete</Text>
-                  <Text className='text-heading font-notoMedium text-green'>333</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={()=>{router.push('/home/goal/inprogress')}} className='flex-col p-1 px-4 rounded-normal bg-white border border-gray items-center justify-center'>
-                  <Text className='font-noto text-body text-subText'>in progress</Text>
-                  <Text className='text-heading font-notoMedium text-yellow'>333</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={()=>{router.push('/home/goal/fail')}} className='flex-col p-1 px-4 rounded-normal bg-white border border-gray items-center justify-center'>
-                  <Text className='font-noto text-body text-subText'>failed</Text>
-                  <Text className='text-heading font-notoMedium text-red'>333</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
 
             {/*
             =============================
@@ -195,13 +205,15 @@ const YourGoal = () => {
                     <Text className='font-noto text-subText text-heading3'>No goal</Text>
                   </View>
                 ):(
-                  <FlashList
-                    data={allGoal}
-                    renderItem={({ item }) =>
-                      <HomeGoalCard goal_id={item.goal_id} goal_name={item.goal_name} end_date={item.end_date} total_task={item.total_task} complete_task={item.complete_task}/>
-                    }
-                    estimatedItemSize={200}
-                  />
+                  <View className='w-full min-h-32'>
+                    <FlashList
+                      data={allGoal}
+                      renderItem={({ item }) =>
+                        <HomeGoalCard goal_id={item.goal_id} goal_name={item.goal_name} end_date={item.end_date} total_task={item.total_task} complete_task={item.complete_task}/>
+                      }
+                      estimatedItemSize={200}
+                    />
+                  </View>
                 )}
             </View>
           </View>

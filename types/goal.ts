@@ -3,6 +3,7 @@ type goal = {
   goal_name: string
   total_task: number
 }
+
 export type homeGoalCardProp = goal & {
   complete_task: number
   end_date: string

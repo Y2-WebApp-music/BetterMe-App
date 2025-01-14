@@ -1,7 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView, TextInput, Switch } from 'react-native';
 import BackButton from '../../../../../components/Back';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import FormInput from '../../../../../components/FormInput';
 import PickDateModal from '../../../../../components/modal/PickDateModal';
 import { calculateDuration } from '../../../../../components/goal/goalCreateCard';
@@ -30,6 +30,36 @@ export default function GoalCreatePage() {
     create_by:user?._id,
     public_goal:true,
   })
+
+  const getGoalDetail = async () => {
+    if (id === "blank") {
+      return
+    } else {
+      try {
+        const response = await axios.get(`${SERVER_URL}/goal/create/${id}`);
+        const data = response.data // homeGoalCardProp[]
+  
+        console.log('getAllGoal response \n',response.data);
+  
+        if (data.message === "Goal not found") {
+          return
+        } else {
+          setForm({
+            goal_name:data.goal_name,
+            description:data.description,
+            start_date:new Date(),
+            end_date:new Date(),
+            task:data.task,
+            create_by:user?._id,
+            public_goal:data.public_goal,
+          })
+        }
+  
+      } catch (error: any){
+        console.error(error)
+      }
+    }
+  }
 
   const [startDateModal,setStartDateModal] = useState(false)
   const updateStartDate = (date: Date) => {
@@ -78,38 +108,6 @@ export default function GoalCreatePage() {
   const [err, setErr] = useState('')
   const [countdownInterval, setCountdownInterval] = useState<NodeJS.Timeout | null>(null);
 
-  const handleCreateGoal = async () => {
-
-    if ( form.goal_name != '' && form.description != ''){
-      if (form.task.length === 0) {
-        console.log('At least one task is required');
-        return setErr('At least one task is required');
-      }
-      if (form.task.some(task => task.task_name === '')){
-        console.log('Task at least one is empty please complete it');
-        return setErr('Task at least one is empty please complete it');
-      }
-
-      let counter = 3;
-      setCountdown(counter)
-      setIsConfirming(true);
-
-      const interval = setInterval(() => {
-        counter -= 1;
-        setCountdown(counter);
-
-        if (counter <= 0) {
-          clearInterval(interval);
-          postToDB()
-        }
-      }, 1000);
-
-      setCountdownInterval(interval)
-    } else {
-      console.log('goal_name or description is empty');
-    }
-  }
-
   const handleCancel = () => {
     if (countdownInterval) {
       clearInterval(countdownInterval);
@@ -142,6 +140,43 @@ export default function GoalCreatePage() {
       console.error('Can not create goal:', error);
     }
   }
+
+  const handleCreateGoal = async () => {
+
+    if ( form.goal_name != '' && form.description != ''){
+      if (form.task.length === 0) {
+        console.log('At least one task is required');
+        return setErr('At least one task is required');
+      }
+      if (form.task.some(task => task.task_name === '')){
+        console.log('Task at least one is empty please complete it');
+        return setErr('Task at least one is empty please complete it');
+      }
+
+      let counter = 3;
+      setCountdown(counter)
+      setIsConfirming(true);
+
+      const interval = setInterval(() => {
+        counter -= 1;
+        setCountdown(counter);
+
+        if (counter <= 0) {
+          clearInterval(interval);
+          postToDB()
+        }
+      }, 1000);
+
+      setCountdownInterval(interval)
+    } else {
+      console.log('goal_name or description is empty');
+    }
+  }
+
+  useMemo(()=>{
+    console.log('Goal ID :',id);
+    getGoalDetail()
+  },[id])
 
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
@@ -225,7 +260,7 @@ export default function GoalCreatePage() {
                 <FlashList
                     data={form.task}
                     renderItem={({ item, index }) =>
-                    <View key={index} className="flex-row gap-1 items-center">
+                    <View key={index} style={{marginBottom:8}} className="flex-row gap-1 items-center">
                       <View className="rounded-full h-3 w-3 bg-primary"></View>
                       <View
                         className="grow flex justify-center border border-gray focus:border-primary rounded-normal"
