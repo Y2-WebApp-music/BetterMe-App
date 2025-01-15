@@ -74,7 +74,7 @@ const Menu = () => {
             </View>
           </View>
           </View>
-          
+          <FoodSummary/>
           <Text className='text-subText my-2'>today : 23 May 2024</Text>
           <FoodToday/>
 
