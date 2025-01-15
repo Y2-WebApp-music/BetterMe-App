@@ -150,11 +150,6 @@ const Home = () => {
                     estimatedItemSize={200}
                   />
               )}
-              {/* {todayGoal.length != 0 &&
-                todayGoal.map((data,i)=>(
-                  <HomeGoalCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} end_date={data.end_date} total_task={data.total_task} complete_task={data.complete_task}/>
-                ))
-              } */}
               <View className='flex-1 justify-center items-center'>
                 <TouchableOpacity onPress={()=>{router.push('/home/yourGoal')}} className=' bg-primary flex-row gap-2 p-2 px-4 justify-center items-center rounded-full'>
                   <Text className='text-body text-white font-notoMedium'>View all goals</Text>

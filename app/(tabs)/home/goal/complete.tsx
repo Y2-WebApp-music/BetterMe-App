@@ -1,28 +1,55 @@
 import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, RefreshControl } from 'react-native'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import BackButton from '../../../../components/Back'
-import { goalDataDummy } from '../../../../types/goal';
+import { goalDataDummy, homeGoalCardProp } from '../../../../types/goal';
 import HomeGoalCard from '../../../../components/goal/homeGoalCard';
 import { FlashList } from '@shopify/flash-list';
+import axios from 'axios';
+import { SERVER_URL } from '@env';
+import { useAuth } from '../../../../context/authContext';
 
 const Complete = () => {
 
-  const sortedGoalData = [
-    ...goalDataDummy
-      .filter((goal) => goal.total_task === goal.complete_task)
-      .sort((a, b) => {
-        const dateA = new Date(a.end_date).setHours(0, 0, 0, 0);
-        const dateB = new Date(b.end_date).setHours(0, 0, 0, 0);
-        return dateA - dateB;
-      })
-  ];
+  const { user } = useAuth()
+  const [goal, setGoal] = useState<homeGoalCardProp[]>([])
+  const [isEmpty, setIsEmpty] = useState<boolean>(false)
+
+  const getGoal = async () => {
+    try {
+      const response = await axios.get(`${SERVER_URL}/goal/complete/${user?._id}`);
+      const data = response.data // homeGoalCardProp[]
+
+      // console.log('getGoal response \n',response.data);
+
+      if ((data.message === "Goal not found") || (data.message === "No completed goals")) {
+        setIsEmpty(true)
+      } else {
+        setGoal([
+          ...data.map((goal: any) => ({
+            goal_id:goal._id,
+            goal_name:goal.goal_name,
+            total_task:goal.tasks.length,
+            complete_task:goal.tasks.filter((task:any) => task.status === true).length,
+            end_date:goal.end_date,
+          })),
+        ])
+      }
+
+    } catch (error: any){
+      console.error(error)
+    }
+  }
+  useMemo(()=>{
+    getGoal()
+  },[])
 
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = useCallback(() => {
     setRefreshing(true);
+    getGoal()
     setTimeout(() => {
       setRefreshing(false);
-    }, 2000);
+    }, 500);
   }, []);
 
   return (
@@ -48,20 +75,22 @@ const Complete = () => {
         }
       >
         <View className=''>
-              <View className='flex flex-row gap-2 items-center'>
-
-              </View>
-
-              <View className='mt-2 flex-col gap-2'>
-                <FlashList
-                  data={sortedGoalData}
-                  renderItem={({ item }) =>
-                  <HomeGoalCard goal_id={item.goal_id} goal_name={item.goal_name} end_date={item.end_date} total_task={item.total_task} complete_task={item.complete_task}/>
-                  }
-                  estimatedItemSize={200}
-                />
-              </View>
+          {isEmpty? (
+            <View className='flex flex-row gap-2 h-[60vh] items-center justify-center'>
+              <Text className='font-noto text-subText text-heading2'>No goal</Text>
             </View>
+          ):(
+            <View className='mt-2 flex-col gap-2'>
+              <FlashList
+                data={goal}
+                renderItem={({ item }) =>
+                <HomeGoalCard goal_id={item.goal_id} goal_name={item.goal_name} end_date={item.end_date} total_task={item.total_task} complete_task={item.complete_task}/>
+                }
+                estimatedItemSize={200}
+              />
+            </View>
+          )}
+        </View>
       </ScrollView>
     </SafeAreaView>
   )
