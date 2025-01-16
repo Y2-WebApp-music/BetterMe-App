@@ -9,6 +9,7 @@ import { goalDataDummy, homeGoalCardProp } from '../../../types/goal'
 import SearchInput from '../../../components/SearchInput'
 import axios from 'axios'
 import { SERVER_URL } from '@env'
+import { FlashList } from "@shopify/flash-list";
 
 const YourGoal = () => {
 
@@ -21,12 +22,18 @@ const YourGoal = () => {
   const [isNoTodayGoal, setIsNoTodayGoal] = useState(false)
   const [todayGoal, setTodayGoal] = useState<homeGoalCardProp[]>([])
 
+  const [summary,setSummary] = useState({
+    complete:0,
+    inprogress:0,
+    fail:0,
+  })
+
   const getTodayGoal = async () => {
     try {
       const response = await axios.get(`${SERVER_URL}/goal/today/${user?._id}`);
       const data = response.data // homeGoalCardProp[]
 
-      console.log('getTodayGoal response \n',response.data);
+      // console.log('getTodayGoal response \n',response.data);
 
       if (data.message === "No goals for today") {
         setIsNoTodayGoal(true)
@@ -41,7 +48,7 @@ const YourGoal = () => {
 
   const getAllGoal = async () => {
     try {
-      const response = await axios.get(`${SERVER_URL}/goal/all`);
+      const response = await axios.get(`${SERVER_URL}/goal/user/${user?._id}`);
       const data = response.data // homeGoalCardProp[]
 
       console.log('getAllGoal response \n',response.data);
@@ -49,7 +56,15 @@ const YourGoal = () => {
       if (data.message === "No goal") {
         setNoGoal(true)
       } else {
-        setAllGoal(data)
+        setAllGoal([
+          ...data.map((goal: any) => ({
+            goal_id:goal.goal_id,
+            goal_name:goal.goal_name,
+            total_task:goal.total_task,
+            complete_task:goal.complete_task,
+            end_date:goal.end_date,
+          })),
+        ])
       }
 
     } catch (error: any){
@@ -57,10 +72,26 @@ const YourGoal = () => {
     }
   }
 
-  useMemo(()=>{
-    getTodayGoal()
-    getAllGoal()
-  },[])
+  const updateSummary = (allGoal:homeGoalCardProp[]) => {
+    console.log('updateSummary');
+    const todayDate = new Date().setHours(0, 0, 0, 0);
+    const complete = allGoal.filter(goal => goal.complete_task === goal.total_task).length;
+    const inprogress = allGoal.filter(goal => goal.complete_task < goal.total_task && new Date(goal.end_date).setHours(0, 0, 0, 0) >= todayDate).length;
+    const fail = allGoal.filter(goal => goal.complete_task < goal.total_task && new Date(goal.end_date).setHours(0, 0, 0, 0) < todayDate).length;
+
+    console.log('complete:',complete,' inprogress:',inprogress,' fail:',fail);
+  
+    setSummary({ complete, inprogress, fail });
+  };
+
+  useMemo(() => {
+    const fetchData = async () => {
+      await getTodayGoal();
+      await getAllGoal();
+      updateSummary(allGoal);
+    };
+    fetchData();
+  }, []);
 
   const sortedGoalData = todayGoal?
   [
@@ -71,13 +102,13 @@ const YourGoal = () => {
         const dateB = new Date(b.end_date).setHours(0, 0, 0, 0);
         return dateA - dateB;
       }),
-    ...todayGoal
-      .filter((goal) => goal.total_task === goal.complete_task)
-      .sort((a, b) => {
-        const dateA = new Date(a.end_date).setHours(0, 0, 0, 0);
-        const dateB = new Date(b.end_date).setHours(0, 0, 0, 0);
-        return dateA - dateB;
-      }),
+      // ...todayGoal
+      // .filter((goal) => goal.total_task === goal.complete_task)
+      // .sort((a, b) => {
+      //   const dateA = new Date(a.end_date).setHours(0, 0, 0, 0);
+      //   const dateB = new Date(b.end_date).setHours(0, 0, 0, 0);
+      //   return dateA - dateB;
+      // }),
   ] : [];
 
   const [refreshing, setRefreshing] = useState(false);
@@ -86,6 +117,7 @@ const YourGoal = () => {
     getTodayGoal().finally(() => setRefreshing(false));
     setRefreshing(true);
     getAllGoal().finally(() => setRefreshing(false));
+    updateSummary(allGoal)
   }, []);
 
   return (
@@ -108,6 +140,27 @@ const YourGoal = () => {
           </View>
         </View>
       </View>
+        {/*
+        =============================
+        ======== Goal Summary ========
+        =============================
+        */}
+        <View className='flex w-full justify-center'>
+          <View className='mt-3 w-full flex-row gap-2 items-center justify-center'>
+            <TouchableOpacity onPress={()=>{router.push('/home/goal/complete')}} className='flex-col p-1 px-4 min-w-28 rounded-normal bg-white border border-gray items-center justify-center'>
+              <Text className='font-noto text-body text-subText'>complete</Text>
+              <Text className='text-heading font-notoMedium text-green'>{summary.complete}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={()=>{router.push('/home/goal/inprogress')}} className='flex-col p-1 px-4 min-w-28 rounded-normal bg-white border border-gray items-center justify-center'>
+              <Text className='font-noto text-body text-subText'>in progress</Text>
+              <Text className='text-heading font-notoMedium text-yellow'>{summary.inprogress}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={()=>{router.push('/home/goal/fail')}} className='flex-col p-1 px-4 min-w-28 rounded-normal bg-white border border-gray items-center justify-center'>
+              <Text className='font-noto text-body text-subText'>failed</Text>
+              <Text className='text-heading font-notoMedium text-red'>{summary.fail}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1, width:"100%",alignItems:'center' }}
@@ -122,27 +175,6 @@ const YourGoal = () => {
         >
           <View className='mt-2'>
 
-            {/*
-            =============================
-            ======== Goal Summary ========
-            =============================
-            */}
-            <View className=''>
-              <View className='mt-3 w-full flex-row gap-2 items-center justify-center'>
-                <TouchableOpacity onPress={()=>{router.push('/home/goal/complete')}} className='flex-col p-1 px-4 rounded-normal bg-white border border-gray items-center justify-center'>
-                  <Text className='font-noto text-body text-subText'>complete</Text>
-                  <Text className='text-heading font-notoMedium text-green'>333</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={()=>{router.push('/home/goal/inprogress')}} className='flex-col p-1 px-4 rounded-normal bg-white border border-gray items-center justify-center'>
-                  <Text className='font-noto text-body text-subText'>in progress</Text>
-                  <Text className='text-heading font-notoMedium text-yellow'>333</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={()=>{router.push('/home/goal/fail')}} className='flex-col p-1 px-4 rounded-normal bg-white border border-gray items-center justify-center'>
-                  <Text className='font-noto text-body text-subText'>failed</Text>
-                  <Text className='text-heading font-notoMedium text-red'>333</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
 
             {/*
             =============================
@@ -157,14 +189,23 @@ const YourGoal = () => {
 
               <View className='mt-2 flex-col gap-2'>
                 {isNoTodayGoal? (
-                  <View className='flex-1 justify-center items-center p-6 pt-20'>
-                    <Text className='font-noto text-subText text-heading3'>No goal Today</Text>
+                  <View style={{width:'100%', height:80, justifyContent:'center', alignContent:'center'}}>
+                    <Text className='font-noto text-subText text-heading3 text-center'>No goal Today</Text>
                   </View>
                 ):(
-                  sortedGoalData.length != 0 &&
-                    sortedGoalData.map((data,i)=>(
-                      <HomeGoalCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} end_date={data.end_date} total_task={data.total_task} complete_task={data.complete_task}/>
-                    ))
+                  sortedGoalData.length != 0 ? (
+                    <FlashList
+                      data={sortedGoalData}
+                      renderItem={({ item }) =>
+                        <HomeGoalCard goal_id={item.goal_id} goal_name={item.goal_name} end_date={item.end_date} total_task={item.total_task} complete_task={item.complete_task}/>
+                      }
+                      estimatedItemSize={200}
+                    />
+                  ):(
+                    <View style={{width:'100%', height:80, justifyContent:'center', alignContent:'center'}}>
+                      <Text className='font-noto text-subText text-heading3 text-center'>No goal Todo</Text>
+                    </View>
+                  )
                 )}
               </View>
             </View>
@@ -190,9 +231,15 @@ const YourGoal = () => {
                     <Text className='font-noto text-subText text-heading3'>No goal</Text>
                   </View>
                 ):(
-                  allGoal.map((data,i)=>(
-                    <HomeGoalCard key={i} goal_id={data.goal_id} goal_name={data.goal_name} end_date={data.end_date} total_task={data.total_task} complete_task={data.complete_task}/>
-                  ))
+                  <View className='w-full min-h-32'>
+                    <FlashList
+                      data={allGoal}
+                      renderItem={({ item }) =>
+                        <HomeGoalCard goal_id={item.goal_id} goal_name={item.goal_name} end_date={item.end_date} total_task={item.total_task} complete_task={item.complete_task}/>
+                      }
+                      estimatedItemSize={200}
+                    />
+                  </View>
                 )}
             </View>
           </View>
@@ -202,70 +249,5 @@ const YourGoal = () => {
   )
 }
 
-export const allGoalDataDummy = [
-  {
-    goal_id:'1',
-    goal_name:'Title 1 Line test text inline style Second Line First Line test text inline style Second Line First Line test text inline style Second Line',
-    end_date:new Date().toDateString(),
-    total_task:12,
-    complete_task:12,
-  },
-  {
-    goal_id:'2',
-    goal_name:'Title 2',
-    end_date:new Date(new Date().setDate(new Date().getDate() + 45)).toDateString(),
-    total_task:6,
-    complete_task:2,
-  },
-  {
-    goal_id:'3',
-    goal_name:'Title 3',
-    end_date:new Date(new Date().setDate(new Date().getDate() + 10)).toDateString(),
-    total_task:6,
-    complete_task:3,
-  },
-  {
-    goal_id:'4',
-    goal_name:'Title 1 Line test text inline style Second Line First Line test text inline style Second Line First Line test text inline style Second Line',
-    end_date:new Date().toDateString(),
-    total_task:12,
-    complete_task:12,
-  },
-  {
-    goal_id:'5',
-    goal_name:'Title 2',
-    end_date:new Date(new Date().setDate(new Date().getDate() + 45)).toDateString(),
-    total_task:6,
-    complete_task:2,
-  },
-  {
-    goal_id:'6',
-    goal_name:'Title 3',
-    end_date:new Date(new Date().setDate(new Date().getDate() + 10)).toDateString(),
-    total_task:6,
-    complete_task:3,
-  },
-  {
-    goal_id:'7',
-    goal_name:'Title 1 Line test text inline style Second Line First Line test text inline style Second Line First Line test text inline style Second Line',
-    end_date:new Date().toDateString(),
-    total_task:12,
-    complete_task:12,
-  },
-  {
-    goal_id:'8',
-    goal_name:'Title 2',
-    end_date:new Date(new Date().setDate(new Date().getDate() + 45)).toDateString(),
-    total_task:6,
-    complete_task:2,
-  },
-  {
-    goal_id:'9',
-    goal_name:'Title 3',
-    end_date:new Date(new Date().setDate(new Date().getDate() + 10)).toDateString(),
-    total_task:6,
-    complete_task:3,
-  },
-]
 
 export default YourGoal

@@ -11,6 +11,7 @@ import BackButton from '../../../../components/Back';
 import { DeleteIcon, OptionIcon } from '../../../../constants/icon';
 import { useAuth } from '../../../../context/authContext';
 import { GoalData, Task } from '../../../../types/goal';
+import { FlashList } from '@shopify/flash-list';
 
 const { width } = Dimensions.get('window');
 const circle_length = width * 0.62;
@@ -298,20 +299,25 @@ export default function GoalScreen() {
                 </View>
               ):(
                 <View className='w-[95%] mt-2 flex-col gap-4'>
-                  {goalData.task.map((data,i)=>(
-                    <BouncyCheckbox
-                      key={i}
-                      size={25}
-                      fillColor="#0DC47C"
-                      unFillColor="#FFFFFF"
-                      textComponent={<TextCheckBox taskName={data.task_name} isChecked={data.status} />}
-                      textContainerStyle={{ marginLeft:20 }}
-                      iconStyle={{ borderColor: "#0DC47C", borderRadius:6 }}
-                      innerIconStyle={{ borderWidth: 2, borderRadius:6, borderColor:'#E8E8E8' }}
-                      isChecked={data.status}
-                      onPress={() => handleToggleTask(i)}
-                    />
-                  ))}
+                  <FlashList
+                    data={goalData.task}
+                    renderItem={({ item, index }) =>
+                      <View style={{ marginBottom: 12 }}>
+                        <BouncyCheckbox
+                          size={25}
+                          fillColor="#0DC47C"
+                          unFillColor="#FFFFFF"
+                          textComponent={<TextCheckBox taskName={item.task_name} isChecked={item.status} />}
+                          textContainerStyle={{ marginLeft:20 }}
+                          iconStyle={{ borderColor: "#0DC47C", borderRadius:6 }}
+                          innerIconStyle={{ borderWidth: 2, borderRadius:6, borderColor:'#E8E8E8' }}
+                          isChecked={item.status}
+                          onPress={() => handleToggleTask(index)}
+                        />
+                      </View>
+                    }
+                    estimatedItemSize={200}
+                  />
                 </View>
               )}
             </View>

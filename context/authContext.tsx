@@ -65,7 +65,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         if (userData.message === "User not found"){
           router.replace('/(auth)/googleRegis');
         } else {
-          const { _id,birth_date, gender, weight, height, activity, calorie_need } = response.data.user;
+          const { _id, birth_date, gender, weight, height, activity, calorie_need } = response.data.user;
           const serverToken = response.data.token;
           const extendedUser: UserData = {
             ...firebaseUser,
@@ -109,6 +109,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const handleSignOut = async () => {
     try {
       await signOut(auth);
+      const response = await axios.post(`${SERVER_URL}/user/logout`);
+      const res = response.data
+      console.log('message :',res.message);
+
       await AsyncStorage.removeItem('@user');
       setUser(null);
     } catch (error) {

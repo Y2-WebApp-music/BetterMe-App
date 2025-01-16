@@ -1,7 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView, TextInput, Switch } from 'react-native';
 import BackButton from '../../../../../components/Back';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import FormInput from '../../../../../components/FormInput';
 import PickDateModal from '../../../../../components/modal/PickDateModal';
 import { calculateDuration } from '../../../../../components/goal/goalCreateCard';
@@ -9,6 +9,7 @@ import { AddIcon, CloseIcon } from '../../../../../constants/icon';
 import { useAuth } from '../../../../../context/authContext';
 import axios from 'axios';
 import { SERVER_URL } from '@env';
+import { FlashList } from '@shopify/flash-list';
 
 export default function GoalCreatePage() {
 
@@ -29,6 +30,36 @@ export default function GoalCreatePage() {
     create_by:user?._id,
     public_goal:true,
   })
+
+  const getGoalDetail = async () => {
+    if (id === "blank") {
+      return
+    } else {
+      try {
+        const response = await axios.get(`${SERVER_URL}/goal/create/${id}`);
+        const data = response.data // homeGoalCardProp[]
+  
+        console.log('getAllGoal response \n',response.data);
+  
+        if (data.message === "Goal not found") {
+          return
+        } else {
+          setForm({
+            goal_name:data.goal_name,
+            description:data.description,
+            start_date:new Date(),
+            end_date:new Date(),
+            task:data.task,
+            create_by:user?._id,
+            public_goal:data.public_goal,
+          })
+        }
+  
+      } catch (error: any){
+        console.error(error)
+      }
+    }
+  }
 
   const [startDateModal,setStartDateModal] = useState(false)
   const updateStartDate = (date: Date) => {
@@ -77,38 +108,6 @@ export default function GoalCreatePage() {
   const [err, setErr] = useState('')
   const [countdownInterval, setCountdownInterval] = useState<NodeJS.Timeout | null>(null);
 
-  const handleCreateGoal = async () => {
-
-    if ( form.goal_name != '' && form.description != ''){
-      if (form.task.length === 0) {
-        console.log('At least one task is required');
-        return setErr('At least one task is required');
-      }
-      if (form.task.some(task => task.task_name === '')){
-        console.log('Task at least one is empty please complete it');
-        return setErr('Task at least one is empty please complete it');
-      }
-
-      let counter = 3;
-      setCountdown(counter)
-      setIsConfirming(true);
-
-      const interval = setInterval(() => {
-        counter -= 1;
-        setCountdown(counter);
-
-        if (counter <= 0) {
-          clearInterval(interval);
-          postToDB()
-        }
-      }, 1000);
-
-      setCountdownInterval(interval)
-    } else {
-      console.log('goal_name or description is empty');
-    }
-  }
-
   const handleCancel = () => {
     if (countdownInterval) {
       clearInterval(countdownInterval);
@@ -141,6 +140,43 @@ export default function GoalCreatePage() {
       console.error('Can not create goal:', error);
     }
   }
+
+  const handleCreateGoal = async () => {
+
+    if ( form.goal_name != '' && form.description != ''){
+      if (form.task.length === 0) {
+        console.log('At least one task is required');
+        return setErr('At least one task is required');
+      }
+      if (form.task.some(task => task.task_name === '')){
+        console.log('Task at least one is empty please complete it');
+        return setErr('Task at least one is empty please complete it');
+      }
+
+      let counter = 3;
+      setCountdown(counter)
+      setIsConfirming(true);
+
+      const interval = setInterval(() => {
+        counter -= 1;
+        setCountdown(counter);
+
+        if (counter <= 0) {
+          clearInterval(interval);
+          postToDB()
+        }
+      }, 1000);
+
+      setCountdownInterval(interval)
+    } else {
+      console.log('goal_name or description is empty');
+    }
+  }
+
+  useMemo(()=>{
+    console.log('Goal ID :',id);
+    getGoalDetail()
+  },[id])
 
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
@@ -221,37 +257,41 @@ export default function GoalCreatePage() {
               <View className='mt-2 flex-col gap-2 pb-20'>
                 <Text>Task</Text>
 
-                {form.task.map((task, index) => (
-                  <View key={index} className="flex-row gap-1 items-center">
-                    <View className="rounded-full h-3 w-3 bg-primary"></View>
-                    <View
-                      className="grow flex justify-center border border-gray focus:border-primary rounded-normal"
-                      style={{ height: 40 }}
-                    >
-                      <TextInput
-                        className="flex-1 px-2 text-primary text-heading2 flex-wrap"
-                        style={{
-                          height: 40,
-                          width: '100%',
-                          textAlignVertical: 'center',
-                        }}
-                        placeholder="Task name..."
-                        placeholderTextColor="#CFCFCF"
-                        multiline={true}
-                        numberOfLines={4}
-                        value={task.task_name}
-                        onChangeText={(value) => handleTaskChange(index, value)}
-                        onContentSizeChange={(e) => {
-                          const height = Math.min(4 * 20, e.nativeEvent.contentSize.height);
-                          e.target.setNativeProps({ style: { height } });
-                        }}
-                      />
+                <FlashList
+                    data={form.task}
+                    renderItem={({ item, index }) =>
+                    <View key={index} style={{marginBottom:8}} className="flex-row gap-1 items-center">
+                      <View className="rounded-full h-3 w-3 bg-primary"></View>
+                      <View
+                        className="grow flex justify-center border border-gray focus:border-primary rounded-normal"
+                        style={{ height: 40 }}
+                      >
+                        <TextInput
+                          className="flex-1 px-2 text-primary text-heading2 flex-wrap"
+                          style={{
+                            height: 40,
+                            width: '100%',
+                            textAlignVertical: 'center',
+                          }}
+                          placeholder="Task name..."
+                          placeholderTextColor="#CFCFCF"
+                          multiline={true}
+                          numberOfLines={4}
+                          value={item.task_name}
+                          onChangeText={(value) => handleTaskChange(index, value)}
+                          onContentSizeChange={(e) => {
+                            const height = Math.min(4 * 20, e.nativeEvent.contentSize.height);
+                            e.target.setNativeProps({ style: { height } });
+                          }}
+                        />
+                      </View>
+                      <TouchableOpacity onPress={() => removeTask(index)}>
+                        <CloseIcon width={26} height={26} color="#CFCFCF" />
+                      </TouchableOpacity>
                     </View>
-                    <TouchableOpacity onPress={() => removeTask(index)}>
-                      <CloseIcon width={26} height={26} color="#CFCFCF" />
-                    </TouchableOpacity>
-                  </View>
-                ))}
+                    }
+                    estimatedItemSize={200}
+                  />
 
                 <View className="flex-1 justify-center items-center">
                   <TouchableOpacity

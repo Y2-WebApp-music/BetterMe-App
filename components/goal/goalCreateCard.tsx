@@ -26,7 +26,7 @@ const GoalCreateCard = ({goal_id, goal_name, start_date, end_date, total_task, c
   const duration = calculateDuration(start_date, end_date)
 
   return (
-    <TouchableOpacity onPress={()=>{router.push(`/home/goal/create/${goal_id}`)}} className='h-32 p-4 w-full justify-center rounded-normal border border-gray bg-white flex-row'>
+    <TouchableOpacity onPress={()=>{router.push(`/home/goal/create/${goal_id}`)}} style={{marginBottom: 8}} className='h-32 p-4 w-full justify-center rounded-normal border border-gray bg-white flex-row'>
       <View style={{width:'89%', height:'100%'}} className='flex justify-center items-start'>
         <View style={{width:'100%', height:'70%'}} className='justify-center'>
           <Text

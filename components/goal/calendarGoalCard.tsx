@@ -26,7 +26,7 @@ const CalendarGoalCard = ({goal_id, goal_name, total_task, complete_task}:calend
   });
 
   return (
-    <TouchableOpacity  onPress={()=>{router.push(`/home/goal/${goal_id}`)}} className='h-32 w-full bg-white rounded-normal border border-gray justify-center items-center'>
+    <TouchableOpacity  onPress={()=>{router.push(`/home/goal/${goal_id}`)}} style={{marginBottom: 8}} className='h-32 w-full bg-white rounded-normal border border-gray justify-center items-center'>
       <View className='w-[92%] h-32 flex-col gap-1 justify-center'>
         <View className='flex-col w-full h-[80%]'>
           <View className='w-full h-[78%] flex-row items-center justify-center gap-1'>
