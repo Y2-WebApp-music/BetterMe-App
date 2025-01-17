@@ -37,7 +37,7 @@
     "expo-font": "~13.0.2",
     "expo-image": "~2.0.3",
     "expo-image-picker": "~16.0.3",
-    "expo-linear-gradient": "~14.0.1",
+    "expo-linear-gradient": "~14.0.2",
     "expo-media-library": "~17.0.4",
     "expo-notifications": "~0.29.11",
     "expo-router": "~4.0.15",
