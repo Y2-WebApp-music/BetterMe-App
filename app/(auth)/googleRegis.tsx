@@ -8,9 +8,10 @@ import PickNumberModal from '../../components/modal/PickNumberModal'
 import { onAuthStateChanged, User } from 'firebase/auth'
 import { auth } from '../../components/auth/firebaseConfig'
 import axios from 'axios'
-import { useAuth, UserData } from '../../context/authContext'
+import { useAuth } from '../../context/authContext'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { SERVER_URL } from '@env'
+import { UserData } from '../../types/user'
 
 
 type UserProp = {
@@ -130,10 +131,14 @@ const Register = () => {
           activity: form.activity,
         });
 
-        const { birth_date, gender, weight, height, activity, calorie_need } = response.data.user;
+        const { _id, birth_date, gender, weight, height, activity, calorie_need } = response.data.user;
+        const serverToken = response.data.token;
+        // const { birth_date, gender, weight, height, activity, calorie_need } = response.data.user;
 
         const extendedUser: UserData = {
           ...firebaseUser,
+          _id,
+          serverToken,
           birth_date,
           gender,
           weight,

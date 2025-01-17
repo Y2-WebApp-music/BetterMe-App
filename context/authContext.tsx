@@ -5,17 +5,8 @@ import { router } from 'expo-router';
 import { GoogleAuthProvider, IdTokenResult, onAuthStateChanged, signInWithCredential, signOut, User, UserInfo, UserMetadata } from 'firebase/auth';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { auth } from '../components/auth/firebaseConfig';
+import { UserData } from '../types/user';
 
-export type UserData = User & {
-  _id:string
-  serverToken:string
-  birth_date: Date
-  gender: number
-  weight: number,
-  height: number,
-  activity: number,
-  calorie_need: number,
-}
 type AuthContextType = {
   user: UserData | null;
   setUser: React.Dispatch<React.SetStateAction<UserData | null>>;

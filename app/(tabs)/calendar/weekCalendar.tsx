@@ -61,7 +61,7 @@ const WeekCalendar = () => {
               </TouchableOpacity>
               <View className='grow'/>
               {viewMeal?(
-                <TouchableOpacity onPress={()=>{router.push('/camera')}} className='rounded-full p-1 px-4 bg-primary flex-row items-center justify-center gap-1'>
+                <TouchableOpacity onPress={()=>{router.push('/calendar/addMeal')}} className='rounded-full p-1 px-4 bg-primary flex-row items-center justify-center gap-1'>
                   <Text className='text-white font-noto text-heading3'>add meal</Text>
                   <AddIcon width={22} height={22} color={'#fff'}/>
                 </TouchableOpacity>
@@ -72,23 +72,27 @@ const WeekCalendar = () => {
             </View>
             {viewMeal? (
               <View className='w-full justify-center items-center gap-2 mt-2 pb-16'>
-                <FlashList
-                  data={mealListDummy}
-                  renderItem={({ item }) =>
-                    <MealCard meal_id={item.meal_id} meal_date={item.meal_date} food_name={item.food_name} calorie={item.calorie} ai_create={item.ai_create}/>
-                  }
-                  estimatedItemSize={200}
-                />
+                <View className='w-full'>
+                  <FlashList
+                    data={mealListDummy}
+                    renderItem={({ item }) =>
+                      <MealCard meal_id={item.meal_id} meal_date={item.meal_date} food_name={item.food_name} calorie={item.calorie} ai_create={item.ai_create}/>
+                    }
+                    estimatedItemSize={200}
+                  />
+                </View>
               </View>
             ):(
               <View className='w-full justify-center items-center gap-2 mt-2 pb-16'>
-                <FlashList
-                  data={goalDataDummy}
-                  renderItem={({ item }) =>
-                    <CalendarGoalCard goal_id={item.goal_id} goal_name={item.goal_name} total_task={item.total_task} complete_task={item.complete_task}/>
-                  }
-                  estimatedItemSize={200}
-                />
+                <View className='w-full'>
+                  <FlashList
+                    data={goalDataDummy}
+                    renderItem={({ item }) =>
+                      <CalendarGoalCard goal_id={item.goal_id} goal_name={item.goal_name} total_task={item.total_task} complete_task={item.complete_task}/>
+                    }
+                    estimatedItemSize={200}
+                  />
+                </View>
               </View>
 
             )}

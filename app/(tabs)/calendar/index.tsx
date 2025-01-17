@@ -146,7 +146,6 @@ const MonthCalendar = () => {
                   />
                 </View>
               </View>
-
             )}
           </View>
         </ScrollView>

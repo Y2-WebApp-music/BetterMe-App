@@ -13,9 +13,6 @@ const MealPage = () => {
             <BackButton />
           </View>
         </View>
-        <View className='grow items-end'>
-          <Text className='text-subText'>14:00</Text>
-        </View>
       </View>
       <ScrollView
         className='w-[92%] h-auto pb-20 mt-2'
@@ -27,10 +24,11 @@ const MealPage = () => {
             <View className='grow'>
               <Text className='text-heading font-noto'>Food Meal Name</Text>
               <Text className='text-subText font-noto -translate-y-1'>portion</Text>
+              <Text className='text-subText font-noto -translate-y-1 mt-1'>12 September 2025 14:39</Text>
             </View>
-            <View className='flex-row gap-1 items-end'>
+            <View className='flex-row gap-1 items-center'>
               <Text className='text-title font-notoMedium text-primary'>468</Text>
-              <View style={{transform:[{ translateY: -8 }]}}>
+              <View style={{transform:[{ translateY: 4 }]}}>
                 <Text className='font-noto'>cal</Text>
               </View>
             </View>

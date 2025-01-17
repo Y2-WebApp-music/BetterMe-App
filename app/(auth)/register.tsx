@@ -17,7 +17,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth, firebaseStorage } from '../../components/auth/firebaseConfig';
-import { useAuth, UserData } from '../../context/authContext';
+import { useAuth } from '../../context/authContext';
+import { UserData } from '../../types/user';
 
 type UserProp = {
   username:string,
@@ -211,10 +212,14 @@ const Register = () => {
 
         // const res = response.data;
         // const extendedUser: UserData = { ...user, ...res };
-        const { birth_date, gender, weight, height, activity, calorie_need } = response.data.user;
+        const { _id, birth_date, gender, weight, height, activity, calorie_need } = response.data.user;
+        const serverToken = response.data.token;
+        // const { birth_date, gender, weight, height, activity, calorie_need } = response.data.user;
 
         const extendedUser: UserData = {
           ...user,
+          _id,
+          serverToken,
           birth_date,
           gender,
           weight,
