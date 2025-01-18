@@ -59,8 +59,8 @@ const RainbowButton = ({handleClick, text, active}:RainbowButtonProp) => {
         </View>
       )}
       <TouchableOpacity onPress={handleClick} disabled={!active} style={styles.button} activeOpacity={0.7}>
-        <View style={{transform:[{translateY:-2}]}}>
-          <Text className='font-semibold' style={[styles.text,{color: active? '#1C60DE': '#CFCFCF'}]}>{text}</Text>
+        <View style={{transform:[{translateY:1}]}}>
+          <Text className='font-notoSemiBold' style={[styles.text,{color: active? '#1C60DE': '#CFCFCF'}]}>{text}</Text>
         </View>
       </TouchableOpacity>
     </View>
@@ -69,15 +69,16 @@ const RainbowButton = ({handleClick, text, active}:RainbowButtonProp) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    // flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    // backgroundColor: 'red',
+    width: 'auto',
+    alignContent:'flex-end',
   },
   overflow:{
     position:'relative',
-    width: screenWidth*0.91,
-    height: screenWidth*0.094,
+    width: screenWidth*0.45,
+    height: screenWidth*0.084,
     borderRadius: 999,
     justifyContent: 'center',
     alignItems: 'center',
@@ -94,16 +95,16 @@ const styles = StyleSheet.create({
   },
   gradientBorder: {
     position: 'absolute',
-    width: screenWidth*1,
+    width: screenWidth*0.5,
     height: screenWidth*1,
     borderRadius: 9999,
     borderWidth: 0, // Width of the rainbow border
   },
   button: {
     position: 'absolute',
-    width: screenWidth*0.9, // Inner button size
-    height: screenWidth*0.085,
-    padding:8,
+    width: screenWidth*0.44, // Inner button size
+    height: screenWidth*0.075,
+    // padding:8,
     paddingHorizontal:14,
     borderRadius: 9999,
     backgroundColor: '#fbffff',
@@ -114,7 +115,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontWeight: '500',
-    fontSize: 18,
+    fontSize: 15,
   },
 });
 

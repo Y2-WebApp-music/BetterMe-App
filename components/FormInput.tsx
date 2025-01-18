@@ -21,8 +21,8 @@ const FormInput:React.FC<TextInputProp> = ({name, value, handleChange, keyboardT
   const borderColor = value || isFocused ? '#1C60DE' : '#E8E8E8'
 
   return (
-    <View className='w-full mt-2'
-      style={{marginTop: 10}}
+    <View className='w-full'
+      style={{marginTop: 6}}
     >
       <Text className='text-subText text-detail'>{name}</Text>
       <View

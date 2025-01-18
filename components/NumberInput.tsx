@@ -27,9 +27,9 @@ const NumberInput:React.FC<TextInputProp> = ({name, value, handleChange}) => {
         ]}
       >
         <TextInput
-          className='flex-1 text-primary text-heading2 font-noto'
+          className='flex-1 text-primary text-heading2 font-noto text-center'
           style={{
-            height: 40,
+            height: 38,
             width:"94%",
             textAlignVertical: "center",
           }}
