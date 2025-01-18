@@ -1,8 +1,8 @@
 import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, Switch, TouchableWithoutFeedback } from 'react-native'
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Calendar, toDateId, CalendarTheme } from "@marceloterreiro/flash-calendar";
 import { AddIcon, ArrowIcon, BackwardIcon, ForwardIcon, GridIcon, MenuIcon } from '../../../constants/icon';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import CalendarGoalCard from '../../../components/goal/calendarGoalCard';
 import MealCard from '../../../components/food/mealCard';
 import { FlashList } from '@shopify/flash-list';
@@ -32,6 +32,11 @@ const MonthCalendar = () => {
   const year = currentMonth.getFullYear();
 
   const [openOption, setOpenOption] = useState(false)
+
+  useFocusEffect(
+    useCallback(() => {
+    }, [])
+  );
 
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">

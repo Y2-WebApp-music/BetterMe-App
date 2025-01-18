@@ -7,6 +7,7 @@ import { FlashList } from '@shopify/flash-list';
 import axios from 'axios';
 import { SERVER_URL } from '@env';
 import { useAuth } from '../../../../context/authContext';
+import { useFocusEffect } from 'expo-router';
 
 const Complete = () => {
 
@@ -39,9 +40,12 @@ const Complete = () => {
       console.error(error)
     }
   }
-  useMemo(()=>{
-    getGoal()
-  },[])
+
+  useFocusEffect(
+    useCallback(() => {
+      getGoal()
+    }, [])
+  );
 
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = useCallback(() => {

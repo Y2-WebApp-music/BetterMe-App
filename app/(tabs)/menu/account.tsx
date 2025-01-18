@@ -25,9 +25,6 @@ const AccountSetting = () => {
     await signOut();
   };
 
-
-
-
   return (
       <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
         <KeyboardAvoidingView

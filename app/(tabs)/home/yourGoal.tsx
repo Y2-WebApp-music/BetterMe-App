@@ -1,6 +1,6 @@
 import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, Platform, KeyboardAvoidingView, RefreshControl } from 'react-native'
 import React, { useCallback, useMemo, useState } from 'react'
-import { router } from 'expo-router'
+import { router, useFocusEffect } from 'expo-router'
 import { AddIcon, LeftArrowIcon } from '../../../constants/icon'
 import { useAuth } from '../../../context/authContext'
 import BackButton from '../../../components/Back'
@@ -119,6 +119,13 @@ const YourGoal = () => {
     getAllGoal().finally(() => setRefreshing(false));
     updateSummary(allGoal)
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      getTodayGoal()
+      getAllGoal()
+    }, [])
+  );
 
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
