@@ -21,7 +21,7 @@ type MealProp = {
   protein :number
   carbs:number
   fat:number
-  isAIcreate:boolean
+  createByAI:boolean
 }
 
 const AddMeal = () => {
@@ -39,7 +39,7 @@ const AddMeal = () => {
     protein :0,
     carbs:0,
     fat:0,
-    isAIcreate:false
+    createByAI:false
   })
 
   const removeImage = () =>{
