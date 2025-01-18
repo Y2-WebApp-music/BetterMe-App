@@ -13,14 +13,16 @@ const HomeGoalCard = ({goal_id, goal_name, end_date, total_task, complete_task}:
 
   const progressBar = useRef(new Animated.Value(0)).current;
   useEffect(() => {
-    if (complete_task) {
+    if (percent !== 0) {
       Animated.timing(progressBar, {
         toValue: percent,
         duration: 500,
         useNativeDriver: false,
       }).start();
+    } else {
+      progressBar.setValue(0);
     }
-  }, [complete_task]);
+  }, [percent]);
 
   const progressBarWidth = progressBar.interpolate({
     inputRange: [0, 100],

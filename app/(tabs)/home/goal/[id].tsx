@@ -117,6 +117,9 @@ export default function GoalScreen() {
     }
   }
 
+  const [warning, setWarning] = useState(false)
+  const [index, setIndex] = useState<number>(0)
+
   const handleToggleTask = async (index: number) => {
     let data:any = null;
 
@@ -136,6 +139,7 @@ export default function GoalScreen() {
       setErr('Failed to update task-status');
     } finally {
       setIsLoad(false);
+      setWarning(false)
     }
 
     setGoalData((prevData) => {
@@ -307,22 +311,39 @@ export default function GoalScreen() {
                 <View className='w-[95%] mt-2 flex-col gap-4'>
                   <FlashList
                     data={goalData.task}
-                    renderItem={({ item, index }) =>
+                    renderItem={({ item, index }) => (
                       <View style={{ marginBottom: 12 }}>
                         <BouncyCheckbox
                           size={25}
                           fillColor="#0DC47C"
                           unFillColor="#FFFFFF"
                           textComponent={<TextCheckBox taskName={item.task_name} isChecked={item.status} />}
-                          textContainerStyle={{ marginLeft:20 }}
-                          iconStyle={{ borderColor: "#0DC47C", borderRadius:6 }}
-                          innerIconStyle={{ borderWidth: 2, borderRadius:6, borderColor:'#E8E8E8' }}
+                          textContainerStyle={{ marginLeft: 20 }}
+                          iconStyle={{ borderColor: "#0DC47C", borderRadius: 6 }}
+                          innerIconStyle={{ borderWidth: 2, borderRadius: 6, borderColor: '#E8E8E8' }}
                           isChecked={item.status}
-                          onPress={() => handleToggleTask(index)}
+                          useBuiltInState={false}
+                          onPress={() => {
+                            if (item.status) {
+                              setIndex(index)
+                              setWarning(true);
+                            } else {
+                              handleToggleTask(index);
+                            }
+                          }}
+                          // disabled={item.status}
                         />
                       </View>
-                    }
+                    )}
                     estimatedItemSize={200}
+                  />
+                  <ConfirmDeleteModal
+                    title={'Task'}
+                    detail={'This will cancel Task. You can re-check it anytime.'}
+                    isOpen={warning}
+                    setIsOpen={setWarning}
+                    handelDelete={() => { handleToggleTask(index); }}
+                    deleteType={'Cancel'}
                   />
                 </View>
               )}
@@ -331,7 +352,14 @@ export default function GoalScreen() {
         </View>
       </TouchableWithoutFeedback>
 
-      <ConfirmDeleteModal isOpen={openModal} setIsOpen={setOpenModal} title='goal' handelDelete={deleteGoal}/>
+      <ConfirmDeleteModal
+        isOpen={openModal}
+        setIsOpen={setOpenModal}
+        title='goal'
+        detail={'This will delete delete permanently. You cannot undo this action.'}
+        handelDelete={deleteGoal}
+        deleteType={'Delete'}
+      />
       </ScrollView>
     </SafeAreaView>
   );
@@ -339,6 +367,6 @@ export default function GoalScreen() {
 
 const TextCheckBox = ({ taskName, isChecked }: { taskName: string; isChecked: boolean }) => (
   <View className="w-full">
-    <Text className={`pl-3 w-[97%] font-noto text-body ${isChecked? 'text-green':'text-text'}`}>{taskName}</Text>
+    <Text className={`pl-3 w-[97%] font-noto text-body ${isChecked? 'text-green line-through':'text-text'}`}>{taskName}</Text>
   </View>
 );
