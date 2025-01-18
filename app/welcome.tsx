@@ -14,7 +14,7 @@ export default function Welcome() {
   const { loginWithGoogle } = useAuth()
 
   const [form,setForm]= useState({
-    username:'',
+    email:'',
     password:''
   })
 
@@ -35,7 +35,7 @@ export default function Welcome() {
   const [err, setErr] = useState<string>('')
   const handleSubmit = async () => {
     try {
-      await signInWithEmailAndPassword(auth, form.username, form.password)
+      await signInWithEmailAndPassword(auth, form.email, form.password)
     } catch (error) {
       setErr('Email or password is wrong. Please try again.')
     }
@@ -62,9 +62,9 @@ export default function Welcome() {
             <View className='w-full mt-20' style={{paddingBottom: 20}} >
               <Text className='text-heading text-primary font-notoMedium'>Welcome back</Text>
               <FormInput
-                name='email / username'
-                value={form.username}
-                handleChange={(e:string)=>setForm({ ...form,username: e})}
+                name='email'
+                value={form.email}
+                handleChange={(e:string)=>setForm({ ...form,email: e})}
                 keyboardType="default"
               />
               <FormInput

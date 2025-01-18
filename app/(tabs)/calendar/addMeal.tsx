@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, Image, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View, Keyboard } from 'react-native';
 import BackButton from '../../../components/Back';
 import { router } from 'expo-router';
@@ -13,6 +13,9 @@ import { CameraView } from 'expo-camera';
 import PickDateTimeModal from '../../../components/modal/PickDateTimeModal';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { firebaseStorage } from '../../../components/auth/firebaseConfig';
+import { format } from 'date-fns';
+import { SERVER_URL } from '@env';
+import axios from 'axios';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -46,6 +49,19 @@ const AddMeal = () => {
     fat:0,
     createByAI:false
   });
+
+  const [countdown, setCountdown] = useState(3);
+  const [waiting, setWaiting] = useState(false)
+  const [countdownInterval, setCountdownInterval] = useState<NodeJS.Timeout | null>(null);
+
+  const handleCancel = () => {
+    if (countdownInterval) {
+      clearInterval(countdownInterval);
+      setCountdown(3);
+      setWaiting(false);
+      console.log('creation canceled');
+    }
+  };
 
   const [openModal,setOpenModal] = useState(false)
 
@@ -81,40 +97,107 @@ const AddMeal = () => {
 
   const cameraSize = scrollY.interpolate({
     inputRange: [0, 150],
-    outputRange: [screenWidth * 0.86, screenWidth * 0.5],
+    outputRange: [screenWidth * 0.78, screenWidth * 0.5],
     extrapolate: 'clamp',
   });
 
   const handleSubmit = async () => {
-    let downloadURL: string | null = null;
+    let counter = 3;
+      setCountdown(counter)
+      setWaiting(true);
+
+      const interval = setInterval(() => {
+        counter -= 1;
+        setCountdown(counter);
+
+        if (counter <= 0) {
+          clearInterval(interval);
+          postToDB()
+        }
+      }, 1000);
+      setCountdownInterval(interval)
+
+  };
+
+  const [downloadURL, setDownloadURL] = useState<string | null>(null);
+  const uploadToFirebase = async () => {
     const metadata = {
       contentType: 'image/png',
     };
 
+    if (!photo || !user || !form.meal_date) return;
     try {
-      if (photo && user) {
-        const storageRef = ref(firebaseStorage, `meal/${user.uid}.png`);
+      if (photo && user && form.portion) {
 
-        const response = await fetch(photo);
-        const blob = await response.blob();
+        const storageRef = ref(firebaseStorage, `meal/${user.uid}/${format(form.meal_date, 'dd-MM-yyyy-H-m')}.png`);
+
+        const resPhoto = await fetch(photo);
+        const blob = await resPhoto.blob();
 
         const extension = photo.split('.').pop();
         const mimeType = extension === 'jpg' || extension === 'jpeg' ? 'image/jpeg' : 'image/png';
 
         const uploadTask = await uploadBytes(storageRef, blob, { ...metadata, contentType: mimeType });
 
-        downloadURL = await getDownloadURL(uploadTask.ref);
+        setDownloadURL( await getDownloadURL(uploadTask.ref))
         console.log('Upload Complete', downloadURL);
+
+      }
+    } catch (error) {
+      console.error('Upload failed', error);
+    }
+  }
+
+  const postToDB = async () => {
+    if (!downloadURL) {
+      await uploadToFirebase();
+    }
+    try {
+      if (downloadURL && user && form.meal_date) {
+
+        const response = await axios.post(`${SERVER_URL}/meal/by-user`, {
+          food_name:form.food_name,
+          meal_date:form.meal_date,
+          image:downloadURL,
+          portion:form.portion,
+          protein:form.protein,
+          carbs:form.carbs,
+          fat:form.fat,
+          createByAI:form.createByAI,
+        });
+
+        const data = response.data
+        setWaiting(false)
+
       }
     } catch (error) {
       console.error('Upload failed', error);
     }
 
-    return downloadURL;
-  };
+    router.replace(`calendar/weekCalendar`)
+  }
+
+  const useAI = async () => {
+    if (!downloadURL) {
+      await uploadToFirebase();
+    }
+    try {
+      if (downloadURL && user && form.meal_date) {
+
+        const response = await axios.post(`${SERVER_URL}/meal/useAi`, {
+        });
+
+        const data = response.data
+
+      }
+    } catch (error) {
+      console.error('Upload failed', error);
+    }
+  }
 
   return (
     <SafeAreaView className="w-full h-full justify-start items-center bg-Background font-noto">
+      {!waiting?(
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1, width: '100%', alignItems: 'center' }}
@@ -125,16 +208,23 @@ const AddMeal = () => {
               <BackButton />
             </View>
           </View>
+          <View>
           <View className="flex flex-row gap-2 items-center mt-2">
             <View className="grow">
               <Text className="text-subTitle text-primary font-notoMedium">Add Meal</Text>
             </View>
-            <TouchableOpacity
-              onPress={() => {}}
-              className="bg-primary flex-row gap-2 p-2 px-4 justify-center items-center rounded-full"
-            >
-              <Text className="text-heading2 text-white font-notoMedium">Add meal</Text>
-            </TouchableOpacity>
+            {photo &&
+              <TouchableOpacity
+                onPress={handleSubmit}
+                className="bg-primary flex-row gap-2 p-2 px-4 justify-center items-center rounded-full"
+              >
+                <Text className="text-heading2 text-white font-notoMedium">Add meal</Text>
+              </TouchableOpacity>
+            }
+          </View>
+          {!photo &&
+            <Text className='text-subText font-notoLight'>Snap a photo to identify your dishes or choose from gallery. Learn nutritional facts</Text>
+          }
           </View>
         </View>
 
@@ -142,7 +232,7 @@ const AddMeal = () => {
         <Animated.View
           style={{
             position: 'absolute',
-            top: 87,
+            top: photo ? screenWidth * 0.22 : screenWidth * 0.32,
             left: 0,
             right: 0,
             height: cameraSize,
@@ -159,7 +249,7 @@ const AddMeal = () => {
         <Animated.View
           style={{
             position: 'absolute',
-            top: 87,
+            top: photo ? screenWidth * 0.22 : screenWidth * 0.32,
             width: photo ? cameraSize : screenWidth * 0.92,
             height: photo ? cameraSize : screenWidth * 0.92,
             zIndex: 10,
@@ -185,7 +275,7 @@ const AddMeal = () => {
             <View
               style={{ flex: 1 }}
               onStartShouldSetResponder={() => {
-                Keyboard.dismiss(); 
+                Keyboard.dismiss();
                 return false;
               }}
             >
@@ -195,7 +285,7 @@ const AddMeal = () => {
               />
               <TouchableOpacity
                 onPress={removeImage}
-                className="h-12 w-12 rounded-full bg-primary justify-center items-center"
+                className="h-11 w-11 rounded-full bg-primary justify-center items-center"
                 style={{
                   position: 'absolute',
                   top: 10,
@@ -204,7 +294,7 @@ const AddMeal = () => {
                   borderRadius: 20,
                 }}
               >
-                <CloseIcon width={24} height={24} color={'#FFFFFF'} />
+                <CloseIcon width={34} height={34} color={'#FFFFFF'} />
               </TouchableOpacity>
             </View>
           )}
@@ -226,7 +316,7 @@ const AddMeal = () => {
             contentContainerStyle={{
               flexGrow: 1,
               justifyContent: 'flex-start',
-              paddingTop: screenWidth * 0.87,
+              paddingTop: screenWidth * 0.8,
             }}
             onScroll={Animated.event(
               [{ nativeEvent: { contentOffset: { y: scrollY } } }],
@@ -235,7 +325,13 @@ const AddMeal = () => {
             scrollEventThrottle={20}
             showsVerticalScrollIndicator={false}
           >
-            <View>
+            <View className="items-end justify-center flex-row">
+              <View className='grow'>
+                <Text className='text-heading font-notoMedium text-primary'>Meal detail</Text>
+              </View>
+              <RainbowButton text={'Auto fill with AI'} active={!!photo} />
+            </View>
+            <View style={{transform:[{translateY:-4}]}}>
               <FormInput
                 name={'Food Name'}
                 value={form.food_name}
@@ -260,53 +356,90 @@ const AddMeal = () => {
                 }
                 maximumDate={true}
               />
-              <View className='w-full mt-2'style={{marginTop: 10}}>
-                    <Text className='text-subText text-detail'>Meal time</Text>
-                    <TouchableOpacity
-                      onPress={()=>{setOpenModal(true)}}
-                      className='w-full h-[5vh] p-2 flex justify-center border border-primary rounded-normal'
-                    >
-                      <Text className='flex-1 text-primary text-center font-notoMedium text-heading2'>
-                      {new Intl.DateTimeFormat('en-GB', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      }).format(form.meal_date)}
-                      </Text>
-                    </TouchableOpacity>
+              <View className="flex-row gap-4">
+                <View className="grow flex-row items-end gap-1">
+                  <View className='grow'>
+                    <NumberInput
+                      name={'protein'}
+                      value={form.protein}
+                      handleChange={(e: number) => setForm({
+                        ...form,
+                        protein:e,
+                        calorie:((e*4) + (form.carbs*4) + (form.fat*9))
+                      })}
+                    />
                   </View>
-              <View className="flex-row gap-2">
-                <View className="grow">
-                  <NumberInput
-                    name={'Protein'}
-                    value={form.protein}
-                    handleChange={(e: number) => setForm({ ...form, protein: e })}
-                  />
+                  <Text className='text-detail text-subText'>grams</Text>
                 </View>
-                <View className="grow">
-                  <NumberInput
-                    name={'Carbs'}
-                    value={form.carbs}
-                    handleChange={(e: number) => setForm({ ...form, carbs: e })}
-                  />
+                <View className="grow flex-row items-end gap-1">
+                  <View className='grow'>
+                    <NumberInput
+                      name={'Carbs'}
+                      value={form.carbs}
+                      handleChange={(e: number) => setForm({
+                        ...form,
+                        carbs:e,
+                        calorie:((form.protein*4) + (e*4) + (form.fat*9))
+                      })}
+                    />
+                  </View>
+                  <Text className='text-detail text-subText'>grams</Text>
                 </View>
-                <View className="grow">
-                  <NumberInput
-                    name={'Fat'}
-                    value={form.fat}
-                    handleChange={(e: number) => setForm({ ...form, fat: e })}
-                  />
+                <View className="grow flex-row items-end gap-1">
+                  <View className='grow'>
+                    <NumberInput
+                      name={'fat'}
+                      value={form.fat}
+                      handleChange={(e: number) => setForm({
+                        ...form,
+                        fat:e,
+                        calorie: (form.protein * 4) + (form.carbs * 4) + (e * 9)
+                      })}
+                    />
+                  </View>
+                  <Text className='text-detail text-subText'>grams</Text>
                 </View>
               </View>
-              <View className="py-6">
-                <RainbowButton text={'Auto fill with AI'} active={!!photo} />
+              <View style={{marginTop: 0}} className='flex-row gap-4'>
+                <View className='mt-2 grow' style={{marginTop: 7}}>
+                  <Text className='text-subText text-detail'>total calorie</Text>
+                  <View className='flex-row gap-1 items-end'>
+                    <Text className='text-primary text-center font-notoMedium text-subTitle'> {form.calorie} </Text>
+                    <View style={{transform:[{translateY:-8}]}}>
+                      <Text className='text-body text-subText'>Cal</Text>
+                    </View>
+                  </View>
+                </View>
+                <View className='grow mt-2'>
+                  <Text className='text-subText text-detail'>Meal time</Text>
+                  <TouchableOpacity
+                    onPress={()=>{setOpenModal(true)}}
+                    className='w-full h-[5vh] p-2 flex justify-center border border-primary rounded-normal'
+                  >
+                    <Text className='flex-1 text-primary text-center font-notoMedium text-heading3'>
+                    {new Intl.DateTimeFormat('en-GB', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    }).format(form.meal_date)}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           </Animated.ScrollView>
         )}
       </KeyboardAvoidingView>
+      ):(<View className='flex-1 justify-center items-center'>
+            <Text className='font-notoMedium text-title text-primary'>{countdown}</Text>
+            <Text className='font-notoMedium text-subTitle animate-pulse text-primary'>Creating</Text>
+            <TouchableOpacity onPress={handleCancel} className='mt-12 p-1 px-4 rounded-full bg-nonFocus justify-center items-center'>
+              <Text className='text-white font-noto text-heading2'>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+      )}
     </SafeAreaView>
   );
 };
