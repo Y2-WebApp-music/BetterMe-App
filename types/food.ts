@@ -9,7 +9,7 @@ export type Meal = {
   protein :number
   carbs:number
   fat:number
-  isAIcreate:boolean
+  createByAI:boolean
 }
 
 export type mealCard = {
@@ -17,5 +17,5 @@ export type mealCard = {
   create_by:string
   meal_date:string
   food_name:string
-  isAIcreate:boolean
+  createByAI:boolean
 }
