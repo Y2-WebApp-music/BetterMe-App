@@ -12,6 +12,7 @@ import { DeleteIcon, OptionIcon } from '../../../../constants/icon';
 import { useAuth } from '../../../../context/authContext';
 import { GoalData, Task } from '../../../../types/goal';
 import { FlashList } from '@shopify/flash-list';
+import ConfirmDeleteModal from '../../../../components/modal/ConfirmDeleteModal';
 
 const { width } = Dimensions.get('window');
 const circle_length = width * 0.62;
@@ -94,6 +95,7 @@ export default function GoalScreen() {
     strokeDashoffset: circle_length * (1 - progress.value),
   }));
 
+  const [openModal,setOpenModal] = useState(false)
   const [isOptionsVisible, setOptionsVisible] = useState(false);
   const toggleOptions = () => { setOptionsVisible(!isOptionsVisible) };
   const closeOptions = () => { setOptionsVisible(false) };
@@ -163,6 +165,10 @@ export default function GoalScreen() {
     // console.log('Fetch New data');
   }, []);
 
+  const deleteGoal = async () => {
+    console.log('Delete Goal');
+  }
+
   return (
     <SafeAreaView className="w-full h-full justify-start items-center bg-Background font-noto" >
       <ScrollView
@@ -196,7 +202,7 @@ export default function GoalScreen() {
                     />
                     <Text className='font-noto text-heading3 text-subText'>public this goal</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity className='p-2 px-4 border border-gray rounded-normal flex-row gap-2 justify-center items-center'>
+                  <TouchableOpacity onPress={()=>{setOpenModal(!openModal)}} className='p-2 px-4 border border-gray rounded-normal flex-row gap-2 justify-center items-center'>
                     <DeleteIcon width={26} height={26} color={'#E8E8E8'} />
                     <Text className='font-noto text-heading3 text-subText'>delete this goal</Text>
                   </TouchableOpacity>
@@ -324,6 +330,8 @@ export default function GoalScreen() {
           </ScrollView>
         </View>
       </TouchableWithoutFeedback>
+
+      <ConfirmDeleteModal isOpen={openModal} setIsOpen={setOpenModal} title='goal' handelDelete={deleteGoal}/>
       </ScrollView>
     </SafeAreaView>
   );

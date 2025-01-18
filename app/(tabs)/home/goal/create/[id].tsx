@@ -10,6 +10,7 @@ import { useAuth } from '../../../../../context/authContext';
 import axios from 'axios';
 import { SERVER_URL } from '@env';
 import { FlashList } from '@shopify/flash-list';
+import WarningModal from '../../../../../components/modal/WarningModal';
 
 export default function GoalCreatePage() {
 
@@ -22,10 +23,7 @@ export default function GoalCreatePage() {
     start_date:new Date(),
     end_date:new Date(),
     task:[
-      {
-        task_name:'',
-        status:false
-      },
+      {task_name:'',status:false},
     ],
     create_by:user?._id,
     public_goal:true,
@@ -97,15 +95,16 @@ export default function GoalCreatePage() {
   };
 
   // Handle Task Input Change
-  const handleTaskChange = (index: number, value: string) => {
-    const updatedTasks = [...form.task];
-    updatedTasks[index].task_name = value;
-    setForm({ ...form, task: updatedTasks });
-  };
+  const handleTaskChange = (index:number, value:string) => {
+    const tasks = [...form.task];
+    tasks[index].task_name = value;
+    setForm((prev) => ({ ...prev, task: tasks }));
+};
 
   const [countdown, setCountdown] = useState(3);
   const [isConfirming, setIsConfirming] = useState(false);
   const [err, setErr] = useState('')
+  const [warning, setWarning] = useState(false)
   const [countdownInterval, setCountdownInterval] = useState<NodeJS.Timeout | null>(null);
 
   const handleCancel = () => {
@@ -128,7 +127,7 @@ export default function GoalCreatePage() {
         public_goal:form.public_goal
       });
       const data = response.data;
-      // console.log('=============== ::: userData ::: ===============\n',data);
+      console.log('=============== ::: userData ::: ===============\n',data);
 
       if (data.message === "At least 1 task is required to create a goal") {
         return setErr('At least 1 task is required to create a goal')
@@ -143,14 +142,24 @@ export default function GoalCreatePage() {
 
   const handleCreateGoal = async () => {
 
-    if ( form.goal_name != '' && form.description != ''){
+    if ( form.goal_name != ''){
       if (form.task.length === 0) {
         console.log('At least one task is required');
-        return setErr('At least one task is required');
+        setWarning(true)
+        setErr('At least one task is required');
+        return
       }
       if (form.task.some(task => task.task_name === '')){
         console.log('Task at least one is empty please complete it');
-        return setErr('Task at least one is empty please complete it');
+        setWarning(true)
+        setErr('Task at least one is empty please complete it');
+        return
+      }
+      if (form.end_date < form.start_date) {
+        console.log('Date is false');
+        setWarning(true)
+        setErr('Can not end date less than start date');
+        return
       }
 
       let counter = 3;
@@ -169,7 +178,9 @@ export default function GoalCreatePage() {
 
       setCountdownInterval(interval)
     } else {
-      console.log('goal_name or description is empty');
+      setErr('goal name is empty')
+      setWarning(true)
+      console.log('goal_name is empty');
     }
   }
 
@@ -251,8 +262,14 @@ export default function GoalCreatePage() {
                   </TouchableOpacity>
                 </View>
               </View>
-              <PickDateModal value={form.start_date} isOpen={startDateModal} setIsOpen={setStartDateModal} setDate={updateStartDate} maximumDate={false}/>
-              <PickDateModal value={form.end_date} isOpen={endDateModal} setIsOpen={setEndDateModal} setDate={updateEndDate} maximumDate={false}/>
+              <PickDateModal value={form.start_date} isOpen={startDateModal} setIsOpen={setStartDateModal} setDate={updateStartDate} maximumDate={false} minimumDate={true}/>
+              <PickDateModal value={form.end_date} isOpen={endDateModal} setIsOpen={setEndDateModal} setDate={updateEndDate} maximumDate={false} minimumDate={true}/>
+              <WarningModal
+                title={'Please complete detail'}
+                detail={err}
+                isOpen={warning}
+                setIsOpen={()=>setWarning(!warning)}
+              />
 
               <View className='mt-2 flex-col gap-2 pb-20'>
                 <Text>Task</Text>
