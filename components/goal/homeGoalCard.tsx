@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Animated } from 'react-native'
+import { View, Text, TouchableOpacity, Animated, Easing } from 'react-native'
 import React, { useEffect, useRef } from 'react'
 import { router } from 'expo-router'
 import { homeGoalCardProp } from '../../types/goal'
@@ -16,7 +16,8 @@ const HomeGoalCard = ({goal_id, goal_name, end_date, total_task, complete_task}:
     if (percent !== 0) {
       Animated.timing(progressBar, {
         toValue: percent,
-        duration: 500,
+        duration: 1000,
+        easing: Easing.inOut(Easing.ease),
         useNativeDriver: false,
       }).start();
     } else {
