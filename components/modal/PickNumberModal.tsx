@@ -45,7 +45,7 @@ const PickNumberModal = ({title, min, max, start, dotMax, unit, isOpen, setIsOpe
             <Picker
               selectedValue={selectedNumber}
               onValueChange={handleNumberChange}
-              style={{ width: 100 }}
+              style={{ width: 110 }}
             >
               {number.map((num) => (
                 <Picker.Item key={num} label={num} value={num} color='black'/>

@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView, TextInput, Switch } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView, TextInput, Switch, Platform } from 'react-native';
 import BackButton from '../../../../../components/Back';
 import { useEffect, useMemo, useState } from 'react';
 import FormInput from '../../../../../components/FormInput';
@@ -11,6 +11,7 @@ import axios from 'axios';
 import { SERVER_URL } from '@env';
 import { FlashList } from '@shopify/flash-list';
 import WarningModal from '../../../../../components/modal/WarningModal';
+import RNDateTimePicker from '@react-native-community/datetimepicker';
 
 export default function GoalCreatePage() {
 
@@ -262,8 +263,48 @@ export default function GoalCreatePage() {
                   </TouchableOpacity>
                 </View>
               </View>
+              {Platform.OS === "android" ?(
+                    startDateModal &&
+                    <RNDateTimePicker
+                      display="spinner"
+                      mode="date"
+                      value={form.start_date}
+                      minimumDate={new Date()}
+                      maximumDate={new Date(new Date().setDate(new Date().getDate() + 10000))}
+                      onChange={(event, selectedDate) => {
+                        if (selectedDate) {
+                          setStartDateModal(!startDateModal);
+                          updateStartDate(selectedDate);
+                        }
+                      }}
+                      style={{}}
+                      locale="en-Gn"
+                      themeVariant='light'
+                    />
+                  ):(
               <PickDateModal value={form.start_date} isOpen={startDateModal} setIsOpen={setStartDateModal} setDate={updateStartDate} maximumDate={false} minimumDate={true}/>
+                  )}
+              {Platform.OS === "android" ?(
+                    endDateModal &&
+                    <RNDateTimePicker
+                      display="spinner"
+                      mode="date"
+                      value={form.start_date}
+                      minimumDate={new Date()}
+                      maximumDate={new Date(new Date().setDate(new Date().getDate() + 10000))}
+                      onChange={(event, selectedDate) => {
+                        if (selectedDate) {
+                          setEndDateModal(!endDateModal);
+                          updateEndDate(selectedDate);
+                        }
+                      }}
+                      style={{}}
+                      locale="en-Gn"
+                      themeVariant='light'
+                    />
+                  ):(
               <PickDateModal value={form.end_date} isOpen={endDateModal} setIsOpen={setEndDateModal} setDate={updateEndDate} maximumDate={false} minimumDate={true}/>
+                  )}
               <WarningModal
                 title={'Please complete detail'}
                 detail={err}

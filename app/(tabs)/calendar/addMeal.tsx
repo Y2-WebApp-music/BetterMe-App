@@ -16,6 +16,7 @@ import { firebaseStorage } from '../../../components/auth/firebaseConfig';
 import { format } from 'date-fns';
 import { SERVER_URL } from '@env';
 import axios from 'axios';
+import RNDateTimePicker from '@react-native-community/datetimepicker';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -207,6 +208,8 @@ const AddMeal = () => {
     }
   }
 
+  const [modalStep, setModalStep] = useState<"date" | "time">("date");
+
   return (
     <SafeAreaView className="w-full h-full justify-start items-center bg-Background font-noto">
       {!waiting?(
@@ -360,18 +363,64 @@ const AddMeal = () => {
                 handleChange={(e: string) => setForm({ ...form, portion: e })}
                 keyboardType={'default'}
               />
-              <PickDateTimeModal
-                value={form.meal_date}
-                isOpen={openModal}
-                setIsOpen={()=>{setOpenModal(!openModal)}}
-                setDate={(date: Date) => {
-                  setForm((prevForm) => ({
-                    ...prevForm,
-                    meal_date: date,
-                }))}
-                }
-                maximumDate={true}
-              />
+              {Platform.OS === "android" ? openModal && (
+                <>
+                  {modalStep === "date" && (
+                    <RNDateTimePicker
+                      display="spinner"
+                      mode="date"
+                      value={form.meal_date}
+                      maximumDate={new Date()} // Restrict date to today or earlier
+                      onChange={(event, selectedDate) => {
+                        if (selectedDate) {
+                          setForm((prevForm) => ({
+                            ...prevForm,
+                            meal_date: selectedDate,
+                          }));
+                          setModalStep("time"); // Switch to the time picker
+                        } else {
+                          setOpenModal(false); // Close modal if canceled
+                        }
+                      }}
+                      locale="en-Gn"
+                      themeVariant="light"
+                    />
+                  )}
+
+                  {modalStep === "time" && (
+                    <RNDateTimePicker
+                      display="clock"
+                      mode="time"
+                      value={form.meal_date}
+                      onChange={(event, selectedTime) => {
+                        if (selectedTime) {
+                          setForm((prevForm) => ({
+                            ...prevForm,
+                            meal_date: selectedTime,
+                          }));
+                        }
+                        setOpenModal(false); // Close modal after selecting time
+                        setModalStep("date"); // Reset step for next usage
+                      }}
+                      is24Hour={true}
+                      // themeVariant="light"
+                    />
+                  )}
+                </>
+              ):(
+                <PickDateTimeModal
+                  value={form.meal_date}
+                  isOpen={openModal}
+                  setIsOpen={()=>{setOpenModal(!openModal)}}
+                  setDate={(date: Date) => {
+                    setForm((prevForm) => ({
+                      ...prevForm,
+                      meal_date: date,
+                  }))}
+                  }
+                  maximumDate={true}
+                />
+              )}
               <View className="flex-row gap-4">
                 <View className="grow flex-row items-end gap-1">
                   <View className='grow'>
