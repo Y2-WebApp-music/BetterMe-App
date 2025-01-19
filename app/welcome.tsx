@@ -18,7 +18,6 @@ export default function Welcome() {
     password:''
   })
 
-  const [error, setError] = useState<string | null>(null);
   const [request, response, promptAsync] = Google.useAuthRequest({
     iosClientId: CLIENT_ID_IOS,
     androidClientId: CLIENT_ID_Android,
@@ -37,6 +36,7 @@ export default function Welcome() {
     try {
       await signInWithEmailAndPassword(auth, form.email, form.password)
     } catch (error) {
+      console.log(error);
       setErr('Email or password is wrong. Please try again.')
     }
   }
@@ -64,19 +64,19 @@ export default function Welcome() {
               <FormInput
                 name='email'
                 value={form.email}
-                handleChange={(e:string)=>setForm({ ...form,email: e})}
+                handleChange={(e:string)=>{setForm({ ...form,email: e}); setErr('')}}
                 keyboardType="default"
               />
               <FormInput
                 name='password'
                 value={form.password}
-                handleChange={(e:string)=>setForm({ ...form,password: e})}
+                handleChange={(e:string)=>{setForm({ ...form,password: e});setErr('')}}
                 keyboardType="password"
               />
               <View className='w-full flex items-end mt-1'>
                 <Link href="/(auth)/forgetPassword" relativeToDirectory className='text-subText'>forget password?</Link>
               </View>
-              {err && <Text className='text-detail text-red'>{err}</Text>}
+              {err && <Text className='text-detail text-red absolute bottom-0'>{err}</Text>}
             </View>
 
             <View className='flex gap-6 mt-6'>
