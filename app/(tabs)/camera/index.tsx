@@ -1,5 +1,5 @@
 import { View, Text, SafeAreaView, KeyboardAvoidingView, ScrollView, Platform, TouchableOpacity, StyleSheet, Button, Image, Dimensions } from 'react-native'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import BackButton from '../../../components/Back'
 
 import { Camera, FlashMode, CameraView, useCameraPermissions, CameraCapturedPicture } from 'expo-camera';
@@ -8,32 +8,27 @@ import * as ImagePicker from 'expo-image-picker';
 import FormInput from '../../../components/FormInput';
 import { CloseIcon, GalleryIcon } from '../../../constants/icon';
 import { Skeleton } from 'moti/skeleton'
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 
 const screenWidth = Dimensions.get('window').width;
 
 const TakePicture = () => {
-  const [permission, requestPermission] = useCameraPermissions();
   const cameraRef = useRef<CameraView | null>(null);
   const [photo, setPhoto] = useState<string | null>(null);
   const [step, setStep] = useState(1)
   const [detail, setDetail] = useState<string>('')
   const [waiting, setWaiting] = useState(true)
+  const [permission, requestPermission] = useCameraPermissions();
 
-  if (!permission) {
-    // Camera permissions are still loading.
-    return <View />;
-  }
+  useEffect(() => {
+    if (permission === null || !permission.granted) {
+      const timer = setTimeout(() => {
+        requestPermission();
+      }, 500);
 
-  if (!permission.granted) {
-    // Camera permissions are not granted yet.
-    return (
-      <View style={styles.container}>
-        <Text style={styles.message}>We need your permission to show the camera</Text>
-        <Button onPress={requestPermission} title="grant permission" />
-      </View>
-    );
-  }
+      return () => clearTimeout(timer);
+    }
+  }, [permission, requestPermission]);
 
   const takePicture = async () => {
     if (cameraRef.current) {
@@ -110,6 +105,7 @@ const TakePicture = () => {
               <Text className='text-title font-notoSemiBold text-primary'>Take a Photo!</Text>
               <Text className='text-subText font-notoLight'>Snap a photo to identify your dishes. Learn nutritional facts and make healthier food choices every day!</Text>
               <View className='rounded-normal overflow-hidden mt-4'>
+                {permission && permission.granted?(
                   <CameraView
                     style={styles.camera}
                     facing={'back'}
@@ -121,6 +117,9 @@ const TakePicture = () => {
                       </TouchableOpacity>
                     </View>
                   </CameraView>
+                ):(
+                  <View style={styles.camera} className='bg-gray'/>
+                )}
               </View>
               <View className='w-full mt-10 justify-center items-center'>
                 <TouchableOpacity onPress={takePicture} className=' bg-primary w-32 h-32 flex justify-center items-center rounded-full'>
@@ -206,7 +205,7 @@ const TakePicture = () => {
                         onPress={handleAddFood}
                         className='will-change-contents flex flex-row items-center justify-center p-1 px-4 rounded-full bg-gray'
                       >
-                        <Text className='w-fit text-subText text-heading3 font-notoMedium'>Add new food</Text>
+                        <Text className='w-fit text-subText text-heading3 font-notoMedium'>Add other food</Text>
                       </TouchableOpacity>
                   </View>
                 </View>
@@ -288,10 +287,6 @@ const result = {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-  },
   message: {
     textAlign: 'center',
     paddingBottom: 10,

@@ -9,7 +9,7 @@ import { Meal } from '../../../types/food';
 import { useAuth } from '../../../context/authContext';
 import RainbowButton from '../../../components/RainbowButton';
 import NumberInput from '../../../components/NumberInput';
-import { CameraView } from 'expo-camera';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 import PickDateTimeModal from '../../../components/modal/PickDateTimeModal';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { firebaseStorage } from '../../../components/auth/firebaseConfig';
@@ -49,6 +49,18 @@ const AddMeal = () => {
     fat:0,
     createByAI:false
   });
+
+  const [permission, requestPermission] = useCameraPermissions();
+
+  useEffect(() => {
+    if (permission === null || !permission.granted) {
+      const timer = setTimeout(() => {
+        requestPermission();
+      }, 500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [permission, requestPermission]);
 
   const [countdown, setCountdown] = useState(3);
   const [waiting, setWaiting] = useState(false)
@@ -260,17 +272,21 @@ const AddMeal = () => {
           }}
         >
           {!photo ? (
-            <CameraView
-              style={styles.camera}
-              facing={'back'}
-              ref={cameraRef}
-            >
-              <View className="w-full h-full p-2 justify-end items-end">
-                <TouchableOpacity onPress={pickImage} className="h-12 w-12 rounded-normal bg-primary justify-center items-center">
-                  <GalleryIcon width={30} height={30} color={'white'} />
-                </TouchableOpacity>
-              </View>
-            </CameraView>
+            permission && permission.granted?(
+              <CameraView
+                style={styles.camera}
+                facing={'back'}
+                ref={cameraRef}
+              >
+                <View className='w-full h-full p-2 justify-end items-end'>
+                  <TouchableOpacity onPress={pickImage} className='h-12 w-12 rounded-normal bg-primary justify-center items-center'>
+                    <GalleryIcon width={30} height={30} color={'white'}/>
+                  </TouchableOpacity>
+                </View>
+              </CameraView>
+            ):(
+              <View style={styles.camera} className='bg-gray'/>
+            )
           ) : (
             <View
               style={{ flex: 1 }}
