@@ -19,3 +19,11 @@ export type mealCard = {
   food_name:string
   createByAI:boolean
 }
+
+export type MealAi = {
+  food_name:string
+  calorie:number
+  protein:number
+  carbs:number
+  fat:number
+}

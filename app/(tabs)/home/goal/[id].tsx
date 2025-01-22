@@ -1,7 +1,7 @@
 import { SERVER_URL } from '@env';
 import axios from 'axios';
 import { format } from 'date-fns';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Dimensions, RefreshControl, SafeAreaView, ScrollView, Switch, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
@@ -171,6 +171,24 @@ export default function GoalScreen() {
 
   const deleteGoal = async () => {
     console.log('Delete Goal');
+    try {
+      const response = await axios.delete(`${SERVER_URL}/goal/delete/${id}`);
+
+      let data = response.data
+
+      if (data.message == "Goal not found") {
+        console.error('Can not find Goal ID')
+        return
+      }
+
+      router.back()
+
+    } catch (err) {
+      console.error('Delete Goal Fail:', err);
+      setErr('Failed to delete Goal');
+    } finally {
+      setWarning(false)
+    }
   }
 
   return (

@@ -5,7 +5,7 @@ import { router } from 'expo-router';
 import { CloseIcon, GalleryIcon } from '../../../constants/icon';
 import * as ImagePicker from 'expo-image-picker';
 import FormInput from '../../../components/FormInput';
-import { Meal } from '../../../types/food';
+import { Meal, MealAi } from '../../../types/food';
 import { useAuth } from '../../../context/authContext';
 import RainbowButton from '../../../components/RainbowButton';
 import NumberInput from '../../../components/NumberInput';
@@ -36,6 +36,7 @@ type MealProp = {
 const AddMeal = () => {
   const { user } = useAuth()
   const [photo, setPhoto] = useState<string | null>(null);
+  const [downloadURL, setDownloadURL] = useState<string | null>(null);
   const scrollY = useRef(new Animated.Value(0)).current;
   const cameraRef = useRef<CameraView | null>(null);
   const [form, setForm] = useState<MealProp>({
@@ -50,7 +51,7 @@ const AddMeal = () => {
     fat:0,
     createByAI:false
   });
-
+  const [openModal,setOpenModal] = useState(false)
   const [permission, requestPermission] = useCameraPermissions();
 
   useEffect(() => {
@@ -76,10 +77,13 @@ const AddMeal = () => {
     }
   };
 
-  const [openModal,setOpenModal] = useState(false)
+  useEffect(()=>{
+    console.log('form \n',form);
+  },[form])
 
   const removeImage = () =>{
     setPhoto(null)
+    setDownloadURL('')
   };
 
   const takePicture = async () => {
@@ -132,15 +136,21 @@ const AddMeal = () => {
 
   };
 
-  const [downloadURL, setDownloadURL] = useState<string | null>(null);
   const uploadToFirebase = async () => {
     const metadata = {
       contentType: 'image/png',
     };
 
-    if (!photo || !user || !form.meal_date) return;
+    if (!photo || !user || !form.meal_date) {
+      console.log('!photo || !user || !form.meal_date ');
+      return null
+    }
+
+    console.log('uploadToFirebase()');
+
     try {
       if (photo && user && form.portion) {
+        console.log('Uploading to Firebase....');
 
         const storageRef = ref(firebaseStorage, `meal/${user.uid}/${format(form.meal_date, 'dd-MM-yyyy-H-m')}.png`);
 
@@ -151,9 +161,12 @@ const AddMeal = () => {
         const mimeType = extension === 'jpg' || extension === 'jpeg' ? 'image/jpeg' : 'image/png';
 
         const uploadTask = await uploadBytes(storageRef, blob, { ...metadata, contentType: mimeType });
+        console.log('uploadTask ',uploadTask);
 
-        setDownloadURL( await getDownloadURL(uploadTask.ref))
-        console.log('Upload Complete', downloadURL);
+        const url = await getDownloadURL(uploadTask.ref);
+        setDownloadURL(url);
+        console.log('Upload Complete', url);
+        return url
 
       }
     } catch (error) {
@@ -161,18 +174,38 @@ const AddMeal = () => {
     }
   }
 
-  const postToDB = async () => {
+  const handleImageUpload = async () => {
     if (!downloadURL) {
-      await uploadToFirebase();
+      console.log('downloadURL is empty try to upload and get URl');
+      const url = await uploadToFirebase();
+      if (url !== undefined) {
+        setDownloadURL(url)
+        return url
+      }
+      console.error('Fail to get Image URL')
     }
-    try {
-      if (downloadURL && user && form.meal_date) {
+    return downloadURL;
+  };
 
-        const response = await axios.post(`${SERVER_URL}/meal/by-user`, {
-          food_name:form.food_name,
+  useEffect(()=>{
+    console.log('downloadURL : ', downloadURL);
+  },[downloadURL])
+
+  const postToDB = async () => {
+    try {
+
+      console.log('postToDB() USE ');
+      const url = await handleImageUpload();
+      
+      if (url && user && form.meal_date) {
+        console.log('Upload to DB');
+
+        const response = await axios.post(`${SERVER_URL}/meal/add`, {
           meal_date:form.meal_date,
-          image:downloadURL,
+          food_name:form.food_name,
+          image_url:url,
           portion:form.portion,
+          calorie:form.calorie,
           protein:form.protein,
           carbs:form.carbs,
           fat:form.fat,
@@ -180,6 +213,8 @@ const AddMeal = () => {
         });
 
         const data = response.data
+        console.log('data ',data);
+
         setWaiting(false)
 
       }
@@ -190,21 +225,43 @@ const AddMeal = () => {
     router.replace(`calendar/weekCalendar`)
   }
 
-  const useAI = async () => {
-    if (!downloadURL) {
-      await uploadToFirebase();
-    }
+  const [aiCreating, setAiCreating] = useState(false)
+  const getMealByAI = async () => {
+    console.log('getMealByAI');
+
+    setAiCreating(true)
     try {
-      if (downloadURL && user && form.meal_date) {
-
-        const response = await axios.post(`${SERVER_URL}/meal/useAi`, {
-        });
-
-        const data = response.data
-
+      const url = await handleImageUpload();
+      if (!url) {
+        console.error("Image upload failed");
+        return;
       }
-    } catch (error) {
-      console.error('Upload failed', error);
+
+      const response = await axios.post(`${SERVER_URL}/meal/by-ai`, {
+        image_url:url,
+        portion:form.portion,
+      });
+
+      let data = response.data
+      let mealData:MealAi | null = null
+      if (data.message == "Get meal by AI success") {
+        mealData = data.meal_data
+      }
+
+      mealData && setForm({
+        ...form,
+        food_name: mealData.food_name,
+        calorie : mealData.calorie,
+        protein: mealData.protein,
+        carbs: mealData.carbs,
+        fat: mealData.fat,
+        createByAI:true,
+      })
+
+    } catch (err) {
+      console.error('Get Ai Fail:', err);
+    } finally {
+      setAiCreating(false)
     }
   }
 
@@ -348,13 +405,20 @@ const AddMeal = () => {
               <View className='grow'>
                 <Text className='text-heading font-notoMedium text-primary'>Meal detail</Text>
               </View>
-              <RainbowButton text={'Auto fill with AI'} active={!!photo} />
+              {aiCreating?(
+                <View>
+                  <Text>Cancel</Text>
+                </View>
+              ):(
+                <RainbowButton text={'Auto fill with AI'} active={!!photo} handleClick={getMealByAI}/>
+              )}
             </View>
+            {!aiCreating?(
             <View style={{transform:[{translateY:-4}]}}>
               <FormInput
                 name={'Food Name'}
                 value={form.food_name}
-                handleChange={(e: string) => setForm({ ...form, food_name: e })}
+                handleChange={(e: string) => setForm({ ...form, food_name: e, createByAI:false })}
                 keyboardType={'default'}
               />
               <FormInput
@@ -366,11 +430,7 @@ const AddMeal = () => {
               {Platform.OS === "android" ? openModal && (
                 <>
                   {modalStep === "date" && (
-                    <RNDateTimePicker
-                      display="spinner"
-                      mode="date"
-                      value={form.meal_date}
-                      maximumDate={new Date()} // Restrict date to today or earlier
+                    <RNDateTimePicker display="spinner" mode="date" value={form.meal_date} maximumDate={new Date()}
                       onChange={(event, selectedDate) => {
                         if (selectedDate) {
                           setForm((prevForm) => ({
@@ -386,12 +446,8 @@ const AddMeal = () => {
                       themeVariant="light"
                     />
                   )}
-
                   {modalStep === "time" && (
-                    <RNDateTimePicker
-                      display="clock"
-                      mode="time"
-                      value={form.meal_date}
+                    <RNDateTimePicker display="clock" mode="time" value={form.meal_date}
                       onChange={(event, selectedTime) => {
                         if (selectedTime) {
                           setForm((prevForm) => ({
@@ -403,23 +459,17 @@ const AddMeal = () => {
                         setModalStep("date"); // Reset step for next usage
                       }}
                       is24Hour={true}
-                      // themeVariant="light"
                     />
                   )}
                 </>
               ):(
-                <PickDateTimeModal
-                  value={form.meal_date}
-                  isOpen={openModal}
-                  setIsOpen={()=>{setOpenModal(!openModal)}}
+                <PickDateTimeModal value={form.meal_date} isOpen={openModal} setIsOpen={()=>{setOpenModal(!openModal)}}
                   setDate={(date: Date) => {
                     setForm((prevForm) => ({
                       ...prevForm,
                       meal_date: date,
                   }))}
-                  }
-                  maximumDate={true}
-                />
+                } maximumDate={true} />
               )}
               <View className="flex-row gap-4">
                 <View className="grow flex-row items-end gap-1">
@@ -430,7 +480,8 @@ const AddMeal = () => {
                       handleChange={(e: number) => setForm({
                         ...form,
                         protein:e,
-                        calorie:((e*4) + (form.carbs*4) + (form.fat*9))
+                        calorie:((e*4) + (form.carbs*4) + (form.fat*9)),
+                        createByAI:false
                       })}
                     />
                   </View>
@@ -444,7 +495,8 @@ const AddMeal = () => {
                       handleChange={(e: number) => setForm({
                         ...form,
                         carbs:e,
-                        calorie:((form.protein*4) + (e*4) + (form.fat*9))
+                        calorie:((form.protein*4) + (e*4) + (form.fat*9)),
+                        createByAI:false
                       })}
                     />
                   </View>
@@ -458,13 +510,15 @@ const AddMeal = () => {
                       handleChange={(e: number) => setForm({
                         ...form,
                         fat:e,
-                        calorie: (form.protein * 4) + (form.carbs * 4) + (e * 9)
+                        calorie: (form.protein * 4) + (form.carbs * 4) + (e * 9),
+                        createByAI:false
                       })}
                     />
                   </View>
                   <Text className='text-detail text-subText'>grams</Text>
                 </View>
               </View>
+
               <View style={{marginTop: 0}} className='flex-row gap-4'>
                 <View className='mt-2 grow' style={{marginTop: 7}}>
                   <Text className='text-subText text-detail'>total calorie</Text>
@@ -493,7 +547,26 @@ const AddMeal = () => {
                   </TouchableOpacity>
                 </View>
               </View>
+
             </View>
+            ):(
+              <View className='flex-1 flex-col justify-center items-center flex gap-2 mt-2'>
+                <View className='absolute top-0 z-10 w-full h-full justify-center items-center bg-Background/50'>
+                  <Text className=' text-subTitle text-primary animate-pulse font-notoMedium'> Creating </Text>
+                </View>
+                <View className='w-full rounded-normal h-14 bg-gray animate-pulse'/>
+                <View className='w-full rounded-normal h-14 bg-gray animate-pulse'/>
+                <View className='h-auto w-full flex-row gap-4'>
+                  <View className='grow rounded-normal h-14 bg-gray animate-pulse'/>
+                  <View className='grow rounded-normal h-14 bg-gray animate-pulse'/>
+                  <View className='grow rounded-normal h-14 bg-gray animate-pulse'/>
+                </View>
+                <View className='h-auto w-full flex-row justify-between'>
+                  <View className='w-[25%] rounded-normal h-14 bg-gray animate-pulse'/>
+                  <View className='w-[70%] rounded-normal h-14 bg-gray animate-pulse'/>
+                </View>
+              </View>
+            )}
           </Animated.ScrollView>
         )}
       </KeyboardAvoidingView>
