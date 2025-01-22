@@ -75,7 +75,7 @@ const AccountSetting = () => {
                 </View>
               </View>
               {/* personal data */}
-              <View className='mt-2 flex-col gap-2 pb-20'>
+              <View className='mt-2 flex-col gap-2'>
                 <Text className='text-detail'>personal data</Text>
                   <View className='grow ml-6'>
                     <Text  className='text-subText'>date of birth</Text>
@@ -132,12 +132,14 @@ const AccountSetting = () => {
                   width: '100%',
                 }}
               />
-              <TouchableOpacity
-                onPress={handleSignOut}
-                className="flex flex-row items-center justify-center rounded-normal border border-gray p-1 px-4 bg-red-500 mt-6"
-              >
-                <Text className="text-subText text-heading2 font-notoMedium">Sign Out</Text>
-              </TouchableOpacity>
+              <View className=' pb-20'>
+                <TouchableOpacity
+                  onPress={handleSignOut}
+                  className="flex flex-row items-center justify-center rounded-normal border border-gray p-1 px-4 bg-red-500"
+                >
+                  <Text className="text-subText text-heading2 font-notoMedium">Sign Out</Text>
+                </TouchableOpacity>
+              </View>
           </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>

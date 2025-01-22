@@ -162,30 +162,30 @@ const AddMeal = () => {
   }
 
   const postToDB = async () => {
-    if (!downloadURL) {
-      await uploadToFirebase();
-    }
-    try {
-      if (downloadURL && user && form.meal_date) {
+    // if (!downloadURL) {
+    //   await uploadToFirebase();
+    // }
+    // try {
+    //   if (downloadURL && user && form.meal_date) {
 
-        const response = await axios.post(`${SERVER_URL}/meal/by-user`, {
-          food_name:form.food_name,
-          meal_date:form.meal_date,
-          image:downloadURL,
-          portion:form.portion,
-          protein:form.protein,
-          carbs:form.carbs,
-          fat:form.fat,
-          createByAI:form.createByAI,
-        });
+    //     const response = await axios.post(`${SERVER_URL}/meal/by-user`, {
+    //       food_name:form.food_name,
+    //       meal_date:form.meal_date,
+    //       image:downloadURL,
+    //       portion:form.portion,
+    //       protein:form.protein,
+    //       carbs:form.carbs,
+    //       fat:form.fat,
+    //       createByAI:form.createByAI,
+    //     });
 
-        const data = response.data
-        setWaiting(false)
+    //     const data = response.data
+    //     setWaiting(false)
 
-      }
-    } catch (error) {
-      console.error('Upload failed', error);
-    }
+    //   }
+    // } catch (error) {
+    //   console.error('Upload failed', error);
+    // }
 
     router.replace(`calendar/weekCalendar`)
   }
