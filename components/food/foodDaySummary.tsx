@@ -10,8 +10,8 @@ const FoodDaySummary = () => {
         <Text className='text-subText font-noto'>{format(new Date(), "eee '|' dd MMM yyyy")}</Text>
         <View className='flex-row gap-2 items-end'>
           <Text className='text-body font-noto text-subText'>Total Calories</Text>
-          <View style={{ transform: [{ translateY: 2 }]}}>
-            <Text className='text-heading2 font-noto'>3333</Text>
+          <View style={{ transform: [{ translateY: 4 }]}}>
+            <Text className='text-heading font-noto'>3333</Text>
           </View>
           <View style={{ transform: [{ translateY: 0 }]}}>
             <Text className='text-body font-noto text-subText'>cal</Text>

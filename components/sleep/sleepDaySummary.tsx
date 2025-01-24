@@ -5,7 +5,7 @@ import { format } from 'date-fns'
 
 const SleepDaySummary = () => {
   return (
-    <View className='px-4 py-4 bg-white border border-gray rounded-normal flex-row items-center'>
+    <View style={{paddingVertical:10}} className='px-4 bg-white border border-gray rounded-normal flex-row items-center'>
       <View className='grow'>
         <Text className='text-subText font-noto'>{format(new Date(), "eee '|' dd MMM yyyy")}</Text>
         <View style={{ transform: [{ translateY: 0 }]}} className='flex-row gap-1 items-end'>
