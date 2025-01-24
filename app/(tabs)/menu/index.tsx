@@ -4,9 +4,9 @@ import { router } from 'expo-router'
 import { ForwardIcon, UserIcon } from '../../../constants/icon'
 import { Image } from 'expo-image';
 import { useAuth } from '../../../context/authContext';
-import SleepSummary from '../../../components/sleep/sleepSummary';
+import SleepSummary from '../../../components/sleep/sleepSummaryCard';
 import SleepToday from '../../../components/sleep/sleepToday';
-import FoodSummary from '../../../components/food/foodSummary';
+import FoodSummary from '../../../components/food/foodSummaryCard';
 import FoodToday from '../../../components/food/foodToday'
 
 
@@ -46,13 +46,14 @@ const Menu = () => {
             <Text className="text-subText text-heading2 grow font-noto">account setting</Text>
             <ForwardIcon width={30} height={30} color={'#CFCFCF'}/>
           </TouchableOpacity>
-          <View className='my-3'>
+
+          <View className='my-3 mt-5'>
             <View className='flex flex-row gap-2 items-center'>
               <View className='grow'>
                 <Text className='text-heading2 font-noto'>your sleep</Text>
               </View>
             <View>
-            <TouchableOpacity className=' bg-primary flex-row gap-2 p-1 px-4 justify-center items-center rounded-full'>
+            <TouchableOpacity onPress={()=>{router.push('/menu/sleepSummary')}} className=' bg-primary flex-row gap-2 p-1 px-4 justify-center items-center rounded-full'>
               <Text className='text-body text-white font-notoMedium'>view all sleep</Text>
             </TouchableOpacity>
             </View>
@@ -62,13 +63,13 @@ const Menu = () => {
           <Text className='text-subText my-2'>last night : 23 May 2024</Text>
           <SleepToday />
 
-          <View className='my-3'>
+          <View className='my-3 mt-5'>
             <View className='flex flex-row gap-2 items-center'>
               <View className='grow'>
                 <Text className='text-heading2 font-noto'>your meal</Text>
               </View>
             <View>
-            <TouchableOpacity className=' bg-primary flex-row gap-2 p-1 px-4 justify-center items-center rounded-full'>
+            <TouchableOpacity onPress={()=>{router.push('/menu/foodSummary')}} className=' bg-primary flex-row gap-2 p-1 px-4 justify-center items-center rounded-full'>
               <Text className='text-body text-white font-notoMedium'>view all meal</Text>
             </TouchableOpacity>
             </View>
@@ -77,6 +78,7 @@ const Menu = () => {
           <FoodSummary/>
           <Text className='text-subText my-2'>today : 23 May 2024</Text>
           <FoodToday/>
+          <View className='pb-20'></View>
 
         </ScrollView>
     </SafeAreaView>

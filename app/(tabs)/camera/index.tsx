@@ -9,16 +9,26 @@ import FormInput from '../../../components/FormInput';
 import { CloseIcon, GalleryIcon } from '../../../constants/icon';
 import { Skeleton } from 'moti/skeleton'
 import { router, useFocusEffect } from 'expo-router';
+import axios from 'axios';
+import { SERVER_URL } from '@env';
+import { useAuth } from '../../../context/authContext';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import { firebaseStorage } from '../../../components/auth/firebaseConfig';
+import { format } from 'date-fns';
+import { MealAi } from '../../../types/food';
 
 const screenWidth = Dimensions.get('window').width;
 
 const TakePicture = () => {
+  const { user } = useAuth()
+
   const cameraRef = useRef<CameraView | null>(null);
   const [photo, setPhoto] = useState<string | null>(null);
   const [step, setStep] = useState(1)
   const [detail, setDetail] = useState<string>('')
   const [waiting, setWaiting] = useState(true)
   const [permission, requestPermission] = useCameraPermissions();
+  const [downloadURL, setDownloadURL] = useState<string | null>(null);
 
   useEffect(() => {
     if (permission === null || !permission.granted) {
@@ -63,23 +73,102 @@ const TakePicture = () => {
     }
   };
 
-  const handleSendPhoto = async () => {
-    setWaiting(true)
-    setStep(3)
-    setTimeout(() => {
-      setWaiting(false);
-    }, 2000);
-  }
-
   const handleAddFood = async () => {
     setStep(1)
     setPhoto('')
+    setDownloadURL('')
   }
 
   const handleComplete = async () => {
     setStep(1)
     setPhoto('')
+    setDownloadURL('')
     router.push('/(tabs)/calendar/weekCalendar');
+  }
+
+  const handleSendPhoto = async () => {
+    setWaiting(true)
+    await uploadToFirebase()
+    await getMealByAI()
+  }
+
+  const uploadToFirebase = async () => {
+    const metadata = {
+      contentType: 'image/png',
+    };
+
+    if (!photo || !user) return;
+    try {
+      if (photo && user) {
+
+        const storageRef = ref(firebaseStorage, `meal/${user.uid}/${format(new Date(), 'dd-MM-yyyy-H-m')}.png`);
+
+        const resPhoto = await fetch(photo);
+        const blob = await resPhoto.blob();
+
+        const extension = photo.split('.').pop();
+        const mimeType = extension === 'jpg' || extension === 'jpeg' ? 'image/jpeg' : 'image/png';
+
+        const uploadTask = await uploadBytes(storageRef, blob, { ...metadata, contentType: mimeType });
+
+        setDownloadURL( await getDownloadURL(uploadTask.ref))
+        console.log('Upload Complete', downloadURL);
+
+      }
+    } catch (error) {
+      console.error('Upload failed', error);
+    }
+  }
+
+  const getMealByAI = async () => {
+    if (!downloadURL) {
+      await uploadToFirebase();
+    }
+    try {
+      const response = await axios.post(`${SERVER_URL}/meal/by-ai`, {
+        image_url:downloadURL,
+        portion:detail,
+      });
+
+      let data = response.data
+      let mealData:MealAi | null = null
+      if (data.message == "Get meal by AI success") {
+        mealData = data.meal_data
+      }
+
+      mealData && postToDB(mealData.food_name, mealData.calorie, mealData.protein, mealData.carbs, mealData.fat)
+
+    } catch (err) {
+      console.error('Get Ai Fail:', err);
+    } finally {
+
+    }
+  }
+
+  const postToDB = async (food_name:string, calorie: number, protein: number, carbs: number, fat: number): Promise<void> => {
+    try {
+      const response = await axios.post(`${SERVER_URL}/meal/add`, {
+        meal_date:new Date(),
+        food_name:food_name,
+        image_url:downloadURL,
+        portion:detail,
+        calorie:calorie,
+        protein:protein,
+        carbs:carbs,
+        fat:fat,
+        createByAI:true
+      });
+
+      let data = response.data
+
+      setStep(3)
+
+    } catch (err) {
+      console.error('post to DB fail:', err);
+    } finally {
+      setWaiting(false)
+    }
+
   }
 
   return (

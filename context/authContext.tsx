@@ -51,8 +51,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         });
         const userData = response.data;
 
-        console.log('userData : ',userData);
-
         if (userData.message === "User not found"){
           router.replace('/(auth)/googleRegis');
         } else {
@@ -69,7 +67,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             activity,
             calorie_need,
           };
+          console.log(' :=========== userData ===========: \n',extendedUser);
           setUser(extendedUser);
+
           await AsyncStorage.setItem('@user', JSON.stringify(extendedUser));
         }
       } catch (error) {

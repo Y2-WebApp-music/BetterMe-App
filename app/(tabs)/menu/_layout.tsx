@@ -6,6 +6,8 @@ const MenuLayout = () => {
     <Stack>
       <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name="account" options={{ headerShown: false }} />
+      <Stack.Screen name="foodSummary" options={{ headerShown: false }} />
+      <Stack.Screen name="sleepSummary" options={{ headerShown: false }} />
     </Stack>
   );
 };
