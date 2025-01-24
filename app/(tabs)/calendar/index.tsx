@@ -6,6 +6,8 @@ import { router, useFocusEffect } from 'expo-router';
 import CalendarGoalCard from '../../../components/goal/calendarGoalCard';
 import MealCard from '../../../components/food/mealCard';
 import { FlashList } from '@shopify/flash-list';
+import FoodToday from '../../../components/food/foodToday';
+import SleepToday from '../../../components/sleep/sleepToday';
 
 const MonthCalendar = () => {
 
@@ -105,8 +107,8 @@ const MonthCalendar = () => {
           </View>
           <View style={{ transform: [{ translateY: -18 }] }} className='flex-col gap-2'>
             <Text className='font-noto text-heading3'>{new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(selectedDate))}</Text>
-            <View className='h-28 w-full rounded-normal border border-gray bg-white'></View>
-            <View className='h-28 w-full rounded-normal border border-gray bg-white'></View>
+            <SleepToday/>
+            <FoodToday/>
             <Text className='text-subText font-noto text-body mt-2'>In this day</Text>
             <View className='flex-row justify-start items-center gap-4'>
               <TouchableOpacity onPress={()=>setViewMeal(true)} className={`p-1 px-2 ${viewMeal? 'bg-primary':'bg-transparent'} rounded-normal`}>

@@ -8,6 +8,8 @@ import { subDays, addDays, startOfWeek, addWeeks, addDays as addDaysToDate } fro
 import PagerView from 'react-native-pager-view';
 import DateSlider from '../../../components/DateSlider'
 import { FlashList } from '@shopify/flash-list'
+import SleepToday from '../../../components/sleep/sleepToday'
+import FoodToday from '../../../components/food/foodToday'
 
 const WeekCalendar = () => {
   const [viewMeal, setViewMeal] = useState(true)
@@ -48,8 +50,8 @@ const WeekCalendar = () => {
         >
           <View className='flex-col gap-2'>
             {/* <Text className='font-noto text-heading3'>{new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(selectedDate))}</Text> */}
-            <View className='h-28 w-full rounded-normal border border-gray bg-white'></View>
-            <View className='h-28 w-full rounded-normal border border-gray bg-white'></View>
+            <SleepToday/>
+            <FoodToday/>
             <Text className='text-subText font-noto text-body mt-2'>In this day</Text>
             <View className='flex-row justify-start items-center gap-4'>
               <TouchableOpacity onPress={()=>setViewMeal(true)} className={`p-1 px-2 ${viewMeal? 'bg-primary':'bg-transparent'} rounded-normal`}>

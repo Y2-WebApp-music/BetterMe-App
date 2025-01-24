@@ -4,7 +4,7 @@ import { DayIcon, NightIcon, PenIcon  } from '../../constants/icon'
 const SleepToday = () => {
 
   return (
-    <View style={{paddingHorizontal:14, backgroundColor:'white' }} className='h-28 w-full rounded-normal border border-gray p-2 justify-center items-center flex-row gap-2'>
+    <View style={{paddingHorizontal:14, backgroundColor:'white' }} className='h-[5.5rem] w-full rounded-normal border border-gray p-2 justify-center items-center flex-row gap-2'>
 
       <View style={{paddingLeft:6}} className='grow'>
         <View style={{ transform: [{ translateY: 8 }] }}>
@@ -22,15 +22,15 @@ const SleepToday = () => {
         </View>
       </View>
 
-      <View style={{justifyContent:'center'}} className='grow flex flex-row gap-1'> 
+      <View style={{justifyContent:'center'}} className='grow flex flex-row gap-1'>
         <View>
-        <View style={{ transform: [{ translateY: 10 }] }} className='flex flex-row gap-1 items-center mb-4'>
-          <NightIcon  width={12} height={12} color={'#454AB6'}/>
-            <Text className='text-subText font-noto'>Sleep</Text>
-        </View>
-        <View style={{ transform: [{ translateX: 4 }] }} className='flex-row gap-1 items-end'>
-          <Text className='text-heading3'>33:33</Text>
-        </View>
+          <View style={{ transform: [{ translateY: 10 }] }} className='flex flex-row gap-1 items-center mb-4'>
+            <NightIcon  width={12} height={12} color={'#454AB6'}/>
+              <Text className='text-subText font-noto'>Sleep</Text>
+          </View>
+          <View style={{ transform: [{ translateX: 4 }] }} className='flex-row gap-1 items-end'>
+            <Text className='text-heading3'>33:33</Text>
+          </View>
         </View>
       </View>
 

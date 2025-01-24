@@ -1,20 +1,9 @@
 import { View, Text, Animated, TouchableWithoutFeedback, Easing, TouchableOpacity } from 'react-native'
 import React, { useRef, useState } from 'react'
 import { NightIcon, BackwardIcon, ForwardIcon  } from '../../constants/icon'
-import { StyleSheet } from 'react-native'
-import { BarChart } from "react-native-gifted-charts";
+import WeekSleepChart from './weekSleepChart'
 
 const SleepSummary = () => {
-
-  const barData = [
-    {value: 6.5, label: 'Mon',labelTextStyle: {color: '#626262'},},
-    {value: 4, label: 'Tru',labelTextStyle: {color: '#626262'},},
-    {value: 5, label: 'Wed',labelTextStyle: {color: '#626262'},},
-    {value: 7.8, label: 'Thu',labelTextStyle: {color: '#626262'},},
-    {value: 7, label: 'Fri',labelTextStyle: {color: '#626262'},},
-    {value: 5.6, label: 'Sat',labelTextStyle: {color: '#626262'},},
-    {value: 8, label: 'Sun',labelTextStyle: {color: '#626262'},},
-];
 
   return (
     <View style={{paddingHorizontal:15, paddingVertical:12, backgroundColor:'white' }} className=' w-full rounded-normal border border-gray p-2 justify-center items-center flex-row gap-2'>
@@ -47,26 +36,7 @@ const SleepSummary = () => {
             </View>
           </View>
         </View>
-          <View style={{ overflow:'hidden'}}>
-            <BarChart
-                barWidth={32}
-                noOfSections={3}
-                barBorderRadius={6}
-                barBorderBottomLeftRadius={0}
-                barBorderBottomRightRadius={0}
-                spacing={10}
-                width={300}
-                height={150}
-                frontColor="#454AB6"
-                data={barData}
-                yAxisThickness={0}
-                yAxisLabelSuffix='h'
-                xAxisThickness={1}
-                xAxisColor={'#CFCFCF'}
-                isAnimated
-                disablePress
-            />
-          </View>
+          <WeekSleepChart/>
         </View>
     </View>
 

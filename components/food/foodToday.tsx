@@ -1,10 +1,10 @@
-import { View, Text, TouchableWithoutFeedback } from 'react-native'
-import { PenIcon  } from '../../constants/icon'
+import { View, Text, TouchableWithoutFeedback, TouchableOpacity } from 'react-native'
+import { PenIcon, RightArrowIcon  } from '../../constants/icon'
 
 const FoodToday = () => {
 
   return (
-    <View style={{paddingHorizontal:14, backgroundColor:'white' }} className='h-28 w-full rounded-normal border border-gray p-2 justify-center items-center flex-row gap-2'>
+    <TouchableOpacity activeOpacity={0.7} style={{paddingHorizontal:14, backgroundColor:'white' }} className='h-28 w-full rounded-normal border border-gray p-2 justify-center items-center flex-row gap-2'>
 
       <View style={{paddingLeft:6}} className='grow'>
         <View style={{ transform: [{ translateY: 8 }] }}>
@@ -27,12 +27,13 @@ const FoodToday = () => {
         </View>
       </View>
 
-      <View style={{paddingRight:6}} className='flex flex-row gap-1 items-center'>
-        <PenIcon width={20} height={20} color={'#626262'}/>
-        <Text style={{color:'#626262'}} className='text-body font-noto'>Edit</Text>
+      <View style={{paddingRight:0}} className='flex flex-row gap-1 items-center'>
+        {/* <PenIcon width={20} height={20} color={'#626262'}/> */}
+        <Text style={{color:'#CFCFCF'}} className='text-body font-noto text-DarkGray'>See more</Text>
+        <RightArrowIcon width={20} height={20} color={'#CFCFCF'}/>
       </View>
 
-    </View>
+    </TouchableOpacity>
   )
 }
 
