@@ -218,7 +218,7 @@ export default function GoalCreatePage() {
           contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', marginTop:4}}
           showsVerticalScrollIndicator={false}
         >
-          <View className='w-full flex-col'>
+          <View className='w-full flex-col gap-2'>
             <FormInput
               name='Goal name'
               value={form.goal_name}
@@ -312,17 +312,17 @@ export default function GoalCreatePage() {
                 setIsOpen={()=>setWarning(!warning)}
               />
 
-              <View className='mt-2 flex-col gap-2 pb-20'>
+              <View className='mt-4 flex-col gap-2 pb-20'>
                 <Text>Task</Text>
 
                 <FlashList
                     data={form.task}
                     renderItem={({ item, index }) =>
-                    <View key={index} style={{marginBottom:8}} className="flex-row gap-1 items-center">
+                    <View key={index} style={{marginBottom:12}} className="flex-row gap-2 items-center">
                       <View className="rounded-full h-3 w-3 bg-primary"></View>
                       <View
                         className="grow flex justify-center border border-gray focus:border-primary rounded-normal"
-                        style={{ height: 40 }}
+                        style={{ height: 44 }}
                       >
                         <TextInput
                           className="flex-1 px-2 text-primary text-heading2 flex-wrap"
@@ -365,7 +365,7 @@ export default function GoalCreatePage() {
               </View>
             </View>
 
-            <View className='min-h-24 min-w-32 p-4 flex-col gap-2'>
+            <View className='min-h-24 min-w-32 p-4 flex-col gap-2 pb-20'>
               <TouchableOpacity onPress={()=>{setForm((prev) => ({...prev,public_goal: !prev.public_goal}))}} className='p-2 px-4 border border-gray rounded-normal flex-row gap-2 justify-center items-center'>
                 <Switch
                   trackColor={{false: '#fff', true: '#0DC47C'}}

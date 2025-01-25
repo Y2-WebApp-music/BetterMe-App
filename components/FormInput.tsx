@@ -24,7 +24,9 @@ const FormInput:React.FC<TextInputProp> = ({name, value, handleChange, keyboardT
     <View className='w-full'
       style={{marginTop: 6}}
     >
-      <Text className='text-subText text-detail'>{name}</Text>
+      <View style={{marginBottom: 4}}>
+        <Text className='text-subText text-detail'>{name}</Text>
+      </View>
       <View
         className='w-full flex justify-center border border-gray focus:border-primary rounded-normal'
         style={[
@@ -35,9 +37,11 @@ const FormInput:React.FC<TextInputProp> = ({name, value, handleChange, keyboardT
         <TextInput
           className='flex-1 text-primary text-heading2 font-noto'
           style={{
-            height: 40,
+            // height: 40,
             width:"94%",
             textAlignVertical: "center",
+            paddingHorizontal:4,
+            paddingVertical:6,
           }}
           value={value}
           placeholder={name}
