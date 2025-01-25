@@ -2,20 +2,13 @@ import { View, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { router } from 'expo-router'
 import { format } from 'date-fns';
+import { mealCard } from '../../types/food';
 
-type MealCardProp = {
-  meal_id:string
-  meal_date:Date
-  food_name:string
-  calorie:number
-  ai_create:boolean
-}
-
-const MealCard = ({meal_id, meal_date, food_name, calorie, ai_create}:MealCardProp) => {
+const MealCard = ({meal_id, meal_date, food_name, calorie, createByAI}:mealCard) => {
 
   const formattedTime = format(new Date(meal_date), 'HH:mm');
 
-  const AICreate = ai_create? '#1c60de':'#0dc47c'
+  const AICreate = createByAI? '#1c60de':'#0dc47c'
 
   return (
     <TouchableOpacity onPress={()=>{router.push(`/calendar/meal/${meal_id}`)}} style={{padding:12, paddingHorizontal:20, marginBottom: 8, width:'100%'}} className='rounded-normal border border-gray bg-white flex-row items-center justify-center'>
@@ -25,7 +18,7 @@ const MealCard = ({meal_id, meal_date, food_name, calorie, ai_create}:MealCardPr
             <View style={{width:6, height:6}} className='bg-white rounded-full'/>
           </View>
           <Text className='text-subText text-body font-notoMedium'>{formattedTime}</Text>
-          <Text style={{color: '#CFCFCF'}} className='text-DarkGray'>: from {ai_create? 'Ai':'User'}</Text>
+          <Text style={{color: '#CFCFCF'}} className='text-DarkGray'>: from {createByAI? 'Ai':'User'}</Text>
         </View>
         <View>
           <Text

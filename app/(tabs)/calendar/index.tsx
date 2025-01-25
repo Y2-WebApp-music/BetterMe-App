@@ -8,6 +8,7 @@ import MealCard from '../../../components/food/mealCard';
 import { FlashList } from '@shopify/flash-list';
 import FoodToday from '../../../components/food/foodToday';
 import SleepToday from '../../../components/sleep/sleepToday';
+import { mealListDummy } from '../../../types/food';
 
 const MonthCalendar = () => {
 
@@ -135,7 +136,7 @@ const MonthCalendar = () => {
                   <FlashList
                     data={mealListDummy}
                     renderItem={({ item }) =>
-                      <MealCard meal_id={item.meal_id} meal_date={item.meal_date} food_name={item.food_name} calorie={item.calorie} ai_create={item.ai_create}/>
+                      <MealCard meal_id={item.meal_id} meal_date={item.meal_date} food_name={item.food_name} calorie={item.calorie} createByAI={item.createByAI}/>
                     }
                     estimatedItemSize={200}
                   />
@@ -178,23 +179,6 @@ const goalDataDummy = [
     goal_name:'Title Test 3',
     total_task:8,
     complete_task:3,
-  },
-]
-
-const mealListDummy = [
-  {
-    meal_id:'1',
-    food_name:'กะเพราไก่',
-    meal_date:new Date(),
-    calorie:273,
-    ai_create:true,
-  },
-  {
-    meal_id:'2',
-    food_name:'ไก่ย่าง ข้าวเหนียว',
-    meal_date:new Date(),
-    calorie:234,
-    ai_create:false,
   },
 ]
 

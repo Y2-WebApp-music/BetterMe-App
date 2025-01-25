@@ -5,8 +5,19 @@ import { BackwardIcon, ForwardIcon, NightIcon } from '../../../constants/icon'
 import SleepToday from '../../../components/sleep/sleepToday'
 import WeekSleepChart from '../../../components/sleep/weekSleepChart'
 import SleepDaySummary from '../../../components/sleep/sleepDaySummary'
+import Animated, { useAnimatedRef, useAnimatedStyle, useScrollViewOffset, withTiming } from 'react-native-reanimated'
 
 const SleepSummary = () => {
+
+  const scrollRef = useAnimatedRef<Animated.ScrollView>();
+  const scrollHandler = useScrollViewOffset(scrollRef);
+
+  const buttonStyle = useAnimatedStyle(() => {
+    return {
+      opacity: scrollHandler. value > 330 ? withTiming(1) : withTiming(0),
+    }
+  }) ;
+
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
       <KeyboardAvoidingView
@@ -23,7 +34,15 @@ const SleepSummary = () => {
             </View>
           </View>
         </View>
+
+        <View className='w-[92%]'>
+          <Animated.View style={[buttonStyle]} className='w-full absolute top-0 z-10 bg-Background'>
+            <SummaryHeader/>
+          </Animated.View>
+        </View>
+
         <ScrollView
+          ref={scrollRef}
           className='w-[92%] h-auto'
           contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', marginTop:6}}
           showsVerticalScrollIndicator={false}
@@ -44,8 +63,37 @@ const SleepSummary = () => {
 
           <View style={{height:1, width:'100%'}} className=' bg-gray my-2'/>
 
+          <SummaryHeader/>
 
-          <View className='my-2'>
+          <View className='p-4 bg-white border border-gray rounded-normal'>
+            <View className='flex flex-row gap-2 items-center mb-2'>
+              <NightIcon width={15} height={15} color={'#454ab6'}/>
+              <Text className='text-body font-noto'>Sleep Time</Text>
+            </View>
+            <View >
+              <WeekSleepChart/>
+            </View>
+          </View>
+
+          <View className='gap-2 pb-16 mt-2'>
+            <SleepDaySummary/>
+            <SleepDaySummary/>
+            <SleepDaySummary/>
+            <SleepDaySummary/>
+            <SleepDaySummary/>
+            <SleepDaySummary/>
+            <SleepDaySummary/>
+          </View>
+
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  )
+}
+
+const SummaryHeader = () => {
+  return (
+    <View className='my-2'>
             <View className='flex-row items-center'>
               <View className='grow'>
                 <Text className='font-notoMedium text-heading2'>Summary</Text>
@@ -112,30 +160,6 @@ const SleepSummary = () => {
               </View>
             </View>
           </View>
-
-          <View className='p-4 bg-white border border-gray rounded-normal'>
-            <View className='flex flex-row gap-2 items-center mb-2'>
-              <NightIcon width={15} height={15} color={'#454ab6'}/>
-              <Text className='text-body font-noto'>Sleep Time</Text>
-            </View>
-            <View >
-              <WeekSleepChart/>
-            </View>
-          </View>
-
-          <View className='gap-2 pb-16 mt-2'>
-            <SleepDaySummary/>
-            <SleepDaySummary/>
-            <SleepDaySummary/>
-            <SleepDaySummary/>
-            <SleepDaySummary/>
-            <SleepDaySummary/>
-            <SleepDaySummary/>
-          </View>
-
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
   )
 }
 

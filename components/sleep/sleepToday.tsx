@@ -29,7 +29,7 @@ const SleepToday = () => {
               <Text className='text-subText font-noto'>Sleep</Text>
           </View>
           <View style={{ transform: [{ translateX: 4 }] }} className='flex-row gap-1 items-end'>
-            <Text className='text-heading3'>33:33</Text>
+            <Text style={{color: '#626262'}} className='text-heading3 text-subText'>33:33</Text>
           </View>
         </View>
       </View>
@@ -40,7 +40,7 @@ const SleepToday = () => {
             <Text className='text-subText font-noto'>Wake Up</Text>
         </View>
         <View style={{ transform: [{ translateX: -6 }], justifyContent:'center' }} className='flex-row gap-1'>
-          <Text className='text-heading3'>33:33</Text>
+          <Text style={{color: '#626262'}} className='text-heading3'>33:33</Text>
         </View>
       </View>
 

@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, KeyboardAvoidingView, Platform, SafeAreaView, TouchableOpacity } from 'react-native'
-import React from 'react'
+import React, { useEffect } from 'react'
 import BackButton from '../../../components/Back'
 import { router } from 'expo-router'
 import { AddIcon, BackwardIcon, FoodIcon, ForwardIcon, LeftArrowIcon, RightArrowIcon } from '../../../constants/icon'
@@ -7,8 +7,19 @@ import WeekFoodChart from '../../../components/food/weekFoodChart'
 import MealCard from '../../../components/food/mealCard'
 import FoodToday from '../../../components/food/foodToday'
 import FoodDaySummary from '../../../components/food/foodDaySummary'
+import Animated, { useAnimatedRef, useAnimatedStyle, useScrollViewOffset, withTiming } from 'react-native-reanimated'
 
 const FoodSummary = () => {
+
+  const scrollRef = useAnimatedRef<Animated.ScrollView>();
+  const scrollHandler = useScrollViewOffset(scrollRef);
+
+  const buttonStyle = useAnimatedStyle(() => {
+    return {
+      opacity: scrollHandler. value > 420 ? withTiming(1) : withTiming(0),
+    }
+  }) ;
+
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
       <KeyboardAvoidingView
@@ -31,7 +42,13 @@ const FoodSummary = () => {
             </View>
           </View>
         </View>
+        <View className='w-[92%]'>
+          <Animated.View style={[buttonStyle]} className='w-full absolute top-0 z-10 bg-Background'>
+            <SummaryHeader/>
+          </Animated.View>
+        </View>
         <ScrollView
+          ref={scrollRef}
           className='w-[92%] h-auto'
           contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', marginTop:6}}
           showsVerticalScrollIndicator={false}
@@ -47,14 +64,41 @@ const FoodSummary = () => {
               </Text>
             </View>
             <FoodToday/>
-            <MealCard meal_id={''} meal_date={new Date()} food_name={'TestMeal'} calorie={435} ai_create={true}/>
+            <MealCard meal_id={''} meal_date={new Date().toDateString()} food_name={'TestMeal'} calorie={435} createByAI={true}/>
           </View>
 
 
-          <View style={{height:1, width:'100%'}} className=' bg-gray my-2'/>
+          <View style={{height:1, width:'100%'}} className=' bg-gray mb-2'/>
 
+          <SummaryHeader/>
 
-          <View className=''>
+          <View className='p-4 bg-white border border-gray rounded-normal'>
+            <View className='flex flex-row gap-2 items-center mb-2'>
+              <FoodIcon width={15} height={15} color={'#0dc47c'}/>
+              <Text className='text-body font-noto '>calorie in week</Text>
+            </View>
+            <View >
+              <WeekFoodChart/>
+            </View>
+          </View>
+          <View className='gap-2 pb-16 mt-2'>
+            <FoodDaySummary/>
+            <FoodDaySummary/>
+            <FoodDaySummary/>
+            <FoodDaySummary/>
+            <FoodDaySummary/>
+            <FoodDaySummary/>
+            <FoodDaySummary/>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  )
+}
+
+const SummaryHeader = () => {
+  return (
+    <View className=''>
             <View className='flex-row items-center'>
               <View className='grow'>
                 <Text className='font-notoMedium text-heading2'>Summary</Text>
@@ -79,7 +123,7 @@ const FoodSummary = () => {
                   <Text className='text-green font-notoMedium text-subTitle'>33333</Text>
                   <View style={{ transform: [{ translateY: -6 }]}}><Text className='text-subText font-noto text-body pl-1'>cal</Text></View>
                 </View>
-                <View style={{ transform: [{ translateY: -6 }]}} className='flex-row items-end'>
+                <View style={{ transform: [{ translateY: -6 }]}} className='flex-row items-end ml-3'>
                   <Text className='text-subText font-notoLight text-detail pl-1'>Protein :</Text>
                   <Text className='text-subText font-noto text-body pl-1'>679</Text>
                   <Text className='text-subText font-noto text-detail pl-1'>g</Text>
@@ -97,27 +141,6 @@ const FoodSummary = () => {
               </View>
             </View>
           </View>
-          <View className='p-4 bg-white border border-gray rounded-normal'>
-            <View className='flex flex-row gap-2 items-center mb-2'>
-              <FoodIcon width={15} height={15} color={'#0dc47c'}/>
-              <Text className='text-body font-noto '>calorie in week</Text>
-            </View>
-            <View >
-              <WeekFoodChart/>
-            </View>
-          </View>
-          <View className='gap-2 pb-16 mt-2'>
-            <FoodDaySummary/>
-            <FoodDaySummary/>
-            <FoodDaySummary/>
-            <FoodDaySummary/>
-            <FoodDaySummary/>
-            <FoodDaySummary/>
-            <FoodDaySummary/>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
   )
 }
 

@@ -16,6 +16,11 @@ const WeekSleepChart = () => {
     {value: 8, label: 'Sun',labelTextStyle: {color: '#626262'},},
   ];
 
+  const barWidth = screenWidth * 0.08;
+  const spacing = 8;
+  const totalWidth = barData.length * (barWidth + spacing);
+  const chartWidth = Math.min(totalWidth, screenWidth * 0.9);
+
   return (
     <View style={{ overflow:'hidden'}}>
       <BarChart
@@ -24,8 +29,8 @@ const WeekSleepChart = () => {
         barBorderRadius={6}
         barBorderBottomLeftRadius={0}
         barBorderBottomRightRadius={0}
-        spacing={10}
-        width={screenWidth*0.72}
+        spacing={spacing}
+        width={chartWidth}
         height={150}
         frontColor="#454AB6"
         data={barData}

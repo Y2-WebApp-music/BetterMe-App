@@ -4,9 +4,9 @@ import { router } from 'expo-router'
 import { AddIcon, ForwardIcon, UserIcon } from '../../../constants/icon'
 import { Image } from 'expo-image';
 import { useAuth } from '../../../context/authContext';
-import SleepSummary from '../../../components/sleep/sleepSummaryCard';
+import SleepSummary from '../../../components/sleep/weekSleepSummaryCard';
 import SleepToday from '../../../components/sleep/sleepToday';
-import FoodSummary from '../../../components/food/foodSummaryCard';
+import FoodSummary from '../../../components/food/weekFoodSummaryCard';
 import FoodToday from '../../../components/food/foodToday'
 import { RefreshControl } from 'react-native';
 

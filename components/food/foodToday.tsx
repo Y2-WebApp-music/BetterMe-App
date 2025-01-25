@@ -1,6 +1,14 @@
 import { View, Text, TouchableWithoutFeedback, TouchableOpacity } from 'react-native'
 import { PenIcon, RightArrowIcon  } from '../../constants/icon'
 
+
+export type Meal = {
+  total_calorie:number
+  total_protein :number
+  total_carbs:number
+  total_fat:number
+}
+
 const FoodToday = () => {
 
   return (
