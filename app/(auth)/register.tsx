@@ -18,8 +18,10 @@ import axios from 'axios';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth, firebaseStorage } from '../../components/auth/firebaseConfig';
 import { useAuth } from '../../context/authContext';
-import { UserData } from '../../types/user';
+import { activity, gender, UserData } from '../../types/user';
 import RNDateTimePicker from '@react-native-community/datetimepicker';
+import ActivityModal from '../../components/modal/ActivityModal';
+import GenderModal from '../../components/modal/GenderModal';
 
 type UserProp = {
   username:string,
@@ -409,62 +411,8 @@ const Register = () => {
                     </Text>
                   </View>
 
-                  <BottomModal
-                    isOpen={activityModal}
-                    setIsOpen={setActivityModal}
-                  >
-                    <View className= 'w-full p-2 flex gap-2'>
-                      <View className='w-full items-center justify-center'>
-                          <Text className='text-heading2 py-2'>select your activity</Text>
-                      </View>
-                      {activity.map((activityItem) => (
-                        <TouchableOpacity
-                          key={activityItem.id}
-                          onPress={() => updateActivity(activityItem.id)}
-                          className={`${
-                            activityItem.id === form.activity ? 'border-primary' : 'border-gray'
-                          } rounded-normal border p-2`}
-                        >
-                          <Text
-                            className={`${
-                              activityItem.id === form.activity ? 'text-primary' : 'text-text'
-                            } text-heading2 font-noto h-[3vh]`}
-                          >
-                            {activityItem.title}
-                          </Text>
-                          <Text className='text-subText'>{activityItem.description}</Text>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                  </BottomModal>
-
-                  <BottomModal
-                    isOpen={genderModal}
-                    setIsOpen={setGenderModal}
-                  >
-                    <View className= 'w-full p-2 flex gap-2'>
-                      <View className='w-full items-center justify-center'>
-                          <Text className='text-heading2 py-2'>select gender</Text>
-                      </View>
-                      {gender.map((activityItem) => (
-                        <TouchableOpacity
-                          key={activityItem.id}
-                          onPress={() => updateGender(activityItem.id)}
-                          className={`${
-                            activityItem.id === form.gender ? 'border-primary' : 'border-gray'
-                          } rounded-normal border p-2`}
-                        >
-                          <Text
-                            className={`${
-                              activityItem.id === form.gender ? 'text-primary' : 'text-text'
-                            } text-heading2 font-noto h-[3vh]`}
-                          >
-                            {activityItem.gender}
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                  </BottomModal>
+                  <ActivityModal userActivity={form.activity} update={updateActivity} activityModal={activityModal} setActivityModal={setActivityModal}/>
+                  <GenderModal userGender={form.gender} update={updateGender} genderModal={genderModal} setGenderModal={setGenderModal}/>
 
                   {Platform.OS === "android" ?(
                     dateModal &&
@@ -533,44 +481,5 @@ const styles = StyleSheet.create({
     alignContent:'center',
   },
 });
-
-const gender = [
-  {
-    id:1,
-    gender:'Male'
-  },
-  {
-    id:2,
-    gender:'Female'
-  },
-]
-
-const activity = [
-  {
-    id:1,
-    title:'Sedentary',
-    description:'Very little physical activity.'
-  },
-  {
-    id:2,
-    title:'Lightly Active',
-    description:'Light physical activity 1-3 days a week.'
-  },
-  {
-    id:3,
-    title:'Moderately active',
-    description:'Regular moderate exercise 3-5 days a week.'
-  },
-  {
-    id:4,
-    title:'Very active',
-    description:'Hard physical activity or exercise 6-7 days a week.'
-  },
-  {
-    id:5,
-    title:'Extra active',
-    description:'Extremely high physical activity levels, often more than once per day.'
-  },
-]
 
 export default Register
