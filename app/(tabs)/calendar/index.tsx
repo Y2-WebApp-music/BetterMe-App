@@ -1,5 +1,5 @@
 import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, Switch, TouchableWithoutFeedback } from 'react-native'
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Calendar, toDateId, CalendarTheme } from "@marceloterreiro/flash-calendar";
 import { AddIcon, ArrowIcon, BackwardIcon, ForwardIcon, GridIcon, MenuIcon } from '../../../constants/icon';
 import { router, useFocusEffect } from 'expo-router';
@@ -9,12 +9,14 @@ import { FlashList } from '@shopify/flash-list';
 import FoodToday from '../../../components/food/foodToday';
 import SleepToday from '../../../components/sleep/sleepToday';
 import { mealListDummy } from '../../../types/food';
+import PickMonthYearModal from '../../../components/modal/PickMonthYearModal';
 
 const MonthCalendar = () => {
 
   const today = toDateId(new Date());
   const [selectedDate, setSelectedDate] = useState(today);
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [monthModal, setMonthModal] = useState(false);
 
   const [viewMeal, setViewMeal] = useState(true)
 
@@ -31,8 +33,26 @@ const MonthCalendar = () => {
     setCurrentMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
   };
 
-  const monthName = currentMonth.toLocaleString("en-US", { month: "long" });
-  const year = currentMonth.getFullYear();
+  const modalMonthPick = (e: Date) => {
+    setSelectedDate(toDateId(e));
+    setCurrentMonth(new Date(e.getFullYear() - 1, e.getMonth(), 1));
+
+  };
+
+  const [monthName, setMonthName] = useState(currentMonth.toLocaleString("en-US", { month: "long" }));
+  const [year, setYear] = useState(currentMonth.getFullYear());
+
+  useEffect(()=>{
+    setMonthName(currentMonth.toLocaleString("en-US", { month: "long" }));
+    setYear(currentMonth.getFullYear());
+  },[currentMonth])
+
+  const modalYearMonth = (e:string) => {
+    const [month, year] = e.split(' ');
+    setMonthName(month)
+    setYear(parseInt(year));
+
+  }
 
   const [openOption, setOpenOption] = useState(false)
 
@@ -40,6 +60,10 @@ const MonthCalendar = () => {
     useCallback(() => {
     }, [])
   );
+
+  useEffect(()=>{
+    console.log('selectedDate ',selectedDate);
+  },[selectedDate])
 
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
@@ -53,10 +77,10 @@ const MonthCalendar = () => {
           <TouchableOpacity onPress={goToPreviousMonth}>
             <BackwardIcon color={'#1C60DE'}/>
           </TouchableOpacity>
-          <View className="w-[26vw] flex-col justify-center items-center">
+          <TouchableOpacity onPress={()=>{setMonthModal(!monthModal)}} className="w-[26vw] flex-col justify-center items-center">
             <Text className="text-heading2 font-notoMedium">{monthName}</Text>
             <Text className="text-body text-nonFocus">{year}</Text>
-          </View>
+          </TouchableOpacity>
           <TouchableOpacity onPress={goToNextMonth}>
             <ForwardIcon color={'#1C60DE'}/>
           </TouchableOpacity>
@@ -78,6 +102,8 @@ const MonthCalendar = () => {
           </View>
         )}
       </View>
+
+      <PickMonthYearModal isOpen={monthModal} setIsOpen={setMonthModal} selectedDate={new Date(selectedDate)} setSelectedDate={(e) => modalMonthPick(e)} setCurrentMonthYear={(e) => modalYearMonth(e)} currentMonth={(`${monthName} ${year.toString()}`)}/>
       <ScrollView
           className='w-[92%] h-auto'
           contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', marginTop:0}}
