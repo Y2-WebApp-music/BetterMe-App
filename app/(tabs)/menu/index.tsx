@@ -9,6 +9,7 @@ import SleepToday from '../../../components/sleep/sleepToday';
 import FoodSummary from '../../../components/food/weekFoodSummaryCard';
 import FoodToday from '../../../components/food/foodToday'
 import { RefreshControl } from 'react-native';
+import { activity } from '../../../types/user';
 
 
 const screenWidth = Dimensions.get('window').width;
@@ -73,7 +74,7 @@ const Menu = () => {
                   <Text className='text-subText font-noto'>weight</Text>
                 </View>
                 <View className='flex-row gap-1 items-end'>
-                  <Text className='text-green text-heading font-notoMedium'>333.3</Text>
+                  <Text className='text-green text-heading font-notoMedium'>{user?.weight}</Text>
                   <View style={{ transform: [{ translateY: -6 }] }}>
                     <Text className='text-subText font-noto text-detail'>kg</Text>
                   </View>
@@ -84,7 +85,7 @@ const Menu = () => {
                   <Text className='text-subText font-noto'>height</Text>
                 </View>
                 <View className='flex-row gap-1 items-end'>
-                  <Text className='text-green text-heading font-notoMedium'>333.3</Text>
+                  <Text className='text-green text-heading font-notoMedium'>{user?.height}</Text>
                   <View style={{ transform: [{ translateY: -6 }] }}>
                     <Text className='text-subText font-noto text-detail'>cm</Text>
                   </View>
@@ -93,7 +94,13 @@ const Menu = () => {
               <View className=' rounded-normal border border-gray py-1 px-4 bg-white h-[4.5rem] min-w-[9rem] justify-center'>
                 <Text className='text-subText font-noto'>activity</Text>
                 <View className='items-center'>
-                  <Text className='text-primary text-heading2 font-notoMedium'>Moderately</Text>
+                  <Text className='text-primary text-heading2 font-notoMedium'>
+                    {
+                      user?.activity
+                        ? activity.find(a => a.id === user?.activity)?.title.split(' ')[0]
+                        : 'no activity'
+                    }
+                  </Text>
                 </View>
               </View>
             </View>

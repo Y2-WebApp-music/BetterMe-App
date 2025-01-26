@@ -1,9 +1,9 @@
-import { View, Text, SafeAreaView, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, Modal, Dimensions, StyleSheet, TextInput } from 'react-native'
-import React, { useCallback, useEffect, useState } from 'react';
+import { View, Text, SafeAreaView, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, Modal, Dimensions, StyleSheet, TextInput, Alert } from 'react-native'
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from '../../../context/authContext';
 import BackButton from '../../../components/Back';
 import { LeftArrowIcon } from '../../../constants/icon';
-import { router } from 'expo-router';
+import { router, useNavigation } from 'expo-router';
 import { Image } from 'expo-image';
 import { ArrowIcon } from '../../../constants/icon';
 import ActivityModal from '../../../components/modal/ActivityModal';
@@ -11,8 +11,14 @@ import GenderModal from '../../../components/modal/GenderModal';
 import FormInput from '../../../components/FormInput';
 import PickDateModal from '../../../components/modal/PickDateModal';
 import RNDateTimePicker from '@react-native-community/datetimepicker';
-import { activity, gender } from '../../../types/user';
+import { activity, gender, UserData } from '../../../types/user';
 import PickNumberModal from '../../../components/modal/PickNumberModal';
+import WarningModal from '../../../components/modal/WarningModal';
+import axios from 'axios';
+import { SERVER_URL } from '@env';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { updateProfile } from 'firebase/auth';
+import { auth } from '../../../components/auth/firebaseConfig';
 
 type UserProp = {
   username:string,
@@ -30,8 +36,9 @@ const screenWidth = Dimensions.get('window').width;
 
 const AccountSetting = () => {
 
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const { signOut } = useAuth();
+  const [warning, setWarning] = useState(false)
 
   const [form, setForm] = useState<UserProp>({
     username: user?.displayName || '',
@@ -51,6 +58,7 @@ const AccountSetting = () => {
       ...prevForm,
       birth: date,
     }));
+    setChanged(true)
   };
 
   const [weightModal,setWeightModal] = useState(false)
@@ -59,6 +67,7 @@ const AccountSetting = () => {
       ...prevForm,
       weight: weight,
     }));
+    setChanged(true)
   };
 
   const [heightModal,setHeightModal] = useState(false)
@@ -67,6 +76,7 @@ const AccountSetting = () => {
       ...prevForm,
       height: height,
     }));
+    setChanged(true)
   };
 
   const [activityModal,setActivityModal] = useState(false)
@@ -76,6 +86,7 @@ const AccountSetting = () => {
       activity: id,
     }));
     setActivityModal(false)
+    setChanged(true)
   }
 
   const [genderModal,setGenderModal] = useState(false)
@@ -85,11 +96,101 @@ const AccountSetting = () => {
       gender: id,
     }));
     setGenderModal(false)
+    setChanged(true)
   }
 
   const handleSignOut = async () => {
     await signOut();
   };
+
+  const navigation = useNavigation()
+
+  const [changed, setChanged] = useState(false)
+  const buttonClickedRef = useRef(false);
+
+  const handleBack = () => {
+    buttonClickedRef.current = true;
+    router.back()
+  }
+
+  useEffect(()=>{
+    console.log('changed ',changed);
+  },[changed])
+
+  // useEffect(() => {
+  //   const beforeRemoveHandler = (e:any) => {
+  //     const action = e.data.action;
+
+  //     console.log(' changed:',changed,' buttonClickedRef.current:',buttonClickedRef.current);
+
+  //     if (!changed && buttonClickedRef.current) {
+        
+  //       buttonClickedRef.current = false;
+
+  //       return;
+  //     }
+
+  //     e.preventDefault();
+
+  //     Alert.alert(
+  //       'Discard changes?',
+  //       'You have unsaved changes. Are you sure to discard them and leave the screen?',
+  //       [
+  //         { text: "Don't leave", style: 'cancel', onPress: () => {} },
+  //         {
+  //           text: 'Discard',
+  //           style: 'destructive',
+  //           onPress: () => navigation.dispatch(action),
+  //         },
+  //       ]
+  //     );
+  //   }
+
+  //   const unsubscribe = navigation.addListener('beforeRemove', beforeRemoveHandler);
+
+  //   return unsubscribe;
+  // }, [buttonClickedRef, changed]);
+
+  const updateUser = async() => {
+    try {
+      if (user) {
+
+        await updateProfile(auth.currentUser || user, {
+          displayName:form.username,
+        })
+        
+        const response = await axios.put(`${SERVER_URL}/user/update/${user?._id}`, {
+          username: form.username,
+          // profile_img: downloadURL,
+          birth_date: form.birth,
+          gender: form.gender,
+          weight: form.weight,
+          height: form.height,
+          activity: form.activity,
+        });
+
+        await AsyncStorage.removeItem('@user');
+
+        const { _id, birth_date, gender, weight, height, activity, calorie_need } = response.data.user;
+
+        const extendedUser: UserData = {
+          ...user,
+          displayName:form.username,
+          _id,
+          birth_date,
+          gender,
+          weight,
+          height,
+          activity,
+          calorie_need,
+        };
+        setUser(extendedUser)
+        await AsyncStorage.setItem('@user', JSON.stringify(extendedUser));
+      }
+    } catch(error) {
+      console.error('Fail to update :',error)
+    }
+  }
 
   return (
       <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
@@ -104,9 +205,12 @@ const AccountSetting = () => {
               keyboardDismissMode='on-drag'
             >
               <View className='w-full'>
-                <View className='max-w-[14vw]'>
-                  <BackButton goto={'/menu'}/>
+              <TouchableOpacity onPress={handleBack} className='will-change-contents w-fit flex flex-row items-center justify-start'>
+                <View>
+                  <LeftArrowIcon width={14} height={14} color={"black"} />
                 </View>
+                <Text>Back</Text>
+              </TouchableOpacity>
               </View>
               <View className='mt-2'>
                 <View className='flex flex-row gap-2 items-center'>
@@ -114,7 +218,7 @@ const AccountSetting = () => {
                     <Text className='text-subTitle text-primary font-notoMedium'>Account Setting</Text>
                   </View>
                   <View>
-                    <TouchableOpacity className=' bg-primary flex-row gap-2 p-2 px-6 justify-center items-center rounded-full'>
+                    <TouchableOpacity onPress={updateUser} className=' bg-primary flex-row gap-2 p-2 px-6 justify-center items-center rounded-full'>
                       <Text className='text-heading2 text-white font-notoMedium'>Save</Text>
                     </TouchableOpacity>
                   </View>
@@ -124,7 +228,7 @@ const AccountSetting = () => {
                 <View style={styles.imageContainer}>
                   <Image
                     style={styles.image}
-                    source={require('../../../assets/maleAvatar.png')}
+                    source={user?.photoURL ? user?.photoURL : user?.gender === 1 ? require('../../../assets/maleAvatar.png') : require('../../../assets/femaleAvatar.png')}
                     contentFit="cover"
                     transition={1000}
                   />
@@ -133,7 +237,11 @@ const AccountSetting = () => {
                   <FormInput
                     name='username'
                     value={form.username}
-                    handleChange={(e:string)=>setForm({ ...form,username: e})}
+                    handleChange={(e:string) =>(
+                      setForm({ ...form,username: e}),
+                      setChanged(true)
+                      )
+                    }
                     keyboardType="default"
                   />
                   <View className='w-full' style={{marginTop: 6}}>
@@ -208,29 +316,6 @@ const AccountSetting = () => {
                   </View>
                 </View>
 
-                  {/* <View className='mt-3 w-full flex-row gap-2 items-center ml-6'>
-                    <View className='items-center'>
-                      <Text className='grow text-xs text-subText pb-2'>gender</Text>
-                      <View className="flex-row p-1 px-4 rounded-normal bg-white border border-gray items-center justify-center">
-                        <Text className="text-body font-notoMedium">Female</Text>
-                      </View>
-                    </View>
-                    <View className='items-center'>
-                      <Text className='grow text-xs text-subText pb-2'>weight</Text>
-                      <View className="flex-row p-1 px-4 rounded-normal bg-white border border-gray items-center justify-center">
-                        <Text className="text-body font-notoMedium">333</Text>
-                        <Text className="text-xs text-subText ml-1">kg</Text>
-                      </View>
-                    </View>
-                    <View className='items-center'>
-                      <Text className='grow text-xs text-subText pb-2'>height</Text>
-                      <View className="flex-row p-1 px-4 rounded-normal bg-white border border-gray items-center justify-center">
-                        <Text className="text-body font-notoMedium">333</Text>
-                        <Text className="text-xs text-subText ml-1">cm</Text>
-                      </View>
-                    </View>
-                  </View> */}
-
                 <View className='w-[92%]'>
                   <Text className='text-subText text-detail'>your activity</Text>
                   <TouchableOpacity
@@ -245,14 +330,6 @@ const AccountSetting = () => {
                     {form.activity ? activity.find(a => a.id === form.activity)?.description : ''}
                   </Text>
                 </View>
-                  {/* <View className='ml-6'>
-                    <Text className='text-subText'>your activity</Text>
-                    <View className="flex-row p-1 px-4 rounded-normal bg-white border border-gray" style={[styles.input, { justifyContent: 'space-between' }]}>
-                      <Text>Moderately active</Text>
-                      <ArrowIcon width={16} height={16} color={'#626262'}/>
-                    </View>
-                    <Text className='text-xs text-subText'>Regular moderate exercise 3-5 days a week.</Text>
-                  </View> */}
 
                 <View className='w-full mt-2'>
                   <Text className='text-xs font-noto text-subText'>We collect gender, weight, height, and activity level to calculate your daily caloric needs accurately.</Text>
@@ -287,6 +364,7 @@ const AccountSetting = () => {
               </View>
           </ScrollView>
 
+          <WarningModal title={'Something had changed'} detail={'Please save before leave page'} isOpen={warning} setIsOpen={setWarning}/>
           <ActivityModal userActivity={form.activity} update={updateActivity} activityModal={activityModal} setActivityModal={setActivityModal}/>
           <GenderModal userGender={form.gender} update={updateGender} genderModal={genderModal} setGenderModal={setGenderModal}/>
           <PickNumberModal setNumber={updateWeight} isOpen={weightModal} setIsOpen={setWeightModal} title={'Select Weight'} unit={'kg'} min={28} max={150} start={40} dotMax={10} />
