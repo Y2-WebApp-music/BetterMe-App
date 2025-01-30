@@ -7,6 +7,7 @@ import { FlashList } from '@shopify/flash-list';
 import axios from 'axios';
 import { SERVER_URL } from '@env';
 import { useAuth } from '../../../../context/authContext';
+import { useFocusEffect } from 'expo-router';
 
 const Inprogress = () => {
 
@@ -39,9 +40,6 @@ const Inprogress = () => {
       console.error(error)
     }
   }
-  useMemo(()=>{
-    getGoal()
-  },[])
 
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = useCallback(() => {
@@ -51,6 +49,12 @@ const Inprogress = () => {
       setRefreshing(false);
     }, 500);
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      getGoal()
+    }, [])
+  );
 
   return (
     <SafeAreaView className="w-full h-full justify-start items-center bg-Background font-noto" >

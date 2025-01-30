@@ -1,17 +1,22 @@
 import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, Switch, TouchableWithoutFeedback } from 'react-native'
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Calendar, toDateId, CalendarTheme } from "@marceloterreiro/flash-calendar";
 import { AddIcon, ArrowIcon, BackwardIcon, ForwardIcon, GridIcon, MenuIcon } from '../../../constants/icon';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import CalendarGoalCard from '../../../components/goal/calendarGoalCard';
 import MealCard from '../../../components/food/mealCard';
 import { FlashList } from '@shopify/flash-list';
+import FoodToday from '../../../components/food/foodToday';
+import SleepToday from '../../../components/sleep/sleepToday';
+import { mealListDummy } from '../../../types/food';
+import PickMonthYearModal from '../../../components/modal/PickMonthYearModal';
 
 const MonthCalendar = () => {
 
   const today = toDateId(new Date());
   const [selectedDate, setSelectedDate] = useState(today);
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [monthModal, setMonthModal] = useState(false);
 
   const [viewMeal, setViewMeal] = useState(true)
 
@@ -28,10 +33,46 @@ const MonthCalendar = () => {
     setCurrentMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
   };
 
-  const monthName = currentMonth.toLocaleString("en-US", { month: "long" });
-  const year = currentMonth.getFullYear();
+  const modalMonthPick = (e: Date) => {
+    console.log('Date : ',e);
+    
+    setSelectedDate(toDateId(e));
+    setCurrentMonth(new Date(e.getFullYear(), e.getMonth()));
+
+  };
+
+  const [monthName, setMonthName] = useState(currentMonth.toLocaleString("en-US", { month: "long" }));
+  const [year, setYear] = useState(currentMonth.getFullYear());
+
+  useEffect(()=>{
+    setMonthName(currentMonth.toLocaleString("en-US", { month: "long" }));
+    setYear(currentMonth.getFullYear());
+
+    console.log('currentMonth ',currentMonth);
+    
+  },[currentMonth])
+
+  const modalYearMonth = (e:string) => {
+    const [month, year] = e.split(' ');
+
+    console.log('month ',month,'year ',parseInt(year));
+    
+    
+    setMonthName(month)
+    setYear(parseInt(year));
+
+  }
 
   const [openOption, setOpenOption] = useState(false)
+
+  useFocusEffect(
+    useCallback(() => {
+    }, [])
+  );
+
+  useEffect(()=>{
+    console.log('selectedDate ',selectedDate);
+  },[selectedDate])
 
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
@@ -45,10 +86,10 @@ const MonthCalendar = () => {
           <TouchableOpacity onPress={goToPreviousMonth}>
             <BackwardIcon color={'#1C60DE'}/>
           </TouchableOpacity>
-          <View className="w-[26vw] flex-col justify-center items-center">
+          <TouchableOpacity onPress={()=>{setMonthModal(!monthModal)}} className="w-[26vw] flex-col justify-center items-center">
             <Text className="text-heading2 font-notoMedium">{monthName}</Text>
             <Text className="text-body text-nonFocus">{year}</Text>
-          </View>
+          </TouchableOpacity>
           <TouchableOpacity onPress={goToNextMonth}>
             <ForwardIcon color={'#1C60DE'}/>
           </TouchableOpacity>
@@ -70,6 +111,8 @@ const MonthCalendar = () => {
           </View>
         )}
       </View>
+
+      <PickMonthYearModal isOpen={monthModal} setIsOpen={setMonthModal} selectedDate={new Date(selectedDate)} setSelectedDate={(e) => modalMonthPick(e)} setCurrentMonthYear={(e) => modalYearMonth(e)} currentMonth={(`${monthName} ${year.toString()}`)}/>
       <ScrollView
           className='w-[92%] h-auto'
           contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', marginTop:0}}
@@ -88,7 +131,7 @@ const MonthCalendar = () => {
                 calendarFirstDayOfWeek="sunday"
                 calendarDayHeight={40}
                 calendarRowVerticalSpacing={0}
-                calendarRowHorizontalSpacing={0}
+                calendarRowHorizontalSpacing={10}
                 onCalendarDayPress={setSelectedDate}
                 calendarMonthId={toDateId(currentMonth)}
                 theme={linearTheme}
@@ -100,8 +143,8 @@ const MonthCalendar = () => {
           </View>
           <View style={{ transform: [{ translateY: -18 }] }} className='flex-col gap-2'>
             <Text className='font-noto text-heading3'>{new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(selectedDate))}</Text>
-            <View className='h-28 w-full rounded-normal border border-gray bg-white'></View>
-            <View className='h-28 w-full rounded-normal border border-gray bg-white'></View>
+            <SleepToday/>
+            <FoodToday/>
             <Text className='text-subText font-noto text-body mt-2'>In this day</Text>
             <View className='flex-row justify-start items-center gap-4'>
               <TouchableOpacity onPress={()=>setViewMeal(true)} className={`p-1 px-2 ${viewMeal? 'bg-primary':'bg-transparent'} rounded-normal`}>
@@ -128,7 +171,7 @@ const MonthCalendar = () => {
                   <FlashList
                     data={mealListDummy}
                     renderItem={({ item }) =>
-                      <MealCard meal_id={item.meal_id} meal_date={item.meal_date} food_name={item.food_name} calorie={item.calorie} ai_create={item.ai_create}/>
+                      <MealCard meal_id={item.meal_id} meal_date={item.meal_date} food_name={item.food_name} calorie={item.calorie} createByAI={item.createByAI}/>
                     }
                     estimatedItemSize={200}
                   />
@@ -146,7 +189,6 @@ const MonthCalendar = () => {
                   />
                 </View>
               </View>
-
             )}
           </View>
         </ScrollView>
@@ -175,23 +217,6 @@ const goalDataDummy = [
   },
 ]
 
-const mealListDummy = [
-  {
-    meal_id:'1',
-    food_name:'กะเพราไก่',
-    meal_date:new Date(),
-    calorie:273,
-    ai_create:true,
-  },
-  {
-    meal_id:'2',
-    food_name:'ไก่ย่าง ข้าวเหนียว',
-    meal_date:new Date(),
-    calorie:234,
-    ai_create:false,
-  },
-]
-
 const linearAccent = "#1C60DE";
 
 const linearTheme: CalendarTheme = {
@@ -200,7 +225,7 @@ const linearTheme: CalendarTheme = {
       textAlign: "left",
       color: "rgba(0, 0, 0, 1)",
       fontWeight: "700",
-      display:'none'
+      display:'none',
     },
   },
   itemWeekName: { content: { color: "#B8C2D2" } },
@@ -213,19 +238,19 @@ const linearTheme: CalendarTheme = {
     idle: ({ isPressed, isWeekend }) => ({
       container: {
         backgroundColor: isPressed ? linearAccent : "transparent",
-        borderRadius: 12,
+        borderRadius: 99,
       },
       content: {
         color: isWeekend && !isPressed ? "rgba(0, 0, 0, 1)" : "#000",
         fontSize:14,
         fontWeight:600,
-        fontFamily:'noto-sans-thai'
+        fontFamily:'noto-sans-thai',
       },
     }),
     today: ({ isPressed }) => ({
       container: {
         borderColor: "rgba(0, 0, 0, 0)",
-        borderRadius: isPressed ? 12 : 12,
+        borderRadius: isPressed ? 99 : 99,
         backgroundColor: isPressed ? linearAccent : "#B8C2D2",
       },
       content: {
@@ -238,10 +263,10 @@ const linearTheme: CalendarTheme = {
     active: ({ isEndOfRange, isStartOfRange }) => ({
       container: {
         backgroundColor: linearAccent,
-        borderTopLeftRadius: isStartOfRange ? 16 : 0,
-        borderBottomLeftRadius: isStartOfRange ? 16 : 0,
-        borderTopRightRadius: isEndOfRange ? 16 : 0,
-        borderBottomRightRadius: isEndOfRange ? 16 : 0,
+        borderTopLeftRadius: isStartOfRange ? 99 : 20,
+        borderBottomLeftRadius: isStartOfRange ? 99 : 20,
+        borderTopRightRadius: isEndOfRange ? 99 : 20,
+        borderBottomRightRadius: isEndOfRange ? 99 : 20,
       },
       content: {
         color: "#ffffff",

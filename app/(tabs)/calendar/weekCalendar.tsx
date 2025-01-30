@@ -1,5 +1,5 @@
 import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, StyleSheet } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { AddIcon, ArrowIcon, BackwardIcon, ForwardIcon, GridIcon, MenuIcon } from '../../../constants/icon'
 import { router } from 'expo-router'
 import MealCard from '../../../components/food/mealCard'
@@ -8,20 +8,44 @@ import { subDays, addDays, startOfWeek, addWeeks, addDays as addDaysToDate } fro
 import PagerView from 'react-native-pager-view';
 import DateSlider from '../../../components/DateSlider'
 import { FlashList } from '@shopify/flash-list'
+import SleepToday from '../../../components/sleep/sleepToday'
+import FoodToday from '../../../components/food/foodToday'
+import { mealListDummy } from '../../../types/food'
+import { toDateId } from '@marceloterreiro/flash-calendar'
+import PickMonthYearModal from '../../../components/modal/PickMonthYearModal'
 
 const WeekCalendar = () => {
   const [viewMeal, setViewMeal] = useState(true)
   const [openOption, setOpenOption] = useState(false)
+  const [monthModal, setMonthModal] = useState(false)
+
+  const today = new Date();
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [currentMonth, setCurrentMonth] = useState<string>('');
+
+  const goToToday = () => {
+    setSelectedDate(today);
+  };
+
+  useEffect(()=>{
+    console.log('selectedDate ',selectedDate);
+  },[selectedDate])
 
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
       <View className='w-[92%] relative h-auto mt-3 flex-row items-center'>
-        <View className='grow flex-row gap-4 items-center justify-start'>
-          <View className="w-[26vw] flex-col justify-center items-start">
-            <Text className="text-heading2 font-notoMedium">September</Text>
-            <Text className="text-body text-nonFocus">2024</Text>
-          </View>
+        <View className='flex-row gap-4 items-center justify-start pr-4'>
+          <TouchableOpacity activeOpacity={0.6} onPress={()=>{setMonthModal(!monthModal)}} className="min-w-fit flex-col justify-center items-start">
+            <Text className="text-heading2 font-notoMedium ">{currentMonth.split(' ')[0]}</Text>
+            <Text className="text-body font-noto text-nonFocus">{currentMonth.split(' ')[1]}</Text>
+          </TouchableOpacity>
         </View>
+        <View className={`border ${selectedDate.setHours(0, 0, 0, 0).toString() === today.setHours(0, 0, 0, 0).toString()?'border-primary':'border-gray'} p-1 px-2 rounded-normal`}>
+          <TouchableOpacity onPress={goToToday}>
+            <Text className={`text-detail font-noto ${selectedDate.setHours(0, 0, 0, 0) === today.setHours(0, 0, 0, 0)? 'text-primary' : 'text-subText'}`}>Today</Text>
+          </TouchableOpacity>
+        </View>
+        <View className='grow'></View>
         <TouchableOpacity onPress={()=>setOpenOption(!openOption)} className=' p-1 px-2 rounded-normal flex-row gap-1 items-center'>
           <Text className='text-subText font-noto text-body'>Week</Text>
           <ArrowIcon width={16} height={16} color={'#626262'} style={{transform:[openOption?{rotate:'180deg'}:{rotate:'0deg'}]}}/>
@@ -39,7 +63,17 @@ const WeekCalendar = () => {
           </View>
         )}
       </View>
-      <DateSlider/>
+        <View style={{justifyContent: 'space-between', paddingHorizontal:16}} className='w-full flex-row mt-2'>
+          <Text className='text-nonFocus font-noto text-detail text-center w-[40px]'>Sun</Text>
+          <Text className='text-nonFocus font-noto text-detail text-center w-[40px]'>Mon</Text>
+          <Text className='text-nonFocus font-noto text-detail text-center w-[40px]'>Tue</Text>
+          <Text className='text-nonFocus font-noto text-detail text-center w-[40px]'>Wed</Text>
+          <Text className='text-nonFocus font-noto text-detail text-center w-[40px] '>Thu</Text>
+          <Text className='text-nonFocus font-noto text-detail text-center w-[40px]'>Fri</Text>
+          <Text className='text-nonFocus font-noto text-detail text-center w-[40px]'>Sat</Text>
+        </View>
+        <DateSlider selectedDate={selectedDate} setSelectedDate={setSelectedDate} setCurrentMonthYear={setCurrentMonth}/>
+        <PickMonthYearModal isOpen={monthModal} setIsOpen={setMonthModal} selectedDate={selectedDate} setSelectedDate={setSelectedDate} setCurrentMonthYear={setCurrentMonth} currentMonth={currentMonth}/>
 
       <ScrollView
           className='w-[92%] h-auto'
@@ -48,8 +82,8 @@ const WeekCalendar = () => {
         >
           <View className='flex-col gap-2'>
             {/* <Text className='font-noto text-heading3'>{new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(selectedDate))}</Text> */}
-            <View className='h-28 w-full rounded-normal border border-gray bg-white'></View>
-            <View className='h-28 w-full rounded-normal border border-gray bg-white'></View>
+            <SleepToday/>
+            <FoodToday/>
             <Text className='text-subText font-noto text-body mt-2'>In this day</Text>
             <View className='flex-row justify-start items-center gap-4'>
               <TouchableOpacity onPress={()=>setViewMeal(true)} className={`p-1 px-2 ${viewMeal? 'bg-primary':'bg-transparent'} rounded-normal`}>
@@ -61,7 +95,7 @@ const WeekCalendar = () => {
               </TouchableOpacity>
               <View className='grow'/>
               {viewMeal?(
-                <TouchableOpacity onPress={()=>{router.push('/camera')}} className='rounded-full p-1 px-4 bg-primary flex-row items-center justify-center gap-1'>
+                <TouchableOpacity onPress={()=>{router.push('/calendar/addMeal')}} className='rounded-full p-1 px-4 bg-primary flex-row items-center justify-center gap-1'>
                   <Text className='text-white font-noto text-heading3'>add meal</Text>
                   <AddIcon width={22} height={22} color={'#fff'}/>
                 </TouchableOpacity>
@@ -72,23 +106,27 @@ const WeekCalendar = () => {
             </View>
             {viewMeal? (
               <View className='w-full justify-center items-center gap-2 mt-2 pb-16'>
-                <FlashList
-                  data={mealListDummy}
-                  renderItem={({ item }) =>
-                    <MealCard meal_id={item.meal_id} meal_date={item.meal_date} food_name={item.food_name} calorie={item.calorie} ai_create={item.ai_create}/>
-                  }
-                  estimatedItemSize={200}
-                />
+                <View className='w-full'>
+                  <FlashList
+                    data={mealListDummy}
+                    renderItem={({ item }) =>
+                      <MealCard meal_id={item.meal_id} meal_date={item.meal_date} food_name={item.food_name} calorie={item.calorie} createByAI={item.createByAI}/>
+                    }
+                    estimatedItemSize={200}
+                  />
+                </View>
               </View>
             ):(
               <View className='w-full justify-center items-center gap-2 mt-2 pb-16'>
-                <FlashList
-                  data={goalDataDummy}
-                  renderItem={({ item }) =>
-                    <CalendarGoalCard goal_id={item.goal_id} goal_name={item.goal_name} total_task={item.total_task} complete_task={item.complete_task}/>
-                  }
-                  estimatedItemSize={200}
-                />
+                <View className='w-full'>
+                  <FlashList
+                    data={goalDataDummy}
+                    renderItem={({ item }) =>
+                      <CalendarGoalCard goal_id={item.goal_id} goal_name={item.goal_name} total_task={item.total_task} complete_task={item.complete_task}/>
+                    }
+                    estimatedItemSize={200}
+                  />
+                </View>
               </View>
 
             )}
@@ -116,23 +154,6 @@ const goalDataDummy = [
     goal_name:'Title Test 3',
     total_task:8,
     complete_task:3,
-  },
-]
-
-const mealListDummy = [
-  {
-    meal_id:'1',
-    food_name:'กะเพราไก่',
-    meal_date:new Date(),
-    calorie:273,
-    ai_create:true,
-  },
-  {
-    meal_id:'2',
-    food_name:'ไก่ย่าง ข้าวเหนียว',
-    meal_date:new Date(),
-    calorie:234,
-    ai_create:false,
   },
 ]
 

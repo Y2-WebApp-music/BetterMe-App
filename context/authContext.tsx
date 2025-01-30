@@ -5,17 +5,8 @@ import { router } from 'expo-router';
 import { GoogleAuthProvider, IdTokenResult, onAuthStateChanged, signInWithCredential, signOut, User, UserInfo, UserMetadata } from 'firebase/auth';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { auth } from '../components/auth/firebaseConfig';
+import { UserData } from '../types/user';
 
-export type UserData = User & {
-  _id:string
-  serverToken:string
-  birth_date: Date
-  gender: number
-  weight: number,
-  height: number,
-  activity: number,
-  calorie_need: number,
-}
 type AuthContextType = {
   user: UserData | null;
   setUser: React.Dispatch<React.SetStateAction<UserData | null>>;
@@ -60,8 +51,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         });
         const userData = response.data;
 
-        console.log('userData : ',userData);
-
         if (userData.message === "User not found"){
           router.replace('/(auth)/googleRegis');
         } else {
@@ -78,7 +67,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             activity,
             calorie_need,
           };
+          console.log(' :=========== userData ===========: \n',extendedUser);
           setUser(extendedUser);
+
           await AsyncStorage.setItem('@user', JSON.stringify(extendedUser));
         }
       } catch (error) {
@@ -90,8 +81,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (firebaseUser) {
         fetchUserDetails(firebaseUser)
       } else {
-        // setUser(dummyUser);
-        // AsyncStorage.setItem('@user', JSON.stringify(dummyUser));
+         // setUser(dummyUser);
+         // AsyncStorage.setItem('@user', JSON.stringify(dummyUser));
         setUser(null);
         AsyncStorage.removeItem('@user');
       }

@@ -8,9 +8,10 @@ import PickNumberModal from '../../components/modal/PickNumberModal'
 import { onAuthStateChanged, User } from 'firebase/auth'
 import { auth } from '../../components/auth/firebaseConfig'
 import axios from 'axios'
-import { useAuth, UserData } from '../../context/authContext'
+import { useAuth } from '../../context/authContext'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { SERVER_URL } from '@env'
+import { UserData } from '../../types/user'
 
 
 type UserProp = {
@@ -130,10 +131,14 @@ const Register = () => {
           activity: form.activity,
         });
 
-        const { birth_date, gender, weight, height, activity, calorie_need } = response.data.user;
+        const { _id, birth_date, gender, weight, height, activity, calorie_need } = response.data.user;
+        const serverToken = response.data.token;
+        // const { birth_date, gender, weight, height, activity, calorie_need } = response.data.user;
 
         const extendedUser: UserData = {
           ...firebaseUser,
+          _id,
+          serverToken,
           birth_date,
           gender,
           weight,
@@ -325,7 +330,7 @@ const Register = () => {
                     </View>
                   </BottomModal>
 
-                  <PickDateModal value={form.birth} isOpen={dateModal} setIsOpen={setDateModal} setDate={updateDate} maximumDate={true}/>
+                  <PickDateModal value={form.birth} isOpen={dateModal} setIsOpen={setDateModal} setDate={updateDate} maximumDate={true} minimumDate={false}/>
                   <PickNumberModal setNumber={updateWeight} isOpen={weightModal} setIsOpen={setWeightModal} title={'Select Weight'} unit={'kg'} min={28} max={150} start={40} dotMax={10} />
                   <PickNumberModal setNumber={updateHeight} isOpen={heightModal} setIsOpen={setHeightModal} title={'Select Height'} unit={'cm'} min={126} max={210} start={150} dotMax={10} />
 

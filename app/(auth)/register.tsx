@@ -17,7 +17,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth, firebaseStorage } from '../../components/auth/firebaseConfig';
-import { useAuth, UserData } from '../../context/authContext';
+import { useAuth } from '../../context/authContext';
+import { activity, gender, UserData } from '../../types/user';
+import RNDateTimePicker from '@react-native-community/datetimepicker';
+import ActivityModal from '../../components/modal/ActivityModal';
+import GenderModal from '../../components/modal/GenderModal';
 
 type UserProp = {
   username:string,
@@ -211,10 +215,14 @@ const Register = () => {
 
         // const res = response.data;
         // const extendedUser: UserData = { ...user, ...res };
-        const { birth_date, gender, weight, height, activity, calorie_need } = response.data.user;
+        const { _id, birth_date, gender, weight, height, activity, calorie_need } = response.data.user;
+        const serverToken = response.data.token;
+        // const { birth_date, gender, weight, height, activity, calorie_need } = response.data.user;
 
         const extendedUser: UserData = {
           ...user,
+          _id,
+          serverToken,
           birth_date,
           gender,
           weight,
@@ -403,64 +411,30 @@ const Register = () => {
                     </Text>
                   </View>
 
-                  <BottomModal
-                    isOpen={activityModal}
-                    setIsOpen={setActivityModal}
-                  >
-                    <View className= 'w-full p-2 flex gap-2'>
-                      <View className='w-full items-center justify-center'>
-                          <Text className='text-heading2 py-2'>select your activity</Text>
-                      </View>
-                      {activity.map((activityItem) => (
-                        <TouchableOpacity
-                          key={activityItem.id}
-                          onPress={() => updateActivity(activityItem.id)}
-                          className={`${
-                            activityItem.id === form.activity ? 'border-primary' : 'border-gray'
-                          } rounded-normal border p-2`}
-                        >
-                          <Text
-                            className={`${
-                              activityItem.id === form.activity ? 'text-primary' : 'text-text'
-                            } text-heading2 font-noto h-[3vh]`}
-                          >
-                            {activityItem.title}
-                          </Text>
-                          <Text className='text-subText'>{activityItem.description}</Text>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                  </BottomModal>
+                  <ActivityModal userActivity={form.activity} update={updateActivity} activityModal={activityModal} setActivityModal={setActivityModal}/>
+                  <GenderModal userGender={form.gender} update={updateGender} genderModal={genderModal} setGenderModal={setGenderModal}/>
 
-                  <BottomModal
-                    isOpen={genderModal}
-                    setIsOpen={setGenderModal}
-                  >
-                    <View className= 'w-full p-2 flex gap-2'>
-                      <View className='w-full items-center justify-center'>
-                          <Text className='text-heading2 py-2'>select gender</Text>
-                      </View>
-                      {gender.map((activityItem) => (
-                        <TouchableOpacity
-                          key={activityItem.id}
-                          onPress={() => updateGender(activityItem.id)}
-                          className={`${
-                            activityItem.id === form.gender ? 'border-primary' : 'border-gray'
-                          } rounded-normal border p-2`}
-                        >
-                          <Text
-                            className={`${
-                              activityItem.id === form.gender ? 'text-primary' : 'text-text'
-                            } text-heading2 font-noto h-[3vh]`}
-                          >
-                            {activityItem.gender}
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                  </BottomModal>
-
-                  <PickDateModal value={form.birth} isOpen={dateModal} setIsOpen={setDateModal} setDate={updateDate} maximumDate={true}/>
+                  {Platform.OS === "android" ?(
+                    dateModal &&
+                    <RNDateTimePicker
+                      display="spinner"
+                      mode="date"
+                      value={form.birth}
+                      minimumDate={new Date('1950, 0, 1')}
+                      maximumDate={new Date()}
+                      onChange={(event, selectedDate) => {
+                        if (selectedDate) {
+                          setDateModal(!dateModal);
+                          updateDate(selectedDate);
+                        }
+                      }}
+                      style={{}}
+                      locale="en-Gn"
+                      themeVariant='light'
+                    />
+                  ):(
+                    <PickDateModal value={form.birth} isOpen={dateModal} setIsOpen={setDateModal} setDate={updateDate} maximumDate={true} minimumDate={false}/>
+                  )}
                   <PickNumberModal setNumber={updateWeight} isOpen={weightModal} setIsOpen={setWeightModal} title={'Select Weight'} unit={'kg'} min={28} max={150} start={40} dotMax={10} />
                   <PickNumberModal setNumber={updateHeight} isOpen={heightModal} setIsOpen={setHeightModal} title={'Select Height'} unit={'cm'} min={126} max={210} start={150} dotMax={10} />
 
@@ -507,44 +481,5 @@ const styles = StyleSheet.create({
     alignContent:'center',
   },
 });
-
-const gender = [
-  {
-    id:1,
-    gender:'Male'
-  },
-  {
-    id:2,
-    gender:'Female'
-  },
-]
-
-const activity = [
-  {
-    id:1,
-    title:'Sedentary',
-    description:'Very little physical activity.'
-  },
-  {
-    id:2,
-    title:'Lightly Active',
-    description:'Light physical activity 1-3 days a week.'
-  },
-  {
-    id:3,
-    title:'Moderately active',
-    description:'Regular moderate exercise 3-5 days a week.'
-  },
-  {
-    id:4,
-    title:'Very active',
-    description:'Hard physical activity or exercise 6-7 days a week.'
-  },
-  {
-    id:5,
-    title:'Extra active',
-    description:'Extremely high physical activity levels, often more than once per day.'
-  },
-]
 
 export default Register

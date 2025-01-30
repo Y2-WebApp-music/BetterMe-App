@@ -1,47 +1,101 @@
-import { View, Text, StyleSheet } from 'react-native';
-import React from 'react';
-import { subDays, addDays, startOfWeek, addWeeks, addDays as addDaysToDate, format } from 'date-fns';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import PagerView from 'react-native-pager-view';
+import { startOfWeek, endOfWeek, addWeeks, subWeeks, format, isToday } from 'date-fns';
 
-const generateDates = (start: Date, end: Date, weekStartsOn: number) => {
-  const getStartOfWeek = (date: Date): Date => startOfWeek(date, { weekStartsOn });
-
-  let current = getStartOfWeek(start);
-  const weekStartDates: Date[] = [];
+const generateWeeksForMonth = (start: Date, end: Date) => {
+  const weeks = [];
+  let current = startOfWeek(start, { weekStartsOn: 0 });
 
   while (current <= end) {
-    weekStartDates.push(current);
+    const week = [];
+    for (let i = 0; i < 7; i++) {
+      week.push(new Date(current.getTime() + i * 86400000)); // 86400000 ms = 1 day
+    }
+    weeks.push(week);
     current = addWeeks(current, 1);
   }
 
-  const allWeeks = weekStartDates.map((weekStart) => {
-    const weekDays: Date[] = [];
-    for (let i = 0; i < 7; i++) {
-      weekDays.push(addDaysToDate(weekStart, i));
-    }
-    return weekDays;
-  });
-
-  return allWeeks;
+  return weeks;
 };
 
-const dates = generateDates(
-  subDays(new Date(), 14),
-  addDays(new Date(), 14),
-  0
-);
+type DateSliderProps = {
+  selectedDate: Date;
+  setSelectedDate: (selectedDate: Date) => void;
+  setCurrentMonthYear: (monthYear: string) => void;
+};
 
-const DateSlider = () => {
+const DateSlider = ({ selectedDate, setSelectedDate, setCurrentMonthYear }: DateSliderProps) => {
+  const startDate = new Date('2024-10-01');
+  const endDate = new Date('2025-03-01');
+  const [dates, setDates] = useState(generateWeeksForMonth(startDate, endDate));
+  const [currentPage, setCurrentPage] = useState(0);
+
+  const pagerRef = useRef<PagerView>(null);
+
+  // Find the index of the week containing a specific date
+  const getWeekIndexForDate = (date: Date): number => {
+    for (let i = 0; i < dates.length; i++) {
+      const week = dates[i];
+      if (week.some((day) => day.toDateString() === date.toDateString())) {
+        return i;
+      }
+    }
+    return 0;
+  };
+
+  // Scroll to the page containing the selectedDate
+  useEffect(() => {
+    const pageIndex = getWeekIndexForDate(selectedDate);
+    setCurrentPage(pageIndex);
+    if (pagerRef.current) {
+      pagerRef.current.setPage(pageIndex);
+    }
+  }, [selectedDate]);
+
+  const handlePageSelected = (e: any) => {
+    const page = e.nativeEvent.position;
+    setCurrentPage(page);
+
+    const firstDayOfWeek = dates[page][0];
+    const monthYear = format(firstDayOfWeek, 'MMMM yyyy');
+    setCurrentMonthYear(monthYear);
+  };
+
+  const handleDateSelect = (day: Date) => {
+    setSelectedDate(day);
+  };
+
   return (
-    <PagerView style={styles.container} orientation="horizontal">
-      {dates.map((week, i) => (
-        <View key={i} style={styles.page}>
-          <View style={styles.row}>
-            {week.map((day, j) => (
-              <View key={j} style={styles.day}>
-                <Text className='text-white'>{format(day, 'EEE')}</Text>
-                <Text className='text-white'>{day.getDate()}</Text>
-              </View>
+    <PagerView
+      style={styles.container}
+      ref={pagerRef}
+      onPageSelected={handlePageSelected}
+      initialPage={currentPage}
+    >
+      {dates.map((week, index) => (
+        <View key={index} style={styles.weekContainer}>
+          <View style={styles.week}>
+            {week.map((day, dayIndex) => (
+              <TouchableOpacity
+                key={dayIndex}
+                style={[
+                  styles.day,
+                  isToday(day) && styles.today,
+                  selectedDate && selectedDate.toDateString() === day.toDateString() && styles.selected,
+                ]}
+                onPress={() => handleDateSelect(day)}
+              >
+                <Text
+                  style={[
+                    styles.dayText,
+                    isToday(day) && styles.todayText,
+                    selectedDate && selectedDate.toDateString() === day.toDateString() && styles.todayText,
+                  ]}
+                >
+                  {format(day, 'd')}
+                </Text>
+              </TouchableOpacity>
             ))}
           </View>
         </View>
@@ -54,24 +108,44 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: '100%',
+    maxHeight: 55,
   },
-  page: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+  weekContainer: {
+    justifyContent: 'flex-start',
     alignItems: 'center',
+    paddingHorizontal: 12,
+    overflow: 'hidden',
+    maxHeight: 50,
+  },
+  week: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 2,
+    width: '100%',
   },
   day: {
-    alignItems: 'center',
     justifyContent: 'center',
-    padding: 6,
-    backgroundColor:'#1C60DE',
-    color:'white',
-    borderRadius:12,
-
+    alignItems: 'center',
+    width: 40,
+    height: 40,
+    backgroundColor: '#fbffff',
+    borderRadius: 9999,
+    margin: 2,
+  },
+  today: {
+    backgroundColor: '#B8C2D2',
+  },
+  todayText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  dayText: {
+    color: '#B8C2D2',
+    fontWeight: 'bold',
+  },
+  selected: {
+    backgroundColor: '#1C60DE',
   },
 });
 

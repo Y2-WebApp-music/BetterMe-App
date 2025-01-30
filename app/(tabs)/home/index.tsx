@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Dimensions, RefreshControl, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import HomeGoalCard from '../../../components/goal/homeGoalCard';
@@ -63,10 +63,17 @@ const Home = () => {
   ] : [];
 
   const [refreshing, setRefreshing] = useState(false);
+
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     getTodayGoal().finally(() => setRefreshing(false));
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      getTodayGoal();
+    }, [])
+  );
 
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
@@ -86,7 +93,7 @@ const Home = () => {
           =============================
           */}
           <View className='mb-4 flex flex-row gap-2 items-center'>
-            <View className='overflow-hidden rounded-full'>
+            <View className='overflow-hidden rounded-full border border-gray'>
               <Image
                 style={styles.image}
                 source={user?.photoURL ? user?.photoURL : user?.gender === 1 ? require('../../../assets/maleAvatar.png') : require('../../../assets/femaleAvatar.png')}

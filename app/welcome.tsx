@@ -14,11 +14,10 @@ export default function Welcome() {
   const { loginWithGoogle } = useAuth()
 
   const [form,setForm]= useState({
-    username:'',
+    email:'',
     password:''
   })
 
-  const [error, setError] = useState<string | null>(null);
   const [request, response, promptAsync] = Google.useAuthRequest({
     iosClientId: CLIENT_ID_IOS,
     androidClientId: CLIENT_ID_Android,
@@ -35,8 +34,9 @@ export default function Welcome() {
   const [err, setErr] = useState<string>('')
   const handleSubmit = async () => {
     try {
-      await signInWithEmailAndPassword(auth, form.username, form.password)
+      await signInWithEmailAndPassword(auth, form.email, form.password)
     } catch (error) {
+      console.log(error);
       setErr('Email or password is wrong. Please try again.')
     }
   }
@@ -62,21 +62,21 @@ export default function Welcome() {
             <View className='w-full mt-20' style={{paddingBottom: 20}} >
               <Text className='text-heading text-primary font-notoMedium'>Welcome back</Text>
               <FormInput
-                name='email / username'
-                value={form.username}
-                handleChange={(e:string)=>setForm({ ...form,username: e})}
+                name='email'
+                value={form.email}
+                handleChange={(e:string)=>{setForm({ ...form,email: e}); setErr('')}}
                 keyboardType="default"
               />
               <FormInput
                 name='password'
                 value={form.password}
-                handleChange={(e:string)=>setForm({ ...form,password: e})}
+                handleChange={(e:string)=>{setForm({ ...form,password: e});setErr('')}}
                 keyboardType="password"
               />
               <View className='w-full flex items-end mt-1'>
                 <Link href="/(auth)/forgetPassword" relativeToDirectory className='text-subText'>forget password?</Link>
               </View>
-              {err && <Text className='text-detail text-red'>{err}</Text>}
+              {err && <Text className='text-detail text-red absolute bottom-0'>{err}</Text>}
             </View>
 
             <View className='flex gap-6 mt-6'>

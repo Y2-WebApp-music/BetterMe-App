@@ -1,6 +1,6 @@
 import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, Platform, KeyboardAvoidingView, RefreshControl } from 'react-native'
-import React, { useCallback, useMemo, useState } from 'react'
-import { router } from 'expo-router'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { router, useFocusEffect } from 'expo-router'
 import { AddIcon, LeftArrowIcon } from '../../../constants/icon'
 import { useAuth } from '../../../context/authContext'
 import BackButton from '../../../components/Back'
@@ -51,7 +51,7 @@ const YourGoal = () => {
       const response = await axios.get(`${SERVER_URL}/goal/user/${user?._id}`);
       const data = response.data // homeGoalCardProp[]
 
-      console.log('getAllGoal response \n',response.data);
+      // console.log('getAllGoal response \n',response.data);
 
       if (data.message === "No goal") {
         setNoGoal(true)
@@ -72,15 +72,29 @@ const YourGoal = () => {
     }
   }
 
-  const updateSummary = (allGoal:homeGoalCardProp[]) => {
-    console.log('updateSummary');
+  const updateSummary = (allGoal: homeGoalCardProp[]) => {
+    // console.log('updateSummary');
+    // console.log('All Goal Data:', allGoal);
     const todayDate = new Date().setHours(0, 0, 0, 0);
-    const complete = allGoal.filter(goal => goal.complete_task === goal.total_task).length;
-    const inprogress = allGoal.filter(goal => goal.complete_task < goal.total_task && new Date(goal.end_date).setHours(0, 0, 0, 0) >= todayDate).length;
-    const fail = allGoal.filter(goal => goal.complete_task < goal.total_task && new Date(goal.end_date).setHours(0, 0, 0, 0) < todayDate).length;
-
-    console.log('complete:',complete,' inprogress:',inprogress,' fail:',fail);
+    let complete = 0;
+    let inprogress = 0;
+    let fail = 0;
   
+    allGoal.forEach(goal => {
+      const goalEndDate = new Date(goal.end_date).setHours(0, 0, 0, 0);
+
+      if (goal.complete_task === goal.total_task) {
+        complete += 1;
+      }
+      else if (goal.complete_task < goal.total_task && goalEndDate >= todayDate) {
+        inprogress += 1;
+      }
+      else if (goal.complete_task < goal.total_task && goalEndDate < todayDate) {
+        fail += 1;
+      }
+    });
+  
+    // console.log('Complete:', complete, 'In Progress:', inprogress, 'Fail:', fail);
     setSummary({ complete, inprogress, fail });
   };
 
@@ -88,10 +102,15 @@ const YourGoal = () => {
     const fetchData = async () => {
       await getTodayGoal();
       await getAllGoal();
-      updateSummary(allGoal);
     };
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (allGoal.length > 0) {
+      updateSummary(allGoal);
+    }
+  }, [allGoal]);
 
   const sortedGoalData = todayGoal?
   [
@@ -119,6 +138,14 @@ const YourGoal = () => {
     getAllGoal().finally(() => setRefreshing(false));
     updateSummary(allGoal)
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      getTodayGoal()
+      getAllGoal()
+      updateSummary(allGoal)
+    }, [])
+  );
 
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">

@@ -1,7 +1,7 @@
 import { SERVER_URL } from '@env';
 import axios from 'axios';
 import { format } from 'date-fns';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Dimensions, RefreshControl, SafeAreaView, ScrollView, Switch, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
@@ -12,6 +12,7 @@ import { DeleteIcon, OptionIcon } from '../../../../constants/icon';
 import { useAuth } from '../../../../context/authContext';
 import { GoalData, Task } from '../../../../types/goal';
 import { FlashList } from '@shopify/flash-list';
+import ConfirmDeleteModal from '../../../../components/modal/ConfirmDeleteModal';
 
 const { width } = Dimensions.get('window');
 const circle_length = width * 0.62;
@@ -94,6 +95,7 @@ export default function GoalScreen() {
     strokeDashoffset: circle_length * (1 - progress.value),
   }));
 
+  const [openModal,setOpenModal] = useState(false)
   const [isOptionsVisible, setOptionsVisible] = useState(false);
   const toggleOptions = () => { setOptionsVisible(!isOptionsVisible) };
   const closeOptions = () => { setOptionsVisible(false) };
@@ -115,6 +117,9 @@ export default function GoalScreen() {
     }
   }
 
+  const [warning, setWarning] = useState(false)
+  const [index, setIndex] = useState<number>(0)
+
   const handleToggleTask = async (index: number) => {
     let data:any = null;
 
@@ -134,6 +139,7 @@ export default function GoalScreen() {
       setErr('Failed to update task-status');
     } finally {
       setIsLoad(false);
+      setWarning(false)
     }
 
     setGoalData((prevData) => {
@@ -162,6 +168,28 @@ export default function GoalScreen() {
     fetchGoalData().finally(() => setRefreshing(false));
     // console.log('Fetch New data');
   }, []);
+
+  const deleteGoal = async () => {
+    console.log('Delete Goal');
+    try {
+      const response = await axios.delete(`${SERVER_URL}/goal/delete/${id}`);
+
+      let data = response.data
+
+      if (data.message == "Goal not found") {
+        console.error('Can not find Goal ID')
+        return
+      }
+
+      router.back()
+
+    } catch (err) {
+      console.error('Delete Goal Fail:', err);
+      setErr('Failed to delete Goal');
+    } finally {
+      setWarning(false)
+    }
+  }
 
   return (
     <SafeAreaView className="w-full h-full justify-start items-center bg-Background font-noto" >
@@ -196,7 +224,7 @@ export default function GoalScreen() {
                     />
                     <Text className='font-noto text-heading3 text-subText'>public this goal</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity className='p-2 px-4 border border-gray rounded-normal flex-row gap-2 justify-center items-center'>
+                  <TouchableOpacity onPress={()=>{setOpenModal(!openModal)}} className='p-2 px-4 border border-gray rounded-normal flex-row gap-2 justify-center items-center'>
                     <DeleteIcon width={26} height={26} color={'#E8E8E8'} />
                     <Text className='font-noto text-heading3 text-subText'>delete this goal</Text>
                   </TouchableOpacity>
@@ -301,22 +329,39 @@ export default function GoalScreen() {
                 <View className='w-[95%] mt-2 flex-col gap-4'>
                   <FlashList
                     data={goalData.task}
-                    renderItem={({ item, index }) =>
+                    renderItem={({ item, index }) => (
                       <View style={{ marginBottom: 12 }}>
                         <BouncyCheckbox
                           size={25}
                           fillColor="#0DC47C"
                           unFillColor="#FFFFFF"
                           textComponent={<TextCheckBox taskName={item.task_name} isChecked={item.status} />}
-                          textContainerStyle={{ marginLeft:20 }}
-                          iconStyle={{ borderColor: "#0DC47C", borderRadius:6 }}
-                          innerIconStyle={{ borderWidth: 2, borderRadius:6, borderColor:'#E8E8E8' }}
+                          textContainerStyle={{ marginLeft: 20 }}
+                          iconStyle={{ borderColor: "#0DC47C", borderRadius: 6 }}
+                          innerIconStyle={{ borderWidth: 2, borderRadius: 6, borderColor: '#E8E8E8' }}
                           isChecked={item.status}
-                          onPress={() => handleToggleTask(index)}
+                          useBuiltInState={false}
+                          onPress={() => {
+                            if (item.status) {
+                              setIndex(index)
+                              setWarning(true);
+                            } else {
+                              handleToggleTask(index);
+                            }
+                          }}
+                          // disabled={item.status}
                         />
                       </View>
-                    }
+                    )}
                     estimatedItemSize={200}
+                  />
+                  <ConfirmDeleteModal
+                    title={'Task'}
+                    detail={'This will cancel Task. You can re-check it anytime.'}
+                    isOpen={warning}
+                    setIsOpen={setWarning}
+                    handelDelete={() => { handleToggleTask(index); }}
+                    deleteType={'Cancel'}
                   />
                 </View>
               )}
@@ -324,6 +369,15 @@ export default function GoalScreen() {
           </ScrollView>
         </View>
       </TouchableWithoutFeedback>
+
+      <ConfirmDeleteModal
+        isOpen={openModal}
+        setIsOpen={setOpenModal}
+        title='goal'
+        detail={'This will delete delete permanently. You cannot undo this action.'}
+        handelDelete={deleteGoal}
+        deleteType={'Delete'}
+      />
       </ScrollView>
     </SafeAreaView>
   );
@@ -331,6 +385,6 @@ export default function GoalScreen() {
 
 const TextCheckBox = ({ taskName, isChecked }: { taskName: string; isChecked: boolean }) => (
   <View className="w-full">
-    <Text className={`pl-3 w-[97%] font-noto text-body ${isChecked? 'text-green':'text-text'}`}>{taskName}</Text>
+    <Text className={`pl-3 w-[97%] font-noto text-body ${isChecked? 'text-green line-through':'text-text'}`}>{taskName}</Text>
   </View>
 );
