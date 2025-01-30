@@ -42,7 +42,7 @@ const Menu = () => {
               <Text className='text-heading2 font-notoMedium'>{user?.displayName}</Text>
               <Text className='text-subText font-noto'>{user?.email}</Text>
             </View>
-            <View className='overflow-hidden rounded-full'>
+            <View className='overflow-hidden rounded-full border border-gray'>
               <Image
                 style={styles.image}
                 source={user?.photoURL ? user?.photoURL : user?.gender === 1 ? require('../../../assets/maleAvatar.png') : require('../../../assets/femaleAvatar.png')}

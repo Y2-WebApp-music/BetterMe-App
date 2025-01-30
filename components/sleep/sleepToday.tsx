@@ -29,7 +29,7 @@ const SleepToday = () => {
               <Text className='text-subText font-noto'>Sleep</Text>
           </View>
           <View style={{ transform: [{ translateX: 4 }] }} className='flex-row gap-1 items-end'>
-            <Text style={{color: '#626262'}} className='text-heading3 text-subText'>33:33</Text>
+            <Text style={{color: '#626262'}} className='text-heading3 text-subText'>33:32</Text>
           </View>
         </View>
       </View>

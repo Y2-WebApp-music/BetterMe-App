@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Modal from './Modal'
 import { Picker } from '@react-native-picker/picker'
 import { BackwardIcon, ForwardIcon } from '../../constants/icon'
@@ -25,9 +25,18 @@ const PickMonthYearModal = ({selectedDate, setSelectedDate, currentMonth, setCur
 
   const handleMonthSelect = (monthIndex: number) => {
     const firstSunday = getFirstSunday(selectedDate.getFullYear(), monthIndex);
+    console.log('handleMonthSelect selectedDate',selectedDate);
+    console.log('firstSunday',firstSunday);
+    
     setSelectedDate(firstSunday);
     setCurrentMonthYear(`${months[monthIndex]} ${firstSunday.getFullYear()}`);
+    setIsOpen(false)
   };
+
+  useEffect(()=>{
+    console.log('Date in Modal :',selectedDate);
+    
+  },[])
 
   return (
     <Modal isOpen={isOpen} setIsOpen={setIsOpen}>
@@ -49,9 +58,7 @@ const PickMonthYearModal = ({selectedDate, setSelectedDate, currentMonth, setCur
             <TouchableOpacity
               onPress={() =>
                 setSelectedDate(
-                  new Date(
-                    selectedDate.getFullYear() + 1,
-                    selectedDate.getMonth(),1)
+                  new Date(selectedDate.getFullYear() + 1, selectedDate.getMonth(), 1)
                 )
               }
             >
