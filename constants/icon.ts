@@ -26,3 +26,4 @@ export { default as PenIcon } from '../assets/icons/pen.svg';
 export { default as SearchIcon } from '../assets/icons/search.svg';
 export { default as SortingIcon } from '../assets/icons/sorting.svg';
 export { default as UserIcon } from '../assets/icons/user.svg';
+export { default as BellIcon } from '../assets/icons/bell.svg';

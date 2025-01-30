@@ -34,8 +34,10 @@ const MonthCalendar = () => {
   };
 
   const modalMonthPick = (e: Date) => {
+    console.log('Date : ',e);
+    
     setSelectedDate(toDateId(e));
-    setCurrentMonth(new Date(e.getFullYear() - 1, e.getMonth(), 1));
+    setCurrentMonth(new Date(e.getFullYear(), e.getMonth()));
 
   };
 
@@ -45,10 +47,17 @@ const MonthCalendar = () => {
   useEffect(()=>{
     setMonthName(currentMonth.toLocaleString("en-US", { month: "long" }));
     setYear(currentMonth.getFullYear());
+
+    console.log('currentMonth ',currentMonth);
+    
   },[currentMonth])
 
   const modalYearMonth = (e:string) => {
     const [month, year] = e.split(' ');
+
+    console.log('month ',month,'year ',parseInt(year));
+    
+    
     setMonthName(month)
     setYear(parseInt(year));
 
@@ -122,7 +131,7 @@ const MonthCalendar = () => {
                 calendarFirstDayOfWeek="sunday"
                 calendarDayHeight={40}
                 calendarRowVerticalSpacing={0}
-                calendarRowHorizontalSpacing={0}
+                calendarRowHorizontalSpacing={10}
                 onCalendarDayPress={setSelectedDate}
                 calendarMonthId={toDateId(currentMonth)}
                 theme={linearTheme}
@@ -216,7 +225,7 @@ const linearTheme: CalendarTheme = {
       textAlign: "left",
       color: "rgba(0, 0, 0, 1)",
       fontWeight: "700",
-      display:'none'
+      display:'none',
     },
   },
   itemWeekName: { content: { color: "#B8C2D2" } },
@@ -229,19 +238,19 @@ const linearTheme: CalendarTheme = {
     idle: ({ isPressed, isWeekend }) => ({
       container: {
         backgroundColor: isPressed ? linearAccent : "transparent",
-        borderRadius: 12,
+        borderRadius: 99,
       },
       content: {
         color: isWeekend && !isPressed ? "rgba(0, 0, 0, 1)" : "#000",
         fontSize:14,
         fontWeight:600,
-        fontFamily:'noto-sans-thai'
+        fontFamily:'noto-sans-thai',
       },
     }),
     today: ({ isPressed }) => ({
       container: {
         borderColor: "rgba(0, 0, 0, 0)",
-        borderRadius: isPressed ? 12 : 12,
+        borderRadius: isPressed ? 99 : 99,
         backgroundColor: isPressed ? linearAccent : "#B8C2D2",
       },
       content: {
@@ -254,10 +263,10 @@ const linearTheme: CalendarTheme = {
     active: ({ isEndOfRange, isStartOfRange }) => ({
       container: {
         backgroundColor: linearAccent,
-        borderTopLeftRadius: isStartOfRange ? 16 : 0,
-        borderBottomLeftRadius: isStartOfRange ? 16 : 0,
-        borderTopRightRadius: isEndOfRange ? 16 : 0,
-        borderBottomRightRadius: isEndOfRange ? 16 : 0,
+        borderTopLeftRadius: isStartOfRange ? 99 : 20,
+        borderBottomLeftRadius: isStartOfRange ? 99 : 20,
+        borderTopRightRadius: isEndOfRange ? 99 : 20,
+        borderBottomRightRadius: isEndOfRange ? 99 : 20,
       },
       content: {
         color: "#ffffff",

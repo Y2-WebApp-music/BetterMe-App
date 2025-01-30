@@ -93,7 +93,7 @@ const Home = () => {
           =============================
           */}
           <View className='mb-4 flex flex-row gap-2 items-center'>
-            <View className='overflow-hidden rounded-full'>
+            <View className='overflow-hidden rounded-full border border-gray'>
               <Image
                 style={styles.image}
                 source={user?.photoURL ? user?.photoURL : user?.gender === 1 ? require('../../../assets/maleAvatar.png') : require('../../../assets/femaleAvatar.png')}

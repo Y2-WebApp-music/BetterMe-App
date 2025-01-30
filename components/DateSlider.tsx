@@ -27,7 +27,7 @@ type DateSliderProps = {
 
 const DateSlider = ({ selectedDate, setSelectedDate, setCurrentMonthYear }: DateSliderProps) => {
   const startDate = new Date('2024-10-01');
-  const endDate = new Date('2025-05-01');
+  const endDate = new Date('2025-03-01');
   const [dates, setDates] = useState(generateWeeksForMonth(startDate, endDate));
   const [currentPage, setCurrentPage] = useState(0);
 
