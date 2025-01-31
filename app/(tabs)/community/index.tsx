@@ -7,6 +7,8 @@ import { AddIcon, BellIcon, GalleryIcon, PenIcon, SearchIcon, UserIcon } from '.
 import { FlashList } from '@shopify/flash-list';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import PostOnlyText from '../../../components/Post/postOnlyText';
+
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -179,6 +181,7 @@ const CommunityFeed = () => {
               <Text className='text-body text-white font-notoMedium'>Search in Community</Text>
             </TouchableOpacity> */}
 
+            <PostOnlyText/>
 
             {postList.length != 0 ? (
               <View className='w-full'>
