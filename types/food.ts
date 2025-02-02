@@ -20,12 +20,13 @@ export type mealCard = {
   createByAI:boolean
 }
 
+
 export type MealAi = {
-  food_name:string
-  calorie:number
-  protein:number
-  carbs:number
-  fat:number
+  Menu:string
+  Calorie:number
+  Protein:number
+  Carbs:number
+  Fat:number
 }
 
 
@@ -46,3 +47,12 @@ export const mealListDummy = [
     createByAI:false,
   },
 ]
+
+export type weekMealSummary = {
+  date:string
+  total_calorie:number
+  protein:number
+  carbs:number
+  fat:number
+  meal: mealCard[]
+}

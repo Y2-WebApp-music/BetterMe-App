@@ -17,6 +17,7 @@ import { format } from 'date-fns';
 import { SERVER_URL } from '@env';
 import axios from 'axios';
 import RNDateTimePicker from '@react-native-community/datetimepicker';
+import * as ImageManipulator from 'expo-image-manipulator';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -52,6 +53,7 @@ const AddMeal = () => {
     createByAI:false
   });
   const [openModal,setOpenModal] = useState(false)
+  const [aiCreating, setAiCreating] = useState(false)
   const [permission, requestPermission] = useCameraPermissions();
 
   useEffect(() => {
@@ -141,7 +143,7 @@ const AddMeal = () => {
       contentType: 'image/png',
     };
 
-    if (!photo || !user || !form.meal_date) {
+    if (!photo || !user) {
       console.log('!photo || !user || !form.meal_date ');
       return null
     }
@@ -149,10 +151,10 @@ const AddMeal = () => {
     console.log('uploadToFirebase()');
 
     try {
-      if (photo && user && form.portion) {
+      if (photo && user) {
         console.log('Uploading to Firebase....');
 
-        const storageRef = ref(firebaseStorage, `meal/${user.uid}/${format(form.meal_date, 'dd-MM-yyyy-H-m')}.png`);
+        const storageRef = ref(firebaseStorage, `meal/${user.uid}/${format(new Date(), 'dd-MM-yyyy-H-m')}.png`);
 
         const resPhoto = await fetch(photo);
         const blob = await resPhoto.blob();
@@ -225,44 +227,49 @@ const AddMeal = () => {
     router.replace(`calendar/weekCalendar`)
   }
 
-  const [aiCreating, setAiCreating] = useState(false)
   const getMealByAI = async () => {
-    console.log('getMealByAI');
-
     setAiCreating(true)
-    try {
-      const url = await handleImageUpload();
-      if (!url) {
-        console.error("Image upload failed");
-        return;
+      try {
+        if (!photo) return;
+    
+        // Compress and convert to blob
+        const compressedImage = await ImageManipulator.manipulateAsync(photo, [], { compress: 0.5 });
+        const response = await fetch(compressedImage.uri);
+        const blob = await response.blob();
+    
+        console.log('type ', blob.type);
+        console.log('size ', blob.size);
+    
+        // blob to base64
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+          if (reader.result && typeof reader.result === 'string') {
+            const base64Image = reader.result.split(',')[1];
+    
+            const res = await axios.post(`${SERVER_URL}/meal/by-ai`, {
+              image: base64Image,
+              portion: form.portion,
+            });
+
+            let mealData:MealAi | null = res.data
+            mealData && setForm({
+              ...form,
+              food_name: mealData.Menu,
+              calorie : mealData.Calorie,
+              protein: mealData.Protein,
+              carbs: mealData.Carbs,
+              fat: mealData.Fat,
+              createByAI:true,
+            })
+
+            setAiCreating(false)
+
+          }
+        };
+        reader.readAsDataURL(blob);
+      } catch (err) {
+        console.error('Get Ai Fail:', err);
       }
-
-      const response = await axios.post(`${SERVER_URL}/meal/by-ai`, {
-        image_url:url,
-        portion:form.portion,
-      });
-
-      let data = response.data
-      let mealData:MealAi | null = null
-      if (data.message == "Get meal by AI success") {
-        mealData = data.meal_data
-      }
-
-      mealData && setForm({
-        ...form,
-        food_name: mealData.food_name,
-        calorie : mealData.calorie,
-        protein: mealData.protein,
-        carbs: mealData.carbs,
-        fat: mealData.fat,
-        createByAI:true,
-      })
-
-    } catch (err) {
-      console.error('Get Ai Fail:', err);
-    } finally {
-      setAiCreating(false)
-    }
   }
 
   const [modalStep, setModalStep] = useState<"date" | "time">("date");
@@ -388,7 +395,7 @@ const AddMeal = () => {
           </View>
         ) : (
           <Animated.ScrollView
-            className="w-[92%] h-auto pb-20 mt-2"
+            className="w-[92%] h-auto pb-20 mt-2 relative"
             contentContainerStyle={{
               flexGrow: 1,
               justifyContent: 'flex-start',
@@ -406,14 +413,13 @@ const AddMeal = () => {
                 <Text className='text-heading font-notoMedium text-primary'>Meal detail</Text>
               </View>
               {aiCreating?(
-                <View>
+                <TouchableOpacity onPress={()=>setAiCreating(false)}>
                   <Text>Cancel</Text>
-                </View>
+                </TouchableOpacity>
               ):(
                 <RainbowButton text={'Auto fill with AI'} active={!!photo} handleClick={getMealByAI}/>
               )}
             </View>
-            {!aiCreating?(
             <View style={{transform:[{translateY:-4}]}}>
               <FormInput
                 name={'Food Name'}
@@ -427,50 +433,6 @@ const AddMeal = () => {
                 handleChange={(e: string) => setForm({ ...form, portion: e })}
                 keyboardType={'default'}
               />
-              {Platform.OS === "android" ? openModal && (
-                <>
-                  {modalStep === "date" && (
-                    <RNDateTimePicker display="spinner" mode="date" value={form.meal_date} maximumDate={new Date()}
-                      onChange={(event, selectedDate) => {
-                        if (selectedDate) {
-                          setForm((prevForm) => ({
-                            ...prevForm,
-                            meal_date: selectedDate,
-                          }));
-                          setModalStep("time"); // Switch to the time picker
-                        } else {
-                          setOpenModal(false); // Close modal if canceled
-                        }
-                      }}
-                      locale="en-Gn"
-                      themeVariant="light"
-                    />
-                  )}
-                  {modalStep === "time" && (
-                    <RNDateTimePicker display="clock" mode="time" value={form.meal_date}
-                      onChange={(event, selectedTime) => {
-                        if (selectedTime) {
-                          setForm((prevForm) => ({
-                            ...prevForm,
-                            meal_date: selectedTime,
-                          }));
-                        }
-                        setOpenModal(false); // Close modal after selecting time
-                        setModalStep("date"); // Reset step for next usage
-                      }}
-                      is24Hour={true}
-                    />
-                  )}
-                </>
-              ):(
-                <PickDateTimeModal value={form.meal_date} isOpen={openModal} setIsOpen={()=>{setOpenModal(!openModal)}}
-                  setDate={(date: Date) => {
-                    setForm((prevForm) => ({
-                      ...prevForm,
-                      meal_date: date,
-                  }))}
-                } maximumDate={true} />
-              )}
               <View className="flex-row gap-4">
                 <View className="grow flex-row items-end gap-1">
                   <View className='grow'>
@@ -549,8 +511,8 @@ const AddMeal = () => {
               </View>
 
             </View>
-            ):(
-              <View className='flex-1 flex-col justify-center items-center flex gap-2 mt-2'>
+            {aiCreating &&(
+              <View className=' absolute bottom-0 w-full h-[30vh] bg-Background flex-1 flex-col justify-center items-center flex gap-2 mt-2'>
                 <View className='absolute top-0 z-10 w-full h-full justify-center items-center bg-Background/50'>
                   <Text className=' text-subTitle text-primary animate-pulse font-notoMedium'> Creating </Text>
                 </View>
@@ -578,6 +540,50 @@ const AddMeal = () => {
             </TouchableOpacity>
           </View>
       )}
+      {Platform.OS === "android" ? openModal && (
+                <>
+                  {modalStep === "date" && (
+                    <RNDateTimePicker display="spinner" mode="date" value={form.meal_date} maximumDate={new Date()}
+                      onChange={(event, selectedDate) => {
+                        if (selectedDate) {
+                          setForm((prevForm) => ({
+                            ...prevForm,
+                            meal_date: selectedDate,
+                          }));
+                          setModalStep("time"); // Switch to the time picker
+                        } else {
+                          setOpenModal(false); // Close modal if canceled
+                        }
+                      }}
+                      locale="en-Gn"
+                      themeVariant="light"
+                    />
+                  )}
+                  {modalStep === "time" && (
+                    <RNDateTimePicker display="clock" mode="time" value={form.meal_date}
+                      onChange={(event, selectedTime) => {
+                        if (selectedTime) {
+                          setForm((prevForm) => ({
+                            ...prevForm,
+                            meal_date: selectedTime,
+                          }));
+                        }
+                        setOpenModal(false); // Close modal after selecting time
+                        setModalStep("date"); // Reset step for next usage
+                      }}
+                      is24Hour={true}
+                    />
+                  )}
+                </>
+              ):(
+                <PickDateTimeModal value={form.meal_date} isOpen={openModal} setIsOpen={()=>{setOpenModal(!openModal)}}
+                  setDate={(date: Date) => {
+                    setForm((prevForm) => ({
+                      ...prevForm,
+                      meal_date: date,
+                  }))}
+                } maximumDate={true} />
+              )}
     </SafeAreaView>
   );
 };

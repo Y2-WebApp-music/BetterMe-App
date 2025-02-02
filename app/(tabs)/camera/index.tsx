@@ -16,6 +16,7 @@ import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { firebaseStorage } from '../../../components/auth/firebaseConfig';
 import { format } from 'date-fns';
 import { MealAi } from '../../../types/food';
+import * as ImageManipulator from 'expo-image-manipulator';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -24,6 +25,13 @@ const TakePicture = () => {
 
   const cameraRef = useRef<CameraView | null>(null);
   const [photo, setPhoto] = useState<string | null>(null);
+  const [data, setData] = useState<MealAi>({
+    Menu:'',
+    Calorie:0,
+    Protein:0,
+    Carbs:0,
+    Fat:0,
+  })
   const [step, setStep] = useState(1)
   const [detail, setDetail] = useState<string>('')
   const [waiting, setWaiting] = useState(true)
@@ -88,18 +96,29 @@ const TakePicture = () => {
 
   const handleSendPhoto = async () => {
     setWaiting(true)
-    await uploadToFirebase()
+    setStep(3)
     await getMealByAI()
   }
+
+  useEffect(() => {
+    console.log('Updated downloadURL:', downloadURL);
+  }, [downloadURL]);
 
   const uploadToFirebase = async () => {
     const metadata = {
       contentType: 'image/png',
     };
 
-    if (!photo || !user) return;
+    if (!photo || !user) {
+      console.log('!photo || !user || !form.meal_date ');
+      return null
+    }
+
+    console.log('uploadToFirebase()');
+
     try {
       if (photo && user) {
+        console.log('Uploading to Firebase....');
 
         const storageRef = ref(firebaseStorage, `meal/${user.uid}/${format(new Date(), 'dd-MM-yyyy-H-m')}.png`);
 
@@ -110,9 +129,12 @@ const TakePicture = () => {
         const mimeType = extension === 'jpg' || extension === 'jpeg' ? 'image/jpeg' : 'image/png';
 
         const uploadTask = await uploadBytes(storageRef, blob, { ...metadata, contentType: mimeType });
+        console.log('uploadTask ',uploadTask);
 
-        setDownloadURL( await getDownloadURL(uploadTask.ref))
-        console.log('Upload Complete', downloadURL);
+        const url = await getDownloadURL(uploadTask.ref);
+        setDownloadURL(url);
+        console.log('Upload Complete', url);
+        return url
 
       }
     } catch (error) {
@@ -120,42 +142,83 @@ const TakePicture = () => {
     }
   }
 
-  const getMealByAI = async () => {
+  const handleImageUpload = async () => {
     if (!downloadURL) {
-      await uploadToFirebase();
-    }
-    try {
-      const response = await axios.post(`${SERVER_URL}/meal/by-ai`, {
-        image_url:downloadURL,
-        portion:detail,
-      });
-
-      let data = response.data
-      let mealData:MealAi | null = null
-      if (data.message == "Get meal by AI success") {
-        mealData = data.meal_data
+      console.log('downloadURL is empty try to upload and get URl');
+      const url = await uploadToFirebase();
+      if (url !== undefined) {
+        setDownloadURL(url)
+        return url
       }
-
-      mealData && postToDB(mealData.food_name, mealData.calorie, mealData.protein, mealData.carbs, mealData.fat)
-
-    } catch (err) {
-      console.error('Get Ai Fail:', err);
-    } finally {
-
+      console.error('Fail to get Image URL')
     }
+    return downloadURL;
+  };
+
+  const getMealByAI = async () => {
+    setStep(3)
+    setWaiting(true)
+      try {
+        if (!photo) return;
+
+        const url = await handleImageUpload();
+    
+        // Compress and convert to blob
+        const compressedImage = await ImageManipulator.manipulateAsync(photo, [], { compress: 0.5 });
+        const response = await fetch(compressedImage.uri);
+        const blob = await response.blob();
+    
+        console.log('type ', blob.type);
+        console.log('size ', blob.size);
+    
+        // blob to base64
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+          if (reader.result && typeof reader.result === 'string') {
+            const base64Image = reader.result.split(',')[1];
+    
+            const res = await axios.post(`${SERVER_URL}/meal/by-ai`, {
+              image: base64Image,
+              portion: detail,
+            });
+    
+            console.log('data:', res.data);
+            setWaiting(false)
+            console.log('downloadURL :',downloadURL);
+
+            console.log('Imageurl ',url);
+            
+
+            let mealData:MealAi | null = res.data
+            mealData && setData((prev)=>({...prev,
+              Menu: mealData.Menu,
+              Calorie: mealData.Calorie,
+              Protein:mealData.Protein,
+              Carbs:mealData.Carbs,
+              Fat:mealData.Fat,
+            }))
+            url && mealData && postToDB(url, mealData.Menu, mealData.Calorie, mealData.Protein, mealData.Carbs, mealData.Fat)
+          }
+        };
+        reader.readAsDataURL(blob);
+      } catch (err) {
+        console.error('Get Ai Fail:', err);
+      }
   }
 
-  const postToDB = async (food_name:string, calorie: number, protein: number, carbs: number, fat: number): Promise<void> => {
+  const postToDB = async (image_url:string ,Menu:string, Calorie: number, Protein: number, Carbs: number, Fat: number): Promise<void> => {
+
+    console.log('image_url : ',image_url);
     try {
       const response = await axios.post(`${SERVER_URL}/meal/add`, {
         meal_date:new Date(),
-        food_name:food_name,
-        image_url:downloadURL,
+        food_name:Menu,
+        image_url:image_url,
         portion:detail,
-        calorie:calorie,
-        protein:protein,
-        carbs:carbs,
-        fat:fat,
+        calorie:Calorie,
+        protein:Protein,
+        carbs:Carbs,
+        fat:Fat,
         createByAI:true
       });
 
@@ -299,12 +362,14 @@ const TakePicture = () => {
                   </View>
                 </View>
                 <View className='w-full flex-row'>
-                  <View className='grow'>
-                    <Text className='text-heading font-noto'>{result.food_name}</Text>
-                    <Text className='text-subText font-noto -translate-y-1'>{result.portion}</Text>
+                  <View className='grow justify-center'>
+                    <Text className='text-heading font-noto'>{data.Menu}</Text>
+                    {detail &&
+                      <Text className='text-subText font-noto -translate-y-1'>{detail}</Text>
+                    }
                   </View>
                   <View className='flex-row gap-1 items-end'>
-                    <Text className='text-title font-notoMedium text-primary'>468</Text>
+                    <Text className='text-title font-notoMedium text-primary'>{data.Calorie}</Text>
                     <View style={{transform:[{ translateY: -8 }]}}>
                       <Text className='font-noto'>cal</Text>
                     </View>
@@ -325,14 +390,14 @@ const TakePicture = () => {
                       <View className='flex-row gap-2 items-end'>
                         <Text className='text-body text-subText w-[14vw]'>Carbs</Text>
                         <View style={{transform:[{ translateY: 6 }]}}>
-                          <Text className='text-heading font-notoMedium w-[8vw]'>{result.carbs}</Text>
+                          <Text className='text-heading font-notoMedium w-[8vw]'>{data.Carbs}</Text>
                         </View>
                         <Text className='text-body text-subText'>grams</Text>
                       </View>
                       <View className='flex-row gap-2 items-end'>
                         <Text className='text-body text-subText w-[14vw]'>Protein</Text>
                         <View style={{transform:[{ translateY: 6 }]}}>
-                          <Text className='text-heading font-notoMedium w-[8vw]'>{result.protein}</Text>
+                          <Text className='text-heading font-notoMedium w-[8vw]'>{data.Protein}</Text>
                         </View>
                         <Text className='text-body text-subText'>grams</Text>
                       </View>
@@ -340,7 +405,7 @@ const TakePicture = () => {
                     <View className='flex-row gap-2 items-end'>
                       <Text className='text-body text-subText w-[14vw]'>Fat</Text>
                       <View style={{transform:[{ translateY: 6 }]}}>
-                        <Text className='text-heading font-notoMedium w-[8vw]'>{result.fat}</Text>
+                        <Text className='text-heading font-notoMedium w-[8vw]'>{data.Fat}</Text>
                       </View>
                       <Text className='text-body text-subText'>grams</Text>
                     </View>
