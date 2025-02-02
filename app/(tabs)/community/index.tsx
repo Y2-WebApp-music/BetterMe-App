@@ -8,6 +8,7 @@ import { FlashList } from '@shopify/flash-list';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import PostOnlyText from '../../../components/Post/postOnlyText';
+import PostWithPhoto from '../../../components/Post/postWithPhoto';
 
 
 const screenWidth = Dimensions.get('window').width;
@@ -182,6 +183,7 @@ const CommunityFeed = () => {
             </TouchableOpacity> */}
 
             <PostOnlyText/>
+            <PostWithPhoto/>
 
             {postList.length != 0 ? (
               <View className='w-full'>
