@@ -1,7 +1,5 @@
-import {Image, StyleSheet, Text, View, Dimensions} from 'react-native';
+import {Image, StyleSheet, View, Dimensions} from 'react-native';
 import React from 'react';
-
-const {width} = Dimensions.get('screen');
 
 type SlideItemProps = {
     item: { img: any };
@@ -22,13 +20,13 @@ export default SlideItem
 
 const styles = StyleSheet.create({
     container: {
-        width,
-        height : width,
+        width : '100%',
+        height : '100%',
         alignItems: 'center',
         overflow: 'hidden',
     },
     image:{
-        flex:0.9,
+        flex: 1,
         width:'92%',
         borderRadius: 15
     }
