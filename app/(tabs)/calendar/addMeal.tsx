@@ -244,7 +244,9 @@ const AddMeal = () => {
         const reader = new FileReader();
         reader.onloadend = async () => {
           if (reader.result && typeof reader.result === 'string') {
-            const base64Image = reader.result.split(',')[1];
+            const base64Image = reader.result
+
+            console.log(base64Image);
     
             const res = await axios.post(`${SERVER_URL}/meal/by-ai`, {
               image: base64Image,
