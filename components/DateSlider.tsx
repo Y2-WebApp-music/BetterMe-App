@@ -106,9 +106,8 @@ const DateSlider = ({ selectedDate, setSelectedDate, setCurrentMonthYear }: Date
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     width: '100%',
-    maxHeight: 55,
+    height: 50,
   },
   weekContainer: {
     justifyContent: 'flex-start',

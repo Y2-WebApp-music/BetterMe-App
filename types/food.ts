@@ -28,6 +28,12 @@ export type MealAi = {
   Carbs:number
   Fat:number
 }
+export type MealSummaryCard = {
+  total_calorie:number
+  total_protein:number
+  total_carbs:number
+  total_fat:number
+}
 
 
 

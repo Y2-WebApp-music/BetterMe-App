@@ -8,8 +8,11 @@ import MealCard from '../../../components/food/mealCard';
 import { FlashList } from '@shopify/flash-list';
 import FoodToday from '../../../components/food/foodToday';
 import SleepToday from '../../../components/sleep/sleepToday';
-import { mealListDummy } from '../../../types/food';
+import { mealCard, mealListDummy, MealSummaryCard } from '../../../types/food';
 import PickMonthYearModal from '../../../components/modal/PickMonthYearModal';
+import axios from 'axios';
+import { SERVER_URL } from '@env';
+import { homeGoalCardProp } from '../../../types/goal';
 
 const MonthCalendar = () => {
 
@@ -19,6 +22,11 @@ const MonthCalendar = () => {
   const [monthModal, setMonthModal] = useState(false);
 
   const [viewMeal, setViewMeal] = useState(true)
+  const [openOption, setOpenOption] = useState(false)
+
+  const [mealList, setMealList] = useState<mealCard[]>()
+  const [goalList, setGoalList] = useState<homeGoalCardProp[]>()
+  const [mealSummary, setMealSummary] = useState<MealSummaryCard>()
 
   const goToToday = () => {
     setCurrentMonth(new Date());
@@ -63,15 +71,78 @@ const MonthCalendar = () => {
 
   }
 
-  const [openOption, setOpenOption] = useState(false)
+  const getDateMeal = async () => {
+    try {
+      const response = await axios.get(`${SERVER_URL}/calendar/meal/${selectedDate}`);
+      const data = response.data 
+
+      console.log('response \n',data);
+      if (data) {
+        setMealList(data)
+      }
+
+    } catch (error: any){
+      console.error(error)
+    }
+  }
+
+  const getDateGoal = async () => {
+    try {
+      const response = await axios.get(`${SERVER_URL}/calendar/goal/${selectedDate}`);
+      const data = response.data
+
+      console.log('response \n',data);
+      if (data) {
+        setGoalList(data)
+      }
+
+    } catch (error: any){
+      console.error(error)
+    }
+  }
+
+  const getSummaryMeal = async () => {
+    try {
+      const response = await axios.get(`${SERVER_URL}/calendar/summary-meal/${selectedDate}`);
+      const data = response.data
+
+      console.log('response \n',data);
+      if ( data.message === "No meals found") {return setMealSummary({
+        total_calorie:0,
+        total_protein:0,
+        total_carbs:0,
+        total_fat:0,
+      })}
+
+      if (data) {
+        setMealSummary(data)
+      } else {
+        setMealSummary({
+          total_calorie:0,
+          total_protein:0,
+          total_carbs:0,
+          total_fat:0,
+        })
+      }
+
+    } catch (error: any){
+      console.error(error)
+    }
+  }
 
   useFocusEffect(
     useCallback(() => {
+      getDateMeal()
+      getDateGoal()
+      getSummaryMeal()
     }, [])
   );
 
   useEffect(()=>{
     console.log('selectedDate ',selectedDate);
+    getDateMeal()
+    getDateGoal()
+    getSummaryMeal()
   },[selectedDate])
 
   return (
@@ -144,7 +215,9 @@ const MonthCalendar = () => {
           <View style={{ transform: [{ translateY: -18 }] }} className='flex-col gap-2'>
             <Text className='font-noto text-heading3'>{new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(selectedDate))}</Text>
             <SleepToday/>
-            <FoodToday/>
+            {mealSummary &&
+              <FoodToday total_calorie={mealSummary?.total_calorie} total_protein={mealSummary?.total_protein} total_carbs={mealSummary?.total_carbs} total_fat={mealSummary?.total_fat}/>
+            }
             <Text className='text-subText font-noto text-body mt-2'>In this day</Text>
             <View className='flex-row justify-start items-center gap-4'>
               <TouchableOpacity onPress={()=>setViewMeal(true)} className={`p-1 px-2 ${viewMeal? 'bg-primary':'bg-transparent'} rounded-normal`}>
@@ -168,25 +241,29 @@ const MonthCalendar = () => {
             {viewMeal? (
               <View className='w-full justify-center items-center gap-2 mt-2 pb-16'>
                 <View className='w-full'>
-                  <FlashList
-                    data={mealListDummy}
-                    renderItem={({ item }) =>
-                      <MealCard meal_id={item.meal_id} meal_date={item.meal_date} food_name={item.food_name} calorie={item.calorie} createByAI={item.createByAI}/>
-                    }
-                    estimatedItemSize={200}
-                  />
+                  {mealList &&
+                    <FlashList
+                      data={mealList}
+                      renderItem={({ item }) =>
+                        <MealCard meal_id={item.meal_id} meal_date={item.meal_date} food_name={item.food_name} calorie={item.calorie} createByAI={item.createByAI}/>
+                      }
+                      estimatedItemSize={200}
+                    />
+                  }
                 </View>
               </View>
             ):(
               <View className='w-full justify-center items-center gap-2 mt-2 pb-16'>
                 <View className='w-full'>
-                  <FlashList
-                    data={goalDataDummy}
-                    renderItem={({ item }) =>
-                      <CalendarGoalCard goal_id={item.goal_id} goal_name={item.goal_name} total_task={item.total_task} complete_task={item.complete_task}/>
-                    }
-                    estimatedItemSize={200}
-                  />
+                  {goalList &&
+                    <FlashList
+                      data={goalList}
+                      renderItem={({ item }) =>
+                        <CalendarGoalCard goal_id={item.goal_id} goal_name={item.goal_name} total_task={item.total_task} complete_task={item.complete_task}/>
+                      }
+                      estimatedItemSize={200}
+                    />
+                  }
                 </View>
               </View>
             )}
