@@ -6,9 +6,8 @@ import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { PenIcon } from '../../../constants/icon';
 import { FlashList } from '@shopify/flash-list';
-import { mealListDummy } from '../../../types/food';
-import MealCard from '../../../components/food/mealCard';
-import CalendarGoalCard from '../../../components/goal/calendarGoalCard';
+import CommunityGoalCard from '../../../components/goal/communityGoalCard';
+
 
 
 
@@ -19,6 +18,10 @@ const UserProfile = () => {
   const { user } = useAuth();
 
   const [viewPost, setViewPost] = useState(true);
+  
+  const inProgressGoals = goalDataDummy.filter(goal => goal.total_task !== goal.complete_task);
+
+  const completedGoals = goalDataDummy.filter(goal => goal.total_task === goal.complete_task);
 
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = useCallback(() => {
@@ -99,16 +102,48 @@ const UserProfile = () => {
                   </View>
                 </View>
                 <View className='w-full'>
-                  <Text className='text-body text-yellow pb-3'>In progress</Text>
-                  <FlashList
-                    data={goalDataDummy}
-                    renderItem={({ item }) =>
-                      <CalendarGoalCard goal_id={item.goal_id} goal_name={item.goal_name} total_task={item.total_task} complete_task={item.complete_task}/>
-                    }
-                    estimatedItemSize={200}
-                  />
-                  <Text className='text-body text-green pb-3'>Completed</Text>
-
+                  <View className='mt-2 flex-col gap-2'>
+                    <Text className='text-body text-yellow'>In Progress</Text>
+                    {inProgressGoals.length > 0 ? (
+                      <FlashList
+                        data={inProgressGoals}
+                        renderItem={({ item }) =>
+                          <CommunityGoalCard 
+                            goal_id={item.goal_id} 
+                            goal_name={item.goal_name} 
+                            total_task={item.total_task} 
+                            complete_task={item.complete_task}
+                          />
+                        }
+                        estimatedItemSize={200}
+                      />
+                    ) : (
+                      <View style={{width:'100%', height:80, justifyContent:'center', alignContent:'center'}}>
+                        <Text className='font-noto text-subText text-heading3 text-center'>No In Progress Goals</Text>
+                      </View>
+                    )}
+                  </View>
+                  <View className='mt-2 flex-col gap-2'>
+                    <Text className='text-body text-green'>Completed</Text>
+                    {completedGoals.length > 0 ? (
+                      <FlashList
+                        data={completedGoals}
+                        renderItem={({ item }) =>
+                          <CommunityGoalCard 
+                            goal_id={item.goal_id} 
+                            goal_name={item.goal_name} 
+                            total_task={item.total_task} 
+                            complete_task={item.complete_task}
+                          />
+                        }
+                        estimatedItemSize={200}
+                      />
+                    ) : (
+                      <View style={{width:'100%', height:80, justifyContent:'center', alignContent:'center'}}>
+                        <Text className='font-noto text-subText text-heading3 text-center'>No Completed Goals</Text>
+                      </View>
+                    )}
+                  </View>
                 </View>
               </View>
             )}
@@ -135,7 +170,7 @@ const goalDataDummy = [
     goal_id:'3',
     goal_name:'Title Test 3',
     total_task:8,
-    complete_task:3,
+    complete_task:8,
   },
 ]
 

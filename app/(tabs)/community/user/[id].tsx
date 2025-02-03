@@ -6,8 +6,7 @@ import { router } from 'expo-router';
 import { Image } from 'expo-image';
 import { useAuth } from '../../../../context/authContext';
 import { FlashList } from '@shopify/flash-list';
-import CalendarGoalCard from '../../../../components/goal/calendarGoalCard';
-
+import CommunityGoalCard from '../../../../components/goal/communityGoalCard';
 
 
 
@@ -18,6 +17,10 @@ const Userprofile = () => {
   const { id } = useLocalSearchParams();
 
   const { user } = useAuth();
+
+  const inProgressGoals = goalDataDummy.filter(goal => goal.total_task !== goal.complete_task);
+
+  const completedGoals = goalDataDummy.filter(goal => goal.total_task === goal.complete_task);
   
   const [viewPost, setViewPost] = useState(true);
 
@@ -99,16 +102,48 @@ const Userprofile = () => {
                   </View>
                 </View>
                 <View className='w-full'>
-                  <Text className='text-body text-yellow pb-3'>In progress</Text>
-                  <FlashList
-                    data={goalDataDummy}
-                    renderItem={({ item }) =>
-                      <CalendarGoalCard goal_id={item.goal_id} goal_name={item.goal_name} total_task={item.total_task} complete_task={item.complete_task}/>
-                    }
-                    estimatedItemSize={200}
-                  />
-                  <Text className='text-body text-green pb-3'>Completed</Text>
-
+                  <View className='mt-2 flex-col gap-2'>
+                    <Text className='text-body text-yellow'>In Progress</Text>
+                    {inProgressGoals.length > 0 ? (
+                      <FlashList
+                        data={inProgressGoals}
+                        renderItem={({ item }) =>
+                          <CommunityGoalCard 
+                            goal_id={item.goal_id} 
+                            goal_name={item.goal_name} 
+                            total_task={item.total_task} 
+                            complete_task={item.complete_task}
+                          />
+                        }
+                        estimatedItemSize={200}
+                      />
+                    ) : (
+                      <View style={{width:'100%', height:80, justifyContent:'center', alignContent:'center'}}>
+                        <Text className='font-noto text-subText text-heading3 text-center'>No In Progress Goals</Text>
+                      </View>
+                    )}
+                  </View>
+                  <View className='mt-2 flex-col gap-2'>
+                    <Text className='text-body text-green'>Completed</Text>
+                    {completedGoals.length > 0 ? (
+                      <FlashList
+                        data={completedGoals}
+                        renderItem={({ item }) =>
+                          <CommunityGoalCard 
+                            goal_id={item.goal_id} 
+                            goal_name={item.goal_name} 
+                            total_task={item.total_task} 
+                            complete_task={item.complete_task}
+                          />
+                        }
+                        estimatedItemSize={200}
+                      />
+                    ) : (
+                      <View style={{width:'100%', height:80, justifyContent:'center', alignContent:'center'}}>
+                        <Text className='font-noto text-subText text-heading3 text-center'>No Completed Goals</Text>
+                      </View>
+                    )}
+                  </View>
                 </View>
               </View>
             )}

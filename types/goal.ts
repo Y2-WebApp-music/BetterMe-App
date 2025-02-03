@@ -17,6 +17,10 @@ export type GoalCreateCardProp = goal & {
   end_date: string
 }
 
+export type CommunityGoalCardProp = goal & {
+  complete_task: number
+}
+
 export type Task = {
   task_name: string;
   status: boolean;
