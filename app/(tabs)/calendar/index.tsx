@@ -103,7 +103,7 @@ const MonthCalendar = () => {
 
   const getSummaryMeal = async () => {
     try {
-      const response = await axios.get(`${SERVER_URL}/calendar/summary-meal/${selectedDate}`);
+      const response = await axios.get(`${SERVER_URL}/calendar/meal/summary/${selectedDate}`);
       const data = response.data
 
       console.log('response \n',data);

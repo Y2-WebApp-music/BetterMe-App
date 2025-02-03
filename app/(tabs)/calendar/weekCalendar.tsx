@@ -64,7 +64,7 @@ const WeekCalendar = () => {
 
   const getSummaryMeal = async () => {
     try {
-      const response = await axios.get(`${SERVER_URL}/calendar/summary-meal/${toDateId(selectedDate)}`);
+      const response = await axios.get(`${SERVER_URL}/calendar/meal/summary/${toDateId(selectedDate)}`);
       const data = response.data
 
       if ( data.message === "No meals found") {
