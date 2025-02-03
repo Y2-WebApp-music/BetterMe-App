@@ -1,11 +1,48 @@
 import { View, Text, SafeAreaView, ScrollView, Dimensions, StyleSheet } from 'react-native'
-import React from 'react'
+import React, { useCallback, useState } from 'react'
 import BackButton from '../../../../components/Back'
 import { format } from 'date-fns';
+import { useFocusEffect, useLocalSearchParams } from 'expo-router';
+import axios from 'axios';
+import { SERVER_URL } from '@env';
+import { Meal } from '../../../../types/food';
+import { Image } from 'expo-image';
 
 const screenWidth = Dimensions.get('window').width;
 
 const MealPage = () => {
+
+  const { id } = useLocalSearchParams();
+
+  const [meal, setMeal] = useState<Meal>()
+
+  const getMeal = async () => {
+    try {
+      const response = await axios.get(`${SERVER_URL}/meal/detail/${id}`);
+      const data = response.data
+
+      console.log('response getMeal \n',data);
+      if ( data.message === "No meals found") {return}
+
+      if (data) {
+        setMeal(data)
+        console.log(meal?.image_url);
+        
+      } else {
+        console.warn('No data fetch')
+      }
+
+    } catch (error: any){
+      console.error(error)
+    }
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      getMeal()
+    }, [])
+  );
+
   return (
     <SafeAreaView className="w-full h-full justify-start items-center bg-Background font-noto" >
       <View className='w-[92%] mt-4 flex-row'>
@@ -23,8 +60,10 @@ const MealPage = () => {
         <View className=''>
           <View className='w-full flex-row'>
             <View className='grow'>
-              <Text className='text-heading font-noto'>Food Meal Name</Text>
-              <Text className='text-subText font-noto -translate-y-1'>portion</Text>
+              <Text className='text-heading font-noto'>{meal?.food_name}</Text>
+              {meal?.portion &&
+                <Text className='text-subText font-noto -translate-y-1'>{meal?.portion}</Text>
+              }
               <Text className='text-subText font-noto -translate-y-1 mt-1'>
                 {new Intl.DateTimeFormat('en-GB', {
                       day: 'numeric',
@@ -32,18 +71,27 @@ const MealPage = () => {
                       year: 'numeric',
                       hour: '2-digit',
                       minute: '2-digit'
-                    }).format(new Date())}
+                    }).format(new Date(meal?.meal_date || 0))}
               </Text>
             </View>
             <View className='flex-row gap-1 items-center'>
-              <Text className='text-title font-notoMedium text-primary'>468</Text>
+              <Text className='text-title font-notoMedium text-primary'>{meal?.calorie}</Text>
               <View style={{transform:[{ translateY: 4 }]}}>
                 <Text className='font-noto'>cal</Text>
               </View>
             </View>
           </View>
 
-          <View style={styles.camera} className='bg-gray'></View>
+          {/* <View style={styles.camera} className=''> */}
+          <View className='overflow-hidden rounded-normal border border-gray'>
+            <Image
+                style={styles.camera}
+                source={meal?.image_url}
+                contentFit="cover"
+                transition={1000}
+              />
+          </View>
+          {/* </View> */}
 
           <View className='py-2'>
             <Text className='font-noto text-heading2'>Detail of this food</Text>
@@ -52,14 +100,14 @@ const MealPage = () => {
                 <View className='flex-row gap-2 items-end'>
                   <Text className='text-body text-subText w-[14vw]'>Carbs</Text>
                   <View style={{transform:[{ translateY: 6 }]}}>
-                    <Text className='text-heading font-notoMedium w-[8vw]'> 23 </Text>
+                    <Text className='text-heading font-notoMedium w-[8vw]'> {meal?.carbs} </Text>
                   </View>
                   <Text className='text-body text-subText'>grams</Text>
                 </View>
                 <View className='flex-row gap-2 items-end'>
                   <Text className='text-body text-subText w-[14vw]'>Protein</Text>
                   <View style={{transform:[{ translateY: 6 }]}}>
-                    <Text className='text-heading font-notoMedium w-[8vw]'> 34 </Text>
+                    <Text className='text-heading font-notoMedium w-[8vw]'> {meal?.protein} </Text>
                   </View>
                   <Text className='text-body text-subText'>grams</Text>
                 </View>
@@ -67,7 +115,7 @@ const MealPage = () => {
               <View className='flex-row gap-2 items-end'>
                 <Text className='text-body text-subText w-[14vw]'>Fat</Text>
                 <View style={{transform:[{ translateY: 6 }]}}>
-                  <Text className='text-heading font-notoMedium w-[8vw]'> 76 </Text>
+                  <Text className='text-heading font-notoMedium w-[8vw]'> {meal?.fat} </Text>
                 </View>
                 <Text className='text-body text-subText'>grams</Text>
               </View>
