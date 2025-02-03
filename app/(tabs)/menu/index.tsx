@@ -183,7 +183,7 @@ const Menu = () => {
           </View>
           <FoodSummary/>
           <Text className='text-subText my-2'>today : 23 May 2024</Text>
-          <FoodToday/>
+          {/* <FoodToday/> */}
           <View className='pb-20'></View>
 
         </ScrollView>

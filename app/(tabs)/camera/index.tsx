@@ -26,11 +26,11 @@ const TakePicture = () => {
   const cameraRef = useRef<CameraView | null>(null);
   const [photo, setPhoto] = useState<string | null>(null);
   const [data, setData] = useState<MealAi>({
-    Menu:'',
-    Calorie:0,
-    Protein:0,
-    Carbs:0,
-    Fat:0,
+    food_name:'',
+    calorie:0,
+    protein:0,
+    carbs:0,
+    fat:0,
   })
   const [step, setStep] = useState(1)
   const [detail, setDetail] = useState<string>('')
@@ -183,22 +183,18 @@ const TakePicture = () => {
               portion: detail,
             });
     
-            console.log('data:', res.data);
-            setWaiting(false)
-            console.log('downloadURL :',downloadURL);
-
             console.log('Imageurl ',url);
             
-
             let mealData:MealAi | null = res.data
             mealData && setData((prev)=>({...prev,
-              Menu: mealData.Menu,
-              Calorie: mealData.Calorie,
-              Protein:mealData.Protein,
-              Carbs:mealData.Carbs,
-              Fat:mealData.Fat,
+              food_name: mealData.food_name,
+              calorie : mealData.calorie,
+              protein: mealData.protein,
+              carbs: mealData.carbs,
+              fat: mealData.fat,
             }))
-            url && mealData && postToDB(url, mealData.Menu, mealData.Calorie, mealData.Protein, mealData.Carbs, mealData.Fat)
+            console.log('data:', mealData);
+            url && mealData && postToDB(url, mealData.food_name, mealData.calorie, mealData.protein, mealData.carbs, mealData.fat)
           }
         };
         reader.readAsDataURL(blob);
@@ -364,13 +360,13 @@ const TakePicture = () => {
                 </View>
                 <View className='w-full flex-row'>
                   <View className='grow justify-center'>
-                    <Text className='text-heading font-noto'>{data.Menu}</Text>
+                    <Text className='text-heading font-noto'>{data.food_name}</Text>
                     {detail &&
                       <Text className='text-subText font-noto -translate-y-1'>{detail}</Text>
                     }
                   </View>
                   <View className='flex-row gap-1 items-end'>
-                    <Text className='text-title font-notoMedium text-primary'>{data.Calorie}</Text>
+                    <Text className='text-title font-notoMedium text-primary'>{data.calorie}</Text>
                     <View style={{transform:[{ translateY: -8 }]}}>
                       <Text className='font-noto'>cal</Text>
                     </View>
@@ -391,14 +387,14 @@ const TakePicture = () => {
                       <View className='flex-row gap-2 items-end'>
                         <Text className='text-body text-subText w-[14vw]'>Carbs</Text>
                         <View style={{transform:[{ translateY: 6 }]}}>
-                          <Text className='text-heading font-notoMedium w-[8vw]'>{data.Carbs}</Text>
+                          <Text className='text-heading font-notoMedium w-[8vw]'>{data.carbs}</Text>
                         </View>
                         <Text className='text-body text-subText'>grams</Text>
                       </View>
                       <View className='flex-row gap-2 items-end'>
                         <Text className='text-body text-subText w-[14vw]'>Protein</Text>
                         <View style={{transform:[{ translateY: 6 }]}}>
-                          <Text className='text-heading font-notoMedium w-[8vw]'>{data.Protein}</Text>
+                          <Text className='text-heading font-notoMedium w-[8vw]'>{data.protein}</Text>
                         </View>
                         <Text className='text-body text-subText'>grams</Text>
                       </View>
@@ -406,7 +402,7 @@ const TakePicture = () => {
                     <View className='flex-row gap-2 items-end'>
                       <Text className='text-body text-subText w-[14vw]'>Fat</Text>
                       <View style={{transform:[{ translateY: 6 }]}}>
-                        <Text className='text-heading font-notoMedium w-[8vw]'>{data.Fat}</Text>
+                        <Text className='text-heading font-notoMedium w-[8vw]'>{data.fat}</Text>
                       </View>
                       <Text className='text-body text-subText'>grams</Text>
                     </View>

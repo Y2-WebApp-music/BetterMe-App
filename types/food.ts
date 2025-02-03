@@ -22,11 +22,11 @@ export type mealCard = {
 
 
 export type MealAi = {
-  Menu:string
-  Calorie:number
-  Protein:number
-  Carbs:number
-  Fat:number
+  food_name:string
+  calorie:number
+  protein:number
+  carbs:number
+  fat:number
 }
 export type MealSummaryCard = {
   total_calorie:number

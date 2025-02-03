@@ -33,7 +33,7 @@ const NumberInput:React.FC<TextInputProp> = ({name, value, handleChange}) => {
             width:"94%",
             textAlignVertical: "center",
           }}
-          value={value.toString()}
+          value={value.toString() || ''}
           placeholder={name}
           placeholderTextColor="#CFCFCF"
           onChangeText={(text) => handleChange(Number(text) || 0)}

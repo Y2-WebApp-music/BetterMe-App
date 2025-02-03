@@ -245,8 +245,6 @@ const AddMeal = () => {
         reader.onloadend = async () => {
           if (reader.result && typeof reader.result === 'string') {
             const base64Image = reader.result
-
-            console.log(base64Image);
     
             const res = await axios.post(`${SERVER_URL}/meal/by-ai`, {
               image: base64Image,
@@ -254,13 +252,15 @@ const AddMeal = () => {
             });
 
             let mealData:MealAi | null = res.data
+            console.log('mealData ',mealData);
+            
             mealData && setForm({
               ...form,
-              food_name: mealData.Menu,
-              calorie : mealData.Calorie,
-              protein: mealData.Protein,
-              carbs: mealData.Carbs,
-              fat: mealData.Fat,
+              food_name: mealData.food_name,
+              calorie : mealData.calorie,
+              protein: mealData.protein,
+              carbs: mealData.carbs,
+              fat: mealData.fat,
               createByAI:true,
             })
 
