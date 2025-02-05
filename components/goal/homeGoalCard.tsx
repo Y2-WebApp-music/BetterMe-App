@@ -8,8 +8,11 @@ import { format } from 'date-fns'
 const HomeGoalCard = ({goal_id, goal_name, end_date, total_task, complete_task}:homeGoalCardProp) => {
 
   const percent = total_task > 0 ? Math.round((complete_task / total_task) * 100) : 0;
+  const today = new Date();
+  const end = new Date(end_date);
+  end.setDate(end.getDate() + 1);
 
-  const color = percent === 100? "#0dc47c" : "#FBA742"
+  const color = percent === 100? "#0dc47c" : today > end? "#f43168" : "#FBA742"
 
   const progressBar = useRef(new Animated.Value(0)).current;
   useEffect(() => {
@@ -40,7 +43,7 @@ const HomeGoalCard = ({goal_id, goal_name, end_date, total_task, complete_task}:
                 style={{overflow: 'hidden',}}
                 numberOfLines={2}
                 ellipsizeMode="tail"
-                className='font-noto text-heading2 line-clamp-2'
+                className='font-noto text-heading2 line-clamp-2 '
               >
                 {goal_name}
               </Text>
