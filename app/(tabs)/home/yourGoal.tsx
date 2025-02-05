@@ -98,14 +98,6 @@ const YourGoal = () => {
     setSummary({ complete, inprogress, fail });
   };
 
-  useMemo(() => {
-    const fetchData = async () => {
-      await getTodayGoal();
-      await getAllGoal();
-    };
-    fetchData();
-  }, []);
-
   useEffect(() => {
     if (allGoal.length > 0) {
       updateSummary(allGoal);
