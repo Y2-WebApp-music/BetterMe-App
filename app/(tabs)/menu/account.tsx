@@ -20,7 +20,7 @@ import { updateProfile } from 'firebase/auth';
 import { auth, firebaseStorage } from '../../../components/auth/firebaseConfig';
 import Modal from '../../../components/modal/Modal';
 import PickImageModal from '../../../components/modal/PickImageModal';
-import { getDownloadURL, ref, uploadBytes } from '@firebase/storage';
+import { getDownloadURL, ref, uploadBytes, deleteObject } from '@firebase/storage';
 import ChangePasswordModal from '../../../components/modal/ChangePasswordModal';
 
 type UserProp = {
@@ -58,6 +58,9 @@ const AccountSetting = () => {
     height: user?.height || 0,
     activity: user?.activity || 0,
   });
+
+  const [imageModal, setImageModal] = useState(false)
+  const [passwordModal, setPasswordModal] = useState(true)
 
   const [dateModal,setDateModal] = useState(false)
   const updateDate = (date: Date) => {
@@ -159,7 +162,8 @@ const AccountSetting = () => {
 
   const [downloadURL, setDownloadURL] = useState<string | null>(null);
   const updatePhotoUrl = async () => {
-    handleImageUpload()
+    await handleImageUpload()
+    await updateUser()
   }
 
   const uploadToFirebase = async () => {
@@ -167,58 +171,82 @@ const AccountSetting = () => {
       contentType: 'image/png',
     };
 
+    try {
+      if (photo && user) {
+        console.log('Uploading to Firebase....');
+
+        const storageRef = ref(firebaseStorage, `avatar/${user.uid}.png`);
+
+        const resPhoto = await fetch(photo);
+        const blob = await resPhoto.blob();
+
+        const extension = photo.split('.').pop();
+        const mimeType = extension === 'jpg' || extension === 'jpeg' ? 'image/jpeg' : 'image/png';
+
+        const uploadTask = await uploadBytes(storageRef, blob, { ...metadata, contentType: mimeType });
+        console.log('uploadTask ',uploadTask);
+
+        const url = await getDownloadURL(uploadTask.ref);
+        setDownloadURL(url);
+        console.log('Upload Complete', url);
+
+        await updateProfile(auth.currentUser || user, {
+          photoURL:url,
+        })
+
+        setImageModal(false)
+        return url
+
+      }
+    } catch (error) {
+      console.error('Upload failed', error);
+    }
+  }
+
+  const checkFireBase = async () => {
+
     if (!photo || !user) {
       console.log('!photo || !user || !form.meal_date ');
       return null
     }
 
-    console.log('uploadToFirebase()');
-    console.log('photoURL', user.photoURL);
+    if (user.photoURL) {
+      console.log('photoURL :',user.photoURL);
+      if (user.photoURL.includes("lh3.googleusercontent.com")) {
+        console.log('Photo from google No in firebase');
+        uploadToFirebase()
 
-    const desertRef = ref(firebaseStorage, `${user.photoURL}`);
-    console.log(' desertRef', desertRef);
+      } else {
+        console.log('Photo is in firebase delete first');
 
-    if (desertRef) {
-      console.log('=== Have in Firebase Storage ===');
-    } else {
-      console.warn('=== No image in Firebase Storage ===');
+        const desertRef = ref(firebaseStorage, `${user.photoURL}`);
+        console.log(' desertRef', desertRef);
+
+        if (desertRef) {
+          console.log('=== Have in Firebase Storage ===');
+          // Delete the file
+          deleteObject(desertRef).then(() => {
+            // File deleted successfully
+          }).catch((error) => {
+            console.error('Delete Failed',error);
+          });
+        } else {
+          console.warn('=== No image in Firebase Storage ===');
+        }
+        uploadToFirebase()
+      }
     }
-
-    // try {
-    //   if (photo && user) {
-    //     console.log('Uploading to Firebase....');
-
-    //     const storageRef = ref(firebaseStorage, `avatar/${user.uid}.png`);
-
-    //     const resPhoto = await fetch(photo);
-    //     const blob = await resPhoto.blob();
-
-    //     const extension = photo.split('.').pop();
-    //     const mimeType = extension === 'jpg' || extension === 'jpeg' ? 'image/jpeg' : 'image/png';
-
-    //     const uploadTask = await uploadBytes(storageRef, blob, { ...metadata, contentType: mimeType });
-    //     console.log('uploadTask ',uploadTask);
-
-    //     const url = await getDownloadURL(uploadTask.ref);
-    //     setDownloadURL(url);
-    //     console.log('Upload Complete', url);
-    //     return url
-
-    //   }
-    // } catch (error) {
-    //   console.error('Upload failed', error);
-    // }
   }
 
   const handleImageUpload = async () => {
     if (!downloadURL) {
       console.log('downloadURL is empty try to upload and get URl');
-      const url = await uploadToFirebase();
+      const url = await checkFireBase();
       if (url !== undefined) {
         setDownloadURL(url)
         return url
       }
-      console.error('Fail to get Image URL')
+      console.warn('Fail to get Image URL')
     }
     return downloadURL;
   };
@@ -233,7 +261,7 @@ const AccountSetting = () => {
         
         const response = await axios.put(`${SERVER_URL}/user/update/${user?._id}`, {
           username: form.username,
-          // profile_img: downloadURL,
+          profile_img: downloadURL,
           birth_date: form.birth,
           gender: form.gender,
           weight: form.weight,
@@ -265,9 +293,6 @@ const AccountSetting = () => {
       console.error('Fail to update :',error)
     }
   }
-
-  const [imageModal, setImageModal] = useState(false)
-  const [passwordModal, setPasswordModal] = useState(true)
 
   return (
       <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
