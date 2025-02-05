@@ -1,0 +1,96 @@
+import { Task } from "./goal"
+
+type CommunityUser = {
+  _id:string,
+  username:string,
+  date:string,
+  profile_img:string,
+  post:number,
+  goal:number,
+  follower:string[],
+  following:string[],
+  liked:string[]
+};
+// post and goal is length
+// liked is list of liked post
+
+export type PostContent = CommunityUser & {
+  post_id:string
+  content:string,
+  tag:number[],
+  like:number,
+  comment:number,
+};
+// like is length
+
+export type PostContentPhoto = PostContent & {
+  photo:string[],
+};
+
+export type Comment = CommunityUser & {
+  content:string
+};
+
+export type CommunityGoal = CommunityUser & {
+  goal_id: string
+  goal_name: string
+  start_date: string
+  end_date: string
+  description: string
+  task: Task[]
+  total_task: number
+  complete_task: number
+};
+
+export const TagCommunity = [
+  { id: 1, text: 'clean food' },
+  { id: 2, text: 'weight training' },
+  { id: 3, text: 'healthy eating' },
+  { id: 4, text: 'balanced diet' },
+  { id: 5, text: 'cardio workout' },
+  { id: 6, text: 'yoga practice' },
+  { id: 7, text: 'meditation' },
+  { id: 8, text: 'home workout' },
+  { id: 9, text: 'meal prep' },
+  { id: 10, text: 'low carb' },
+  { id: 11, text: 'high protein' },
+  { id: 12, text: 'vitamin rich' },
+  { id: 13, text: 'hydration' },
+  { id: 14, text: 'mental health' },
+  { id: 15, text: 'fitness goals' },
+  { id: 16, text: 'strength training' },
+  { id: 17, text: 'running' },
+  { id: 18, text: 'cycling' },
+  { id: 19, text: 'sleep hygiene' },
+  { id: 20, text: 'power nap' },
+  { id: 21, text: 'intermittent fasting' },
+  { id: 22, text: 'superfoods' },
+  { id: 23, text: 'organic food' },
+  { id: 24, text: 'healthy snacks' },
+  { id: 25, text: 'smoothies' },
+  { id: 26, text: 'stretching' },
+  { id: 27, text: 'flexibility' },
+  { id: 28, text: 'bodyweight exercises' },
+  { id: 29, text: 'nutrition tips' },
+  { id: 30, text: 'whole grains' },
+  { id: 31, text: 'gut health' },
+  { id: 32, text: 'immune boosting' },
+  { id: 33, text: 'mindfulness' },
+  { id: 34, text: 'posture correction' },
+  { id: 35, text: 'active lifestyle' },
+  { id: 36, text: 'plant-based diet' },
+  { id: 37, text: 'low sugar' },
+  { id: 38, text: 'healthy fats' },
+  { id: 39, text: 'calorie counting' },
+  { id: 40, text: 'portion control' },
+  { id: 41, text: 'recovery' },
+  { id: 42, text: 'strength building' },
+  { id: 43, text: 'outdoor activities' },
+  { id: 44, text: 'cycling workout' },
+  { id: 45, text: 'gym routine' },
+  { id: 46, text: 'herbal tea' },
+  { id: 47, text: 'sleep schedule' },
+  { id: 48, text: 'healthy habits' },
+  { id: 49, text: 'protein shakes' },
+  { id: 50, text: 'stress management' }
+];
