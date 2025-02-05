@@ -11,15 +11,19 @@ import FoodGoal from '../../../components/food/foodGoal';
 import { SERVER_URL } from '@env';
 import axios from 'axios';
 import { FlashList } from "@shopify/flash-list";
+import { toDateId } from '@marceloterreiro/flash-calendar';
 
 const screenWidth = Dimensions.get('window').width;
 
 const Home = () => {
 
   const { user } = useAuth();
+  const today = toDateId(new Date())
 
   const [isNoGoal, setIsNoGoal] = useState(false)
   const [todayGoal, setTodayGoal] = useState<homeGoalCardProp[]>([])
+  const [totalCal, setTotalCal] = useState(0)
+
   const getTodayGoal = async () => {
     try {
       const response = await axios.get(`${SERVER_URL}/goal/today/${user?._id}`);
@@ -39,9 +43,24 @@ const Home = () => {
     }
   }
 
-  useMemo(()=>{
-    getTodayGoal()
-  },[])
+  const getSummaryMeal = async () => {
+    try {
+      const response = await axios.get(`${SERVER_URL}/calendar/meal/summary/${today}`);
+      const data = response.data
+
+      console.log('response \n',data);
+      if ( data.message === "No meals found") {return setTotalCal(0)}
+
+      if (data) {
+        setTotalCal(data.total_calorie)
+      } else {
+        setTotalCal(0)
+      }
+
+    } catch (error: any){
+      console.error(error)
+    }
+  }
 
 
   const sortedGoalData = todayGoal?
@@ -63,15 +82,19 @@ const Home = () => {
   ] : [];
 
   const [refreshing, setRefreshing] = useState(false);
-
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     getTodayGoal().finally(() => setRefreshing(false));
+    getSummaryMeal().finally(() => setRefreshing(false));
   }, []);
+
+  const [profileImage, setProfileImage] = useState('')
 
   useFocusEffect(
     useCallback(() => {
       getTodayGoal();
+      getSummaryMeal();
+      setProfileImage(user?.photoURL ? user?.photoURL : user?.gender === 1 ? require('../../../assets/maleAvatar.png') : require('../../../assets/femaleAvatar.png'))
     }, [])
   );
 
@@ -94,12 +117,14 @@ const Home = () => {
           */}
           <View className='mb-4 flex flex-row gap-2 items-center'>
             <View className='overflow-hidden rounded-full border border-gray'>
-              <Image
-                style={styles.image}
-                source={user?.photoURL ? user?.photoURL : user?.gender === 1 ? require('../../../assets/maleAvatar.png') : require('../../../assets/femaleAvatar.png')}
-                contentFit="cover"
-                transition={1000}
-              />
+              {profileImage &&
+                <Image
+                  style={styles.image}
+                  source={profileImage}
+                  contentFit="cover"
+                  transition={1000}
+                />
+              }
             </View>
             <View className='grow'>
               <Text className='text-heading2 font-notoMedium'>{user?.displayName}</Text>
@@ -119,7 +144,7 @@ const Home = () => {
                 {new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date())}
               </Text>
             </View>
-            <FoodGoal />
+            <FoodGoal totalCal={totalCal} />
             <SleepGoal />
           </View>
 

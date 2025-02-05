@@ -4,19 +4,12 @@ import { RightArrowIcon } from '../../constants/icon'
 import { format } from 'date-fns'
 import { FlashList } from "@shopify/flash-list";
 import MealCard from './mealCard'
+import { weekMealSummary } from '../../types/food';
 
-const FoodDaySummary = () => {
+const FoodDaySummary = ({date, total_calorie, protein, carbs, fat, meal}:weekMealSummary) => {
 
   const [isVisible, setIsVisible] = useState(false);
   const animation = useRef(new Animated.Value(0)).current;
-
-  const mealCards = Array(4).fill({
-    meal_id: "",
-    meal_date: new Date(),
-    food_name: "Test",
-    calorie: 321,
-    createByAI: false,
-  });
 
 
   const toggleVisibility = () => {
@@ -29,7 +22,7 @@ const FoodDaySummary = () => {
   };
 
   const cardHeight = 84;
-  const totalHeight = cardHeight * mealCards.length;
+  const totalHeight = cardHeight * meal.length;
 
   const height = animation.interpolate({
     inputRange: [0, 1],
@@ -46,21 +39,21 @@ const FoodDaySummary = () => {
       <TouchableOpacity activeOpacity={0.7} onPress={toggleVisibility} className='flex-row'>
         <View className='grow'>
           <View style={{ transform: [{ translateY: 4 }]}}>
-            <Text className='text-subText font-noto'>{format(new Date(), "eee '|' dd MMM yyyy")}</Text>
+            <Text className='text-subText font-noto'>{format(new Date(date), "eee '|' dd MMM yyyy")}</Text>
           </View>
           <View className='flex-row gap-2 items-end'>
             <Text className='text-body font-noto text-subText'>Total Calories</Text>
             <View style={{ transform: [{ translateY: 4 }]}}>
-              <Text className='text-heading font-noto'>3333</Text>
+              <Text className='text-heading font-noto'>{total_calorie}</Text>
             </View>
             <View style={{ transform: [{ translateY: 0 }]}}>
               <Text className='text-body font-noto text-subText'>cal</Text>
             </View>
           </View>
           <View style={{ transform: [{ translateY: -2 }], flexDirection:'row', gap:12, marginTop:2 }}>
-            <Text style={{color:'gray'}} className='text-detail font-notoLight'>Protein : 12g</Text>
-            <Text style={{color:'gray'}} className='text-detail font-notoLight'>Carbs : 24g</Text>
-            <Text style={{color:'gray'}} className='text-detail font-notoLight'>Fat : 9g</Text>
+            <Text style={{color:'gray'}} className='text-detail font-notoLight'>Protein : {protein}g</Text>
+            <Text style={{color:'gray'}} className='text-detail font-notoLight'>Carbs : {carbs}g</Text>
+            <Text style={{color:'gray'}} className='text-detail font-notoLight'>Fat : {fat}g</Text>
           </View>
 
 
@@ -72,7 +65,7 @@ const FoodDaySummary = () => {
       <Animated.View style={[styles.animatedContainer, { height, opacity }]}>
       {isVisible &&
           <FlashList
-          data={mealCards}
+          data={meal}
           keyExtractor={(_, index) => index.toString()}
           renderItem={({ item }) => (
             <MealCard

@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, KeyboardAvoidingView, Platform, SafeAreaView, TouchableOpacity } from 'react-native'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import BackButton from '../../../components/Back'
 import { router } from 'expo-router'
 import { AddIcon, BackwardIcon, FoodIcon, ForwardIcon, LeftArrowIcon, RightArrowIcon } from '../../../constants/icon'
@@ -9,16 +9,115 @@ import FoodToday from '../../../components/food/foodToday'
 import FoodDaySummary from '../../../components/food/foodDaySummary'
 import Animated, { useAnimatedRef, useAnimatedStyle, useScrollViewOffset, withTiming } from 'react-native-reanimated'
 
+import { SERVER_URL } from '@env';
+import axios from 'axios';
+import { addDays, format, startOfWeek, subDays } from 'date-fns';
+import { MealSummaryCard, weekMealSummary } from '../../../types/food'
+import { FlashList } from '@shopify/flash-list'
+import { toDateId } from '@marceloterreiro/flash-calendar'
+const getSundayDate = (date: Date): Date => startOfWeek(date, { weekStartsOn: 0 });
+
 const FoodSummary = () => {
 
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollHandler = useScrollViewOffset(scrollRef);
+  const today = toDateId(new Date())
 
   const buttonStyle = useAnimatedStyle(() => {
     return {
       opacity: scrollHandler. value > 420 ? withTiming(1) : withTiming(0),
     }
-  }) ;
+  })
+
+  const [data, setData] = useState<weekMealSummary[]>([])
+  const [weeklyTotal, setWeeklyTotal] = useState({
+    total_calorie: 0, protein: 0, carbs: 0, fat: 0
+  })
+  const [currentSunday, setCurrentSunday] = useState<Date>(getSundayDate(new Date()));
+  const [mealSummary, setMealSummary] = useState<MealSummaryCard>()
+  const [graph, setGraph] = useState([0,0,0,0,0,0,0])
+
+  const getSummaryMeal = async () => {
+    try {
+      const response = await axios.get(`${SERVER_URL}/calendar/meal/summary/${today}`);
+      const data = response.data
+
+      // console.log('calendar/meal/summary \n',data);
+      if ( data.message === "No meals found") {return setMealSummary({
+        total_calorie:0,
+        total_protein:0,
+        total_carbs:0,
+        total_fat:0,
+      })}
+
+      if (data) {
+        setMealSummary(data)
+      } else {
+        setMealSummary({
+          total_calorie:0,
+          total_protein:0,
+          total_carbs:0,
+          total_fat:0,
+        })
+      }
+
+    } catch (error: any){
+      console.error(error)
+    }
+  }
+
+  const getWeeklyTotal = (data: weekMealSummary[]) => {
+    return data.reduce(
+      (acc, day) => ({
+        total_calorie: acc.total_calorie + day.total_calorie,
+        protein: acc.protein + day.protein,
+        carbs: acc.carbs + day.carbs,
+        fat: acc.fat + day.fat,
+      }),
+      { total_calorie: 0, protein: 0, carbs: 0, fat: 0 }
+    );
+  };
+
+  const updateGraphData = (weekData: weekMealSummary[]) => {
+    const calories = weekData.map(day => day.total_calorie || 0);
+    
+    while (calories.length < 7) {
+      calories.push(0);
+    }
+  
+    setGraph(calories);
+  };
+
+  const getWeeklyMeal = async () => {
+    const formattedDate = format(currentSunday, 'yyyy-MM-dd');
+    try {
+      const response = await axios.get(`${SERVER_URL}/menu/meal/weekly/${formattedDate}`);
+      const data = response.data
+
+      console.log('menu/meal/weekly \n',data);
+      if (data.message === "No meals found") {
+        setData([]);
+        setWeeklyTotal(getWeeklyTotal([]))
+        updateGraphData([])
+        return (
+          console.warn(' No meals found ')
+        )
+      }
+
+      setData(data)
+
+      setWeeklyTotal(getWeeklyTotal(data))
+      updateGraphData(data)
+
+    } catch (error: any){
+      console.error(error)
+    }
+  }
+
+  useEffect(()=>{
+    getSummaryMeal()
+    getWeeklyMeal()
+  },[currentSunday])
 
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
@@ -44,7 +143,7 @@ const FoodSummary = () => {
         </View>
         <View className='w-[92%]'>
           <Animated.View style={[buttonStyle]} className='w-full absolute top-0 z-10 bg-Background'>
-            <SummaryHeader/>
+            <SummaryHeader weeklyTotal={weeklyTotal} currentSunday={currentSunday} setCurrentSunday={setCurrentSunday}/>
           </Animated.View>
         </View>
         <ScrollView
@@ -63,14 +162,16 @@ const FoodSummary = () => {
                 {new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date())}
               </Text>
             </View>
-            <FoodToday/>
+            {mealSummary &&
+              <FoodToday total_calorie={mealSummary?.total_calorie} total_protein={mealSummary?.total_protein} total_carbs={mealSummary?.total_carbs} total_fat={mealSummary?.total_fat}/>
+            }
             <MealCard meal_id={''} meal_date={new Date().toDateString()} food_name={'TestMeal'} calorie={435} createByAI={true}/>
           </View>
 
 
           <View style={{height:1, width:'100%'}} className=' bg-gray mb-2'/>
 
-          <SummaryHeader/>
+          <SummaryHeader weeklyTotal={weeklyTotal} currentSunday={currentSunday} setCurrentSunday={setCurrentSunday}/>
 
           <View className='p-4 bg-white border border-gray rounded-normal'>
             <View className='flex flex-row gap-2 items-center mb-2'>
@@ -78,17 +179,26 @@ const FoodSummary = () => {
               <Text className='text-body font-noto '>calorie in week</Text>
             </View>
             <View >
-              <WeekFoodChart/>
+              <WeekFoodChart graph={graph}/>
             </View>
           </View>
           <View className='gap-2 pb-16 mt-2'>
-            <FoodDaySummary/>
-            <FoodDaySummary/>
-            <FoodDaySummary/>
-            <FoodDaySummary/>
-            <FoodDaySummary/>
-            <FoodDaySummary/>
-            <FoodDaySummary/>
+            {data.length != 0 ? (
+              <FlashList
+                data={data}
+                renderItem={({ item }) =>
+                  <View className='my-1'>
+                    <FoodDaySummary date={item.date} total_calorie={item.total_calorie} protein={item.protein} carbs={item.carbs} fat={item.fat} meal={item.meal}/>
+                  </View>
+                }
+                estimatedItemSize={200}
+              />
+              ):(
+                <View>
+                  <Text> No data </Text>
+                </View>
+              )
+            }
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -96,51 +206,78 @@ const FoodSummary = () => {
   )
 }
 
-const SummaryHeader = () => {
+type weeklyTotalProp = {
+  total_calorie: number
+  protein: number
+  carbs: number
+  fat: number
+}
+type SummaryHeaderProp = {
+  weeklyTotal:weeklyTotalProp
+  currentSunday:Date
+  setCurrentSunday:(currentSunday:Date) => void
+}
+
+const SummaryHeader = ({weeklyTotal, currentSunday, setCurrentSunday}:SummaryHeaderProp) => {
+
+  const handlePrevWeek = (): void => {
+    const prevSunday = subDays(currentSunday, 7);
+    setCurrentSunday(prevSunday);
+  };
+
+  const handleNextWeek = (): void => {
+    const nextSunday = addDays(currentSunday, 7);
+    setCurrentSunday(nextSunday);
+  };
+
+  const endOfWeek = addDays(currentSunday, 6);
+
   return (
     <View className=''>
-            <View className='flex-row items-center'>
-              <View className='grow'>
-                <Text className='font-notoMedium text-heading2'>Summary</Text>
-                <Text className='font-noto text-heading3 pl-1'>14-21 Aug 2024</Text>
-              </View>
-              <View className='flex-row gap-3 pr-2'>
-                <TouchableOpacity>
-                  <BackwardIcon width={34} height={34} color={'#1c60de'}/>
-                </TouchableOpacity>
-                <TouchableOpacity>
-                  <ForwardIcon width={34} height={34} color={'#1c60de'}/>
-                </TouchableOpacity>
-              </View>
-            </View>
+      <View className='flex-row items-center'>
+        <View className='grow'>
+          <Text className='font-notoMedium text-heading2'>Summary</Text>
+          <Text className='font-noto text-heading3 pl-1'>
+            {format(currentSunday, 'd MMM yyyy')} - {format(endOfWeek, 'd MMM yyyy')}
+          </Text>
+        </View>
+        <View className='flex-row gap-3 pr-2'>
+          <TouchableOpacity onPress={handlePrevWeek}>
+            <BackwardIcon width={34} height={34} color={'#1c60de'}/>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleNextWeek}>
+            <ForwardIcon width={34} height={34} color={'#1c60de'}/>
+          </TouchableOpacity>
+        </View>
+      </View>
 
-            <View>
-              <View style={{ transform: [{ translateY: 6 }]}}>
-                <Text className='text-subText font-noto text-detail'>Total Calories</Text>
-              </View>
-              <View className='flex-row'>
-                <View className='flex-row items-end'>
-                  <Text className='text-green font-notoMedium text-subTitle'>33333</Text>
-                  <View style={{ transform: [{ translateY: -6 }]}}><Text className='text-subText font-noto text-body pl-1'>cal</Text></View>
-                </View>
-                <View style={{ transform: [{ translateY: -6 }]}} className='flex-row items-end ml-3'>
-                  <Text className='text-subText font-notoLight text-detail pl-1'>Protein :</Text>
-                  <Text className='text-subText font-noto text-body pl-1'>679</Text>
-                  <Text className='text-subText font-noto text-detail pl-1'>g</Text>
-                </View>
-                <View style={{ transform: [{ translateY: -6 }]}} className='flex-row items-end'>
-                  <Text className='text-subText font-notoLight text-detail pl-1'>Carbs :</Text>
-                  <Text className='text-subText font-noto text-body pl-1'>679</Text>
-                  <Text className='text-subText font-noto text-detail pl-1'>g</Text>
-                </View>
-                <View style={{ transform: [{ translateY: -6 }]}} className='flex-row items-end'>
-                  <Text className='text-subText font-notoLight text-detail pl-1'>Fat :</Text>
-                  <Text className='text-subText font-noto text-body pl-1'>679</Text>
-                  <Text className='text-subText font-noto text-detail pl-1'>g</Text>
-                </View>
-              </View>
-            </View>
+      <View>
+        <View style={{ transform: [{ translateY: 6 }]}}>
+          <Text className='text-subText font-noto text-detail'>Total Calories</Text>
+        </View>
+        <View className='flex-row'>
+          <View className='flex-row items-end'>
+            <Text className='text-green font-notoMedium text-subTitle'>{weeklyTotal.total_calorie}</Text>
+            <View style={{ transform: [{ translateY: -6 }]}}><Text className='text-subText font-noto text-body pl-1'>cal</Text></View>
           </View>
+          <View style={{ transform: [{ translateY: -6 }]}} className='flex-row items-end ml-3'>
+            <Text className='text-subText font-notoLight text-detail pl-1'>Protein :</Text>
+            <Text className='text-subText font-noto text-body pl-1'>{weeklyTotal.protein}</Text>
+            <Text className='text-subText font-noto text-detail pl-1'>g</Text>
+          </View>
+          <View style={{ transform: [{ translateY: -6 }]}} className='flex-row items-end'>
+            <Text className='text-subText font-notoLight text-detail pl-1'>Carbs :</Text>
+            <Text className='text-subText font-noto text-body pl-1'>{weeklyTotal.carbs}</Text>
+            <Text className='text-subText font-noto text-detail pl-1'>g</Text>
+          </View>
+          <View style={{ transform: [{ translateY: -6 }]}} className='flex-row items-end'>
+            <Text className='text-subText font-notoLight text-detail pl-1'>Fat :</Text>
+            <Text className='text-subText font-noto text-body pl-1'>{weeklyTotal.fat}</Text>
+            <Text className='text-subText font-noto text-detail pl-1'>g</Text>
+          </View>
+        </View>
+      </View>
+    </View>
   )
 }
 
