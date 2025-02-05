@@ -1,6 +1,6 @@
 import { View, Text, SafeAreaView, TouchableOpacity, ScrollView, StyleSheet, Dimensions } from 'react-native'
 import React, { useCallback, useState } from 'react'
-import { router } from 'expo-router'
+import { router, useFocusEffect } from 'expo-router'
 import { AddIcon, ForwardIcon, UserIcon } from '../../../constants/icon'
 import { Image } from 'expo-image';
 import { useAuth } from '../../../context/authContext';
@@ -10,13 +10,73 @@ import FoodSummary from '../../../components/food/weekFoodSummaryCard';
 import FoodToday from '../../../components/food/foodToday'
 import { RefreshControl } from 'react-native';
 import { activity } from '../../../types/user';
-
+import { MealSummaryCard } from '../../../types/food';
+import axios from 'axios';
+import { SERVER_URL } from '@env';
+import { toDateId } from '@marceloterreiro/flash-calendar';
+import format from 'date-fns/format';
+import { subDays } from 'date-fns';
 
 const screenWidth = Dimensions.get('window').width;
 
 const Menu = () => {
 
   const { user } = useAuth();
+  const today = toDateId(new Date())
+
+  const [mealSummary, setMealSummary] = useState<MealSummaryCard>()
+  const [goalCount, setGoalCount] = useState({
+    completed: 0,in_progress: 0, failed: 0
+  })
+
+  const getSummaryMeal = async () => {
+    try {
+      const response = await axios.get(`${SERVER_URL}/calendar/meal/summary/${today}`);
+      const data = response.data
+
+      // console.log('calendar/meal/summary \n',data);
+      if ( data.message === "No meals found") {return setMealSummary({
+        total_calorie:0,
+        total_protein:0,
+        total_carbs:0,
+        total_fat:0,
+      })}
+
+      if (data) {
+        setMealSummary(data)
+      } else {
+        setMealSummary({
+          total_calorie:0,
+          total_protein:0,
+          total_carbs:0,
+          total_fat:0,
+        })
+      }
+
+    } catch (error: any){
+      console.error(error)
+    }
+  }
+  const getCountGoal = async () => {
+    try {
+      const response = await axios.get(`${SERVER_URL}/menu/goal/count`);
+      const data = response.data
+
+      console.log(' data',data);
+
+      setGoalCount(data)
+
+    } catch (error: any){
+      console.error(error)
+    }
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      getSummaryMeal();
+      getCountGoal();
+    }, [])
+  )
 
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = useCallback(() => {
@@ -127,19 +187,19 @@ const Menu = () => {
                   <View style={{ transform: [{ translateY: 2 }] }}>
                     <Text className='font-noto text-body text-subText'>complete</Text>
                   </View>
-                  <Text className='text-heading font-notoMedium text-green'>33</Text>
+                  <Text className='text-heading font-notoMedium text-green'>{goalCount.completed}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={()=>{router.push('/home/goal/inprogress')}} className='flex-col p-1 px-2 h-[4.5rem] rounded-normal bg-white border border-gray items-center justify-center'>
                   <View style={{ transform: [{ translateY: 2 }] }}>
                     <Text className='font-noto text-body text-subText'>in complete</Text>
                   </View>
-                  <Text className='text-heading font-notoMedium text-yellow'>33</Text>
+                  <Text className='text-heading font-notoMedium text-yellow'>{goalCount.in_progress}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={()=>{router.push('/home/goal/fail')}} className='flex-col p-1 px-4 h-[4.5rem] rounded-normal bg-white border border-gray items-center justify-center'>
                   <View style={{ transform: [{ translateY: 2 }] }}>
                     <Text className='font-noto text-body text-subText'>failed</Text>
                   </View>
-                  <Text className='text-heading font-notoMedium text-red'>33</Text>
+                  <Text className='text-heading font-notoMedium text-red'>{goalCount.failed}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={()=>{router.push('/home/createGoal')}} className='flex-col p-1 px-2 h-[4.5rem] rounded-normal bg-white border border-gray items-center justify-center'>
                   <AddIcon width={30} height={30} color={'#1c60de'}/>
@@ -164,7 +224,7 @@ const Menu = () => {
             </View>
           </View>
           <SleepSummary />
-          <Text className='text-subText my-2'>last night : 23 May 2024</Text>
+          <Text className='text-subText my-2'>last night : {format(subDays(today, 1),'dd MMM yyyy')}</Text>
           <SleepToday />
 
           <View style={{height:1, width:'100%'}} className=' bg-gray my-3'/>
@@ -182,8 +242,10 @@ const Menu = () => {
           </View>
           </View>
           <FoodSummary/>
-          <Text className='text-subText my-2'>today : 23 May 2024</Text>
-          {/* <FoodToday/> */}
+          <Text className='text-subText my-2'>today : {format(today,'dd MMM yyyy')}</Text>
+          {mealSummary &&
+              <FoodToday total_calorie={mealSummary?.total_calorie} total_protein={mealSummary?.total_protein} total_carbs={mealSummary?.total_carbs} total_fat={mealSummary?.total_fat}/>
+          }
           <View className='pb-20'></View>
 
         </ScrollView>
