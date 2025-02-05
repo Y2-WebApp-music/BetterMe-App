@@ -41,8 +41,7 @@ import { ArrowIcon } from '../../../constants/icon';
 
 const AccountSetting = () => {
 
-  const { user, setUser } = useAuth();
-  const { signOut } = useAuth();
+  const { user, setUser, signOut } = useAuth();
   const [warning, setWarning] = useState(false)
   const [editing, setEditing] = useState(false)
 
@@ -60,7 +59,7 @@ const AccountSetting = () => {
   });
 
   const [imageModal, setImageModal] = useState(false)
-  const [passwordModal, setPasswordModal] = useState(true)
+  const [passwordModal, setPasswordModal] = useState(false)
 
   const [dateModal,setDateModal] = useState(false)
   const updateDate = (date: Date) => {
@@ -334,7 +333,7 @@ const AccountSetting = () => {
                 </View>
               </View>
               <View className='mb-4 flex flex-row gap-2 items-center'>
-                <TouchableOpacity onPress={()=>setImageModal(!imageModal)} activeOpacity={0.7} className=' relative'>
+                <TouchableOpacity onPress={()=>{editing && setImageModal(!imageModal)}} activeOpacity={0.9} className=' relative'>
                   <View style={styles.imageContainer} className='border border-gray'>
                     <Image
                       style={styles.image}
@@ -343,9 +342,11 @@ const AccountSetting = () => {
                       transition={1000}
                     />
                   </View>
-                  <View className=' absolute top-1 right-1 bg-primary rounded-full p-1'>
-                    <PenIcon width={16} height={16} color={'white'}/>
-                  </View>
+                  {editing ? (
+                    <View className=' absolute top-1 right-1 bg-primary rounded-full p-1'>
+                      <PenIcon width={16} height={16} color={'white'}/>
+                    </View>
+                  ):(<></>)}
                 </TouchableOpacity>
                 <View className='grow'>
                   {editing ? (
@@ -382,16 +383,18 @@ const AccountSetting = () => {
                       </Text>
                     </View>
                   </View>
-                  <View className='w-full' style={{marginTop: 6}}>
-                    <TouchableOpacity onPress={()=>setPasswordModal(!passwordModal)} activeOpacity={0.4} className='w-full flex justify-center border border-gray focus:border-primary rounded-normal'>
-                      <Text
-                        className='flex-1 text-subText text-body font-noto text-center'
-                        style={{ width:"94%", textAlignVertical: "center", paddingHorizontal:10, paddingVertical:6, }}
-                      >
-                        change password
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
+                  {user?.providerData[0].providerId === 'password' &&
+                    <View className='w-full' style={{marginTop: 6}}>
+                      <TouchableOpacity onPress={()=>setPasswordModal(!passwordModal)} activeOpacity={0.4} className='w-full flex justify-center border border-gray focus:border-primary rounded-normal'>
+                        <Text
+                          className='flex-1 text-subText text-body font-noto text-center'
+                          style={{ width:"94%", textAlignVertical: "center", paddingHorizontal:10, paddingVertical:6, }}
+                        >
+                          change password
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  }
                 </View>
               </View>
               {/* personal data */}
