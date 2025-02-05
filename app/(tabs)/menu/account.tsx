@@ -211,7 +211,9 @@ const AccountSetting = () => {
 
     if (user.photoURL) {
       console.log('photoURL :',user.photoURL);
-      if (user.photoURL.includes("lh3.googleusercontent.com")) {
+      const url = new URL(user.photoURL);
+      const allowedHosts = ["lh3.googleusercontent.com"];
+      if (allowedHosts.includes(url.host)) {
         console.log('Photo from google No in firebase');
         uploadToFirebase()
 
