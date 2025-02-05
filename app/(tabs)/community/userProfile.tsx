@@ -3,11 +3,13 @@ import React, { useCallback, useState } from 'react'
 import BackButton from '../../../components/Back';
 import { useAuth } from '../../../context/authContext';
 import { Image } from 'expo-image';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { PenIcon } from '../../../constants/icon';
 import { FlashList } from '@shopify/flash-list';
 import HomeGoalCard from '../../../components/goal/homeGoalCard';
 import { homeGoalCardProp } from '../../../types/goal'
+import axios from 'axios';
+import { SERVER_URL } from '@env';
 
 
 
@@ -22,6 +24,33 @@ const UserProfile = () => {
   const [viewPost, setViewPost] = useState(true);
 
   const [goalList,setGoalList] = useState<homeGoalCardProp[]>([])
+  const [noGoal, setNoGoal] = useState(false)
+
+  const getAllGoal = async () => {
+    try {
+      const response = await axios.get(`${SERVER_URL}/goal/user/${user?._id}`);
+      const data = response.data // homeGoalCardProp[]
+
+      // console.log('getAllGoal response \n',response.data);
+
+      if (data.message === "No goal") {
+        setNoGoal(true)
+      } else {
+        setGoalList([
+          ...data.map((goal: any) => ({
+            goal_id:goal.goal_id,
+            goal_name:goal.goal_name,
+            total_task:goal.total_task,
+            complete_task:goal.complete_task,
+            end_date:goal.end_date,
+          })),
+        ])
+      }
+
+    } catch (error: any){
+      console.error(error)
+    }
+  }
   
   const completeGoal = goalList?[
     ...goalList
@@ -38,7 +67,7 @@ const UserProfile = () => {
   const inprogressGoal = goalList?[
     ...goalList
   // select only inprogress goal
-    .filter((goal) => goal.total_task !== goal.complete_task) 
+    .filter((goal) => goal.total_task !== goal.complete_task)
   // re-order from old to newest
     .sort((a, b) => {
       const dateA = new Date(a.end_date).setHours(0, 0, 0, 0);
@@ -49,11 +78,15 @@ const UserProfile = () => {
 
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000);
+    setRefreshing(true)
+    getAllGoal().finally(() => setRefreshing(false));
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      getAllGoal()
+    }, [])
+  );
 
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
@@ -79,7 +112,7 @@ const UserProfile = () => {
               <View className='grow'>
                 <Text className='text-heading2 font-notoMedium'>{user?.displayName}</Text>
                 <Text className='text-subText font-not pb-1'>{user?.email}</Text>
-                <Text className='text-subText font-noto pb-1'>333k post 3333 goal</Text>
+                <Text className='text-subText font-noto pb-1'>333k post {goalList.length} goal</Text>
                 <View>
                   <TouchableOpacity onPress={()=>{router.push(`/community/post/create`)}} className=' bg-primary flex-row gap-2 p-2 px-4 justify-center items-center rounded-full'>
                     <Text className='text-body text-white font-notoMedium'>Create post</Text>
@@ -100,11 +133,11 @@ const UserProfile = () => {
             <View style={{height:1, width:'100%'}} className=' bg-gray my-3'/>
 
             <View className='flex-row justify-start items-center gap-4'>
-              <TouchableOpacity onPress={()=>setViewPost(true)} className={`p-1 px-2 ${viewPost? 'bg-primary':'bg-transparent'} rounded-normal`}>
+              <TouchableOpacity onPress={()=>setViewPost(true)} className={`p-1 px-4 ${viewPost? 'bg-primary':'bg-transparent'} rounded-normal`}>
                 <Text className={`${viewPost? 'text-white':'text-subText'} text-heading2 font-notoMedium`}>post</Text>
               </TouchableOpacity>
               <View className='h-full w-[1px] bg-gray rounded-full'/>
-              <TouchableOpacity onPress={()=>setViewPost(false)} className={`p-1 px-2 ${!viewPost? 'bg-primary':'bg-transparent'} rounded-normal`}>
+              <TouchableOpacity onPress={()=>setViewPost(false)} className={`p-1 px-4 ${!viewPost? 'bg-primary':'bg-transparent'} rounded-normal`}>
                 <Text className={`${!viewPost? 'text-white':'text-subText'} text-heading2 font-notoMedium`}>goals</Text>
               </TouchableOpacity>
             </View>
@@ -116,11 +149,11 @@ const UserProfile = () => {
             ):(
               <View className='w-full justify-center items-center gap-2 mt-2 pb-16'>
                 <View className='flex-row items-center justify-center'>
-                  <Text className='text-heading text-yellow'>33</Text>
+                  <Text className='text-heading text-yellow'>{inprogressGoal.length}</Text>
                   <View style={{ transform: [{ translateY: 3 }]}}>
                     <Text className='text-body font-noto text-text pl-3'>In progress</Text>
                   </View>
-                  <Text className='text-heading text-green pl-4'>123</Text>
+                  <Text className='text-heading text-green pl-4'>{completeGoal.length}</Text>
                   <View style={{ transform: [{ translateY: 3 }]}}>
                     <Text className='text-body font-noto text-text pl-3'>Complete</Text>
                   </View>
