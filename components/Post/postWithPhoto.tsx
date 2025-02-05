@@ -77,7 +77,7 @@ const PostWithPhoto = () => {
         <TouchableOpacity activeOpacity={0.6}  className='overflow-hidden rounded-full border border-gray'>
           <Image
           style={styles.image}
-          source={('../../../assets/maleAvatar.png')}
+          source={require('../../assets/maleAvatar.png')}
           contentFit="cover"
           transition={1000}/>
         </TouchableOpacity>
@@ -95,55 +95,57 @@ const PostWithPhoto = () => {
 
     <View>
       
-      <FlatList data={Slides} 
-      renderItem={({item}) => 
-      <View style={{width:screenWidth*0.93, height:screenWidth*0.93, padding:2 }}>
-        <SlideItem item={item} />
-      </View>}
-      horizontal
-      pagingEnabled
-      snapToAlignment = "center"
-      showsHorizontalScrollIndicator={false}
+      <FlatList data={Slides}
+        renderItem={({item}) => 
+        <View style={{width:screenWidth*0.93, height:screenWidth*0.93, padding:3 }}>
+          <SlideItem item={item} />
+        </View>
+        }
+        horizontal
+        pagingEnabled
+        snapToAlignment = "center"
+        showsHorizontalScrollIndicator={false}
         onScroll={handleOnScroll}
         onViewableItemsChanged={handleOnViewableItemChanged}
         viewabilityConfig={viewabilityConfig}
-       />
-       <PageNum currentIndex={index} total={Slides.length}/>
-       <Paginaion data={Slides} scrollX={scrollX}/>
+      />
+      <PageNum currentIndex={index} total={Slides.length}/>
+      <Paginaion data={Slides} scrollX={scrollX}/>
     </View>
 
- 
-    <Text className='text-body font-noto'>
-      Lorem ipsum, dolor sit amet consectetur adipisicing elit. 
-      Error, numquam
+    <Text
+      style={{marginVertical:3}} className='text-body font-noto line-clamp-2'
+      numberOfLines={2}
+      ellipsizeMode="tail"
+    >
+      Lorem ipsum dolor sit amet consectetur adipisicing elit. Labore animi dolorum vel voluptatum amet quae assumenda sit quibusdam dignissimos, vero ut quisquam blanditiis repellendus placeat, deserunt in cupiditate esse voluptatem?
     </Text>
 
-
     <View className="mt-2 flex-row gap-2 items-center justify-between">
+      <View style={{gap:14}} className=" items-end flex-row bg-rose-200">
+        <TouchableOpacity className=" flex-row gap-1 items-center">
+          <LikeIcon width={26} height={26} color={'#CFCFCF'}/>
+          <Text className='text-body font-noto'>123k</Text>
+        </TouchableOpacity>
+        <TouchableOpacity className=" flex-row gap-1 items-center">
+          <CommentIcon width={26} height={26}color={'#CFCFCF'}/>
+          <Text className='text-body font-noto'>567k</Text>
+        </TouchableOpacity>
+      </View>
 
-        <View className=" items-end flex-row gap-2 items-center">
-          <TouchableOpacity className=" flex-row gap-1 items-center">
-            <LikeIcon width={26} height={26} color={'#CFCFCF'}/>
-            <Text className='text-detail font-noto'>123k</Text>
+      <View className=" flex-row gap-1">
+          <TouchableOpacity className="rounded-full bg-gray p-1 px-2">
+            <Text className="text-subText text-detail font-noto">exercise</Text>
           </TouchableOpacity>
-          <TouchableOpacity className=" flex-row gap-1 items-center">
-            <CommentIcon width={26} height={26}color={'#CFCFCF'}/>
-            <Text className='text-detail font-noto'>567k</Text>
+          <TouchableOpacity className="rounded-full bg-gray p-1 px-2">
+            <Text className="text-subText text-detail font-noto ">fitness</Text>
           </TouchableOpacity>
-        </View>
-
-        <View className=" flex-row gap-1">
-            <TouchableOpacity className="rounded-full bg-gray p-1 px-2">
-              <Text className="text-subText text-detail font-noto">exercise</Text>
-            </TouchableOpacity>
-            <TouchableOpacity className="rounded-full bg-gray p-1 px-2">
-              <Text className="text-subText text-detail font-noto ">fitness</Text>
-            </TouchableOpacity>
-            <TouchableOpacity className="rounded-full bg-gray p-1 px-2">
-              <Text className="text-subText text-detail font-noto">+2</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity className="rounded-full bg-gray p-1 px-2">
+            <Text className="text-subText text-detail font-noto">+2</Text>
+          </TouchableOpacity>
+      </View>
     </View>
+
   </View>
 
   

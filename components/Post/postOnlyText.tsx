@@ -25,7 +25,7 @@ const PostOnlyText = () => {
         <TouchableOpacity activeOpacity={0.6}  className='overflow-hidden rounded-full border border-gray'>
           <Image
           style={styles.image}
-          source={('../../../assets/maleAvatar.png')}
+          source={require('../../assets/maleAvatar.png')}
           contentFit="cover"
           transition={1000}/>
         </TouchableOpacity>
@@ -48,15 +48,14 @@ const PostOnlyText = () => {
 
 
     <View className="mt-2 flex-row gap-2 items-center justify-between">
-
-        <View className=" items-end flex-row gap-2 items-center">
+        <View style={{gap:14}} className=" items-end flex-row bg-rose-200">
           <TouchableOpacity className=" flex-row gap-1 items-center">
-            <LikeIcon width={26} height={26} color={'#CFCFCF'}/>
-            <Text className='text-detail font-noto'>123k</Text>
+            <LikeIcon width={25} height={25} color={'#CFCFCF'}/>
+            <Text className='text-body font-noto'>123k</Text>
           </TouchableOpacity>
           <TouchableOpacity className=" flex-row gap-1 items-center">
-            <CommentIcon width={26} height={26} color={'#CFCFCF'}/>
-            <Text className='text-detail font-noto'>567k</Text>
+            <CommentIcon width={25} height={25}color={'#CFCFCF'}/>
+            <Text className='text-body font-noto'>567k</Text>
           </TouchableOpacity>
         </View>
 
@@ -71,8 +70,8 @@ const PostOnlyText = () => {
               <Text className="text-subText text-detail font-noto">+2</Text>
             </TouchableOpacity>
           </View>
-
     </View>
+
   </View>
 
   

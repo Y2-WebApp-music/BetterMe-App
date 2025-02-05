@@ -33,12 +33,12 @@ export default pagination
 
 const styles = StyleSheet.create({
     container:{
-        bottom: 20,
+        bottom: 10,
         flexDirection: 'row',
         width:'100%',
         alignItems:'center',
         justifyContent:'center',
-        marginTop : 25
+        marginTop : 15
     },
     dot:{
         width :8,
