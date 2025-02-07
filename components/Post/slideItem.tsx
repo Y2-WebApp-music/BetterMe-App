@@ -2,17 +2,18 @@ import {Image, StyleSheet, View, Dimensions} from 'react-native';
 import React from 'react';
 
 type SlideItemProps = {
-    item: { img: any };
-  }
+    item: any
+}
 
 const SlideItem = ({item} : SlideItemProps) =>{
+    
     return (
-        <View style = {styles.container} >
-            <Image source={item.img}
-            resizeMode="cover"
-            style={styles.image}
-            />
-        </View>
+            <View style = {styles.container} >
+                <Image source={item}
+                resizeMode="cover"
+                style={styles.image}
+                />
+            </View>
     )
 }
 

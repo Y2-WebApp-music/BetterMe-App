@@ -9,6 +9,7 @@ import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-na
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import PostOnlyText from '../../../components/Post/postOnlyText';
 import PostWithPhoto from '../../../components/Post/postWithPhoto';
+import { postDummy } from '../../../types/community';
 
 
 const screenWidth = Dimensions.get('window').width;
@@ -182,17 +183,16 @@ const CommunityFeed = () => {
               <Text className='text-body text-white font-notoMedium'>Search in Community</Text>
             </TouchableOpacity> */}
 
-            <PostOnlyText/>
-            <PostWithPhoto/>
-
             {postList.length != 0 ? (
               <View className='w-full'>
                 <FlashList
-                  data={postList}
+                  data={postDummy}
                   renderItem={({ item }) => (
-                    <View className='mb-1 w-full bg-rose-100 justify-center items-center p-1 h-80'>
-                      <Text className='text-text font-notoMedium text-heading'> {item} </Text>
-                    </View>
+                    item.photo? (
+                      <PostWithPhoto _id={item._id} username={item.username} profile_img={item.profile_img} post_id={item.post_id} date={item.date} content={item.content} tag={item.tag} like={item.like} comment={item.comment} photo={item.photo} />
+                    ):(
+                      <PostOnlyText/>
+                    )
                   )
                   }
                   estimatedItemSize={200}

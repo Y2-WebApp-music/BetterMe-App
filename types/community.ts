@@ -3,7 +3,6 @@ import { Task } from "./goal"
 type CommunityUser = {
   _id:string,
   username:string,
-  date:string,
   profile_img:string,
   post:number,
   goal:number,
@@ -11,21 +10,25 @@ type CommunityUser = {
   following:string[],
   liked:string[]
 };
+
+type CommunityUserPost = {
+  _id:string,
+  username:string,
+  profile_img:string,
+};
 // post and goal is length
 // liked is list of liked post
 
-export type PostContent = CommunityUser & {
+export type PostContent = CommunityUserPost & {
   post_id:string
+  date:string,
   content:string,
   tag:number[],
   like:number,
   comment:number,
+  photo?:string[],
 };
 // like is length
-
-export type PostContentPhoto = PostContent & {
-  photo:string[],
-};
 
 export type Comment = CommunityUser & {
   content:string
@@ -94,3 +97,99 @@ export const TagCommunity = [
   { id: 49, text: 'protein shakes' },
   { id: 50, text: 'stress management' }
 ];
+
+export const postDummy:PostContent[] = [
+  {
+    _id:'string',
+    username:'Alex Kim',
+    date:'2025-02-04T05:54:45.558+00:00',
+    profile_img:'https://picsum.photos/270',
+    post_id:'wj54knwgeavi89q45ui3gv',
+    content:'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Voluptatem magni facere quasi at temporibus quibusdam provident neque blanditiis quas praesentium ad, veniam, molestias quo, non autem fugiat dolorem nihil error!',
+    tag:[1,4,5,7],
+    like:4123,
+    comment:1345,
+    photo:['https://picsum.photos/400','https://picsum.photos/410','https://picsum.photos/420','https://picsum.photos/430','https://picsum.photos/440','https://picsum.photos/450','https://picsum.photos/460','https://picsum.photos/470','https://picsum.photos/480','https://picsum.photos/490'],
+  },
+  // {
+  //   _id:'string',
+  //   username:'EchoEnigma',
+  //   date:'2025-02-04T05:54:45.558+00:00',
+  //   profile_img:'https://picsum.photos/240',
+  //   post_id:'wj54knwgeavi89q45ui3gv',
+  //   content:'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Voluptatem magni facere quasi at temporibus quibusdam provident neque blanditiis quas praesentium ad, veniam, molestias quo, non autem fugiat dolorem nihil error!',
+  //   tag:[11,14,15,17],
+  //   like:4123,
+  //   comment:1345,
+  // },
+  {
+    _id:'string',
+    username:'VenomVortex',
+    date:'2025-02-04T05:54:45.558+00:00',
+    profile_img:'https://picsum.photos/270',
+    post_id:'wj54knwgeavi89q45ui3gv',
+    content:'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Voluptatem magni facere quasi at temporibus quibusdam provident neque blanditiis quas praesentium ad, veniam, molestias quo, non autem fugiat dolorem nihil error!',
+    tag:[21,24,25,27],
+    like:4123,
+    comment:1345,
+    photo:['https://picsum.photos/400','https://picsum.photos/410','https://picsum.photos/420','https://picsum.photos/430','https://picsum.photos/440','https://picsum.photos/450','https://picsum.photos/460','https://picsum.photos/470','https://picsum.photos/480','https://picsum.photos/490','https://picsum.photos/500'],
+  },
+  // {
+  //   _id:'string',
+  //   username:'PhantomPhoenix',
+  //   date:'2025-02-04T05:54:45.558+00:00',
+  //   profile_img:'https://picsum.photos/220',
+  //   post_id:'wj54knwgeavi89q45ui3gv',
+  //   content:'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Voluptatem magni facere quasi at temporibus quibusdam provident neque blanditiis quas praesentium ad, veniam, molestias quo, non autem fugiat dolorem nihil error!',
+  //   tag:[12,18,25,26],
+  //   like:4123,
+  //   comment:1345,
+  // },
+  // {
+  //   _id:'string',
+  //   username:'MysticMaverick',
+  //   date:'2025-02-04T05:54:45.558+00:00',
+  //   profile_img:'https://picsum.photos/215',
+  //   post_id:'wj54knwgeavi89q45ui3gv',
+  //   content:'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Voluptatem magni facere quasi at temporibus quibusdam provident neque blanditiis quas praesentium ad, veniam, molestias quo, non autem fugiat dolorem nihil error!',
+  //   tag:[1,4,5,7],
+  //   like:4123,
+  //   comment:1345,
+  // },
+  {
+    _id:'string',
+    username:'CyberSamurai77',
+    date:'2025-02-04T05:54:45.558+00:00',
+    profile_img:'https://picsum.photos/270',
+    post_id:'wj54knwgeavi89q45ui3gv',
+    content:'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Voluptatem magni facere quasi at temporibus quibusdam provident neque blanditiis quas praesentium ad, veniam, molestias quo, non autem fugiat dolorem nihil error!',
+    tag:[16,24,35,42],
+    like:4123,
+    comment:1345,
+    photo:['https://picsum.photos/400','https://picsum.photos/410','https://picsum.photos/420','https://picsum.photos/430','https://picsum.photos/440','https://picsum.photos/450','https://picsum.photos/460','https://picsum.photos/470','https://picsum.photos/480','https://picsum.photos/490','https://picsum.photos/500'],
+  },
+  {
+    _id:'string',
+    username:'LunarLynx',
+    date:'2025-02-04T05:54:45.558+00:00',
+    profile_img:'https://picsum.photos/270',
+    post_id:'wj54knwgeavi89q45ui3gv',
+    content:'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Voluptatem magni facere quasi at temporibus quibusdam provident neque blanditiis quas praesentium ad, veniam, molestias quo, non autem fugiat dolorem nihil error!',
+    tag:[1,6,34,37],
+    like:4123,
+    comment:1345,
+    photo:['https://picsum.photos/400','https://picsum.photos/410','https://picsum.photos/420','https://picsum.photos/430','https://picsum.photos/440','https://picsum.photos/450','https://picsum.photos/460','https://picsum.photos/470','https://picsum.photos/480','https://picsum.photos/490','https://picsum.photos/500'],
+  },
+  {
+    _id:'string',
+    username:'NovaNomad',
+    date:'2025-02-04T05:54:45.558+00:00',
+    profile_img:'https://picsum.photos/270',
+    post_id:'wj54knwgeavi89q45ui3gv',
+    content:'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Voluptatem magni facere quasi at temporibus quibusdam provident neque blanditiis quas praesentium ad, veniam, molestias quo, non autem fugiat dolorem nihil error!',
+    tag:[1,4,5,7],
+    like:4123,
+    comment:1345,
+    photo:['https://picsum.photos/400','https://picsum.photos/410','https://picsum.photos/420','https://picsum.photos/430','https://picsum.photos/440','https://picsum.photos/450','https://picsum.photos/460','https://picsum.photos/470','https://picsum.photos/480','https://picsum.photos/490','https://picsum.photos/500'],
+  },
+]
