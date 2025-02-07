@@ -50,6 +50,19 @@ const FoodSummary = () => {
     );
   };
 
+  const fillWeekData = (data: weekMealSummary[], startDate: Date) => {
+    const weekData = Array.from({ length: 7 }, (_, index) => {
+      const currentDate = format(addDays(startDate, index), "yyyy-MM-dd");
+      return (
+        data.find((item) => item.date === currentDate) ?? {
+          total_calorie: 0,
+        }
+      );
+    });
+  
+    return setGraph(weekData.map((day) => day.total_calorie));
+  };
+
   const getWeeklyMeal = async () => {
     const formattedDate = format(currentSunday, 'yyyy-MM-dd');
     try {
@@ -69,7 +82,7 @@ const FoodSummary = () => {
 
       setData(data)
       setWeeklyTotal(getWeeklyTotal(data))
-      updateGraphData(data)
+      fillWeekData(data, currentSunday)
 
     } catch (error: any){
       console.error(error)

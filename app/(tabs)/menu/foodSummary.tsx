@@ -1,7 +1,7 @@
 import { View, Text, ScrollView, KeyboardAvoidingView, Platform, SafeAreaView, TouchableOpacity } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import BackButton from '../../../components/Back'
-import { router } from 'expo-router'
+import { router, useFocusEffect } from 'expo-router'
 import { AddIcon, BackwardIcon, FoodIcon, ForwardIcon, LeftArrowIcon, RightArrowIcon } from '../../../constants/icon'
 import WeekFoodChart from '../../../components/food/weekFoodChart'
 import MealCard from '../../../components/food/mealCard'
@@ -78,14 +78,24 @@ const FoodSummary = () => {
     );
   };
 
-  const updateGraphData = (weekData: weekMealSummary[]) => {
-    const calories = weekData.map(day => day.total_calorie || 0);
-    
-    while (calories.length < 7) {
-      calories.push(0);
-    }
+  const fillWeekData = (data: weekMealSummary[], startDate: Date) => {
+    const weekData = Array.from({ length: 7 }, (_, index) => {
+      const currentDate = format(addDays(startDate, index), "yyyy-MM-dd");
+      return (
+        data.find((item) => item.date === currentDate) ?? {
+          date: currentDate,
+          carbs: 0,
+          fat: 0,
+          protein: 0,
+          total_calorie: 0,
+          meal: [],
+        }
+      );
+    });
   
-    setGraph(calories);
+    setGraph(weekData.map((day) => day.total_calorie));
+  
+    return weekData;
   };
 
   const getWeeklyMeal = async () => {
@@ -94,30 +104,29 @@ const FoodSummary = () => {
       const response = await axios.get(`${SERVER_URL}/menu/meal/weekly/${formattedDate}`);
       const data = response.data
 
-      console.log('menu/meal/weekly \n',data);
       if (data.message === "No meals found") {
-        setData([]);
+        setData(fillWeekData([], currentSunday));
         setWeeklyTotal(getWeeklyTotal([]))
-        updateGraphData([])
         return (
           console.warn(' No meals found ')
         )
       }
 
-      setData(data)
+      setData(fillWeekData(data, currentSunday))
 
       setWeeklyTotal(getWeeklyTotal(data))
-      updateGraphData(data)
 
     } catch (error: any){
       console.error(error)
     }
   }
 
-  useEffect(()=>{
-    getSummaryMeal()
-    getWeeklyMeal()
-  },[currentSunday])
+  useFocusEffect(
+    useCallback(() => {
+      getSummaryMeal()
+      getWeeklyMeal()
+    }, [currentSunday])
+  );
 
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
