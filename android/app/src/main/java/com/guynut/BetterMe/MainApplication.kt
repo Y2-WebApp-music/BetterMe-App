@@ -1,4 +1,4 @@
-package com.guynut.BetterMe
+package com.guynut.betterme
 
 import android.app.Application
 import android.content.res.Configuration

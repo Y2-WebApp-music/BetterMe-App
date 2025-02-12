@@ -47,7 +47,7 @@ const PostOnlyText = () => {
     </Text>
 
 
-    <View className="mt-2 flex-row gap-2 items-center justify-between">
+    <View style={{paddingBottom:8}} className="mt-2 flex-row gap-2 items-center justify-between">
         <View style={{gap:14}} className=" items-end flex-row bg-rose-200">
           <TouchableOpacity className=" flex-row gap-1 items-center">
             <LikeIcon width={25} height={25} color={'#CFCFCF'}/>

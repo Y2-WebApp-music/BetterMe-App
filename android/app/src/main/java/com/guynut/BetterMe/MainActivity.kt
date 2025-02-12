@@ -1,4 +1,4 @@
-package com.guynut.BetterMe
+package com.guynut.betterme
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

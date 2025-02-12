@@ -8,6 +8,9 @@ import { useAuth } from '../../../../context/authContext';
 import { FlashList } from '@shopify/flash-list';
 import HomeGoalCard from '../../../../components/goal/homeGoalCard';
 import { homeGoalCardProp } from '../../../../types/goal'
+import PostWithPhoto from '../../../../components/Post/postWithPhoto';
+import PostOnlyText from '../../../../components/Post/postOnlyText';
+import { postDummy } from '../../../../types/community';
 
 
 const screenWidth = Dimensions.get('window').width;
@@ -15,6 +18,7 @@ const screenWidth = Dimensions.get('window').width;
 const Userprofile = () => {
 
   const { id } = useLocalSearchParams();
+  const [postList, setPostList] = useState<number[]>([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20])
 
   const { user } = useAuth();
 
@@ -66,15 +70,15 @@ const Userprofile = () => {
           </View>
         </View>
         <ScrollView
-          className='w-[92%] h-auto'
-          contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', marginTop:25}}
+          className='w-full h-auto'
+          contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', alignItems:'center', marginTop:25}}
           showsVerticalScrollIndicator={false}
           keyboardDismissMode='on-drag'
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
-          >
-            <View className='mb-4 flex flex-row-reverse gap-2 items-center'>
+        >
+            <View className='mb-4 w-[92%] flex flex-row-reverse gap-2 items-center'>
               <View className='grow'>
                 <Text className='text-heading2 font-notoMedium'>Guy Nut</Text>
                 <Text className='text-subText font-not pb-1'>maybe.gmail.com</Text>
@@ -97,7 +101,7 @@ const Userprofile = () => {
 
             <View style={{height:1, width:'100%'}} className=' bg-gray my-3'/>
 
-            <View className='flex-row justify-start items-center gap-4'>
+            <View className='flex-row w-[92%] justify-start items-center gap-4'>
               <TouchableOpacity onPress={()=>setViewPost(true)} className={`p-1 px-2 ${viewPost? 'bg-primary':'bg-transparent'} rounded-normal`}>
                 <Text className={`${viewPost? 'text-white':'text-subText'} text-heading2 font-notoMedium`}>post</Text>
               </TouchableOpacity>
@@ -110,9 +114,28 @@ const Userprofile = () => {
             <View style={{height:1, width:'100%'}} className=' bg-gray my-3'/>
 
             {viewPost? (
-              <View></View>
+              postList.length != 0 ? (
+                <View className='w-full'>
+                  <FlashList
+                    data={postDummy}
+                    renderItem={({ item }) => (
+                      item.photo? (
+                        <PostWithPhoto _id={item._id} username={item.username} profile_img={item.profile_img} post_id={item.post_id} date={item.date} content={item.content} tag={item.tag} like={item.like} comment={item.comment} photo={item.photo} />
+                      ):(
+                        <PostOnlyText/>
+                      )
+                    )
+                    }
+                    estimatedItemSize={200}
+                  />
+                </View>
+              ):(
+                <View>
+                  <Text>No post</Text>
+                </View>
+              )
             ):(
-              <View className='w-full justify-center items-center gap-2 mt-2 pb-16'>
+              <View className='w-[92%] justify-center items-center gap-2 mt-2 pb-16'>
                 <View className='flex-row items-center justify-center'>
                   <Text className='text-heading text-yellow'>33</Text>
                   <View style={{ transform: [{ translateY: 3 }]}}>

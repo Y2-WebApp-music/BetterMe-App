@@ -22,7 +22,7 @@
         "foregroundImage": "./assets/Logo_BetterMe.png",
         "backgroundColor": "#F3FEFF"
       },
-      "package": "com.guynut.BetterMe",
+      "package": "com.guynut.betterme",
       "permissions": ["INTERNET"]
     },
     "web": {

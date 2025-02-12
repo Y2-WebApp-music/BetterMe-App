@@ -82,9 +82,9 @@ const TakePicture = () => {
   };
 
   const handleAddFood = async () => {
-    setStep(1)
     setPhoto('')
     setDownloadURL('')
+    setStep(1)
   }
 
   const handleComplete = async () => {

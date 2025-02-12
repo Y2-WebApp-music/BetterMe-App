@@ -10,6 +10,9 @@ import HomeGoalCard from '../../../components/goal/homeGoalCard';
 import { homeGoalCardProp } from '../../../types/goal'
 import axios from 'axios';
 import { SERVER_URL } from '@env';
+import PostOnlyText from '../../../components/Post/postOnlyText';
+import PostWithPhoto from '../../../components/Post/postWithPhoto';
+import { postDummy } from '../../../types/community';
 
 
 
@@ -22,6 +25,7 @@ const UserProfile = () => {
   const { user } = useAuth();
 
   const [viewPost, setViewPost] = useState(true);
+  const [postList, setPostList] = useState<number[]>([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20])
 
   const [goalList,setGoalList] = useState<homeGoalCardProp[]>([])
   const [noGoal, setNoGoal] = useState(false)
@@ -68,6 +72,7 @@ const UserProfile = () => {
     ...goalList
   // select only inprogress goal
     .filter((goal) => goal.total_task !== goal.complete_task)
+    .filter((goal) => new Date(goal.end_date) > new Date())
   // re-order from old to newest
     .sort((a, b) => {
       const dateA = new Date(a.end_date).setHours(0, 0, 0, 0);
@@ -100,15 +105,15 @@ const UserProfile = () => {
           </View>
         </View>
         <ScrollView
-          className='w-[92%] h-auto'
-          contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', marginTop:25}}
+          className='w-full h-auto'
+          contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', alignItems:'center', marginTop:25}}
           showsVerticalScrollIndicator={false}
           keyboardDismissMode='on-drag'
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
-          >
-            <View className='mb-4 flex flex-row-reverse gap-2 items-center'>
+        >
+            <View className='mb-4 w-[92%] flex flex-row-reverse gap-2 items-center'>
               <View className='grow'>
                 <Text className='text-heading2 font-notoMedium'>{user?.displayName}</Text>
                 <Text className='text-subText font-not pb-1'>{user?.email}</Text>
@@ -132,7 +137,7 @@ const UserProfile = () => {
 
             <View style={{height:1, width:'100%'}} className=' bg-gray my-3'/>
 
-            <View className='flex-row justify-start items-center gap-4'>
+            <View className='flex-row w-[92%] justify-start items-center gap-4'>
               <TouchableOpacity onPress={()=>setViewPost(true)} className={`p-1 px-4 ${viewPost? 'bg-primary':'bg-transparent'} rounded-normal`}>
                 <Text className={`${viewPost? 'text-white':'text-subText'} text-heading2 font-notoMedium`}>post</Text>
               </TouchableOpacity>
@@ -145,9 +150,28 @@ const UserProfile = () => {
             <View style={{height:1, width:'100%'}} className=' bg-gray my-3'/>
 
             {viewPost? (
-              <View></View>
+              postList.length != 0 ? (
+                <View className='w-full'>
+                  <FlashList
+                    data={postDummy}
+                    renderItem={({ item }) => (
+                      item.photo? (
+                        <PostWithPhoto _id={item._id} username={item.username} profile_img={item.profile_img} post_id={item.post_id} date={item.date} content={item.content} tag={item.tag} like={item.like} comment={item.comment} photo={item.photo} />
+                      ):(
+                        <PostOnlyText/>
+                      )
+                    )
+                    }
+                    estimatedItemSize={200}
+                  />
+                </View>
+              ):(
+                <View>
+                  <Text>No post</Text>
+                </View>
+              )
             ):(
-              <View className='w-full justify-center items-center gap-2 mt-2 pb-16'>
+              <View className='w-[92%] justify-center items-center gap-2 mt-2 pb-16'>
                 <View className='flex-row items-center justify-center'>
                   <Text className='text-heading text-yellow'>{inprogressGoal.length}</Text>
                   <View style={{ transform: [{ translateY: 3 }]}}>

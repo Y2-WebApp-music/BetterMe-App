@@ -86,9 +86,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.guynut.BetterMe'
+    namespace 'com.guynut.betterme'
     defaultConfig {
-        applicationId 'com.guynut.BetterMe'
+        applicationId 'com.guynut.betterme'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

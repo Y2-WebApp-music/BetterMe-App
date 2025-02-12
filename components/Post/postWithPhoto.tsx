@@ -1,13 +1,14 @@
 import {Animated as ReactAnimated, FlatList, View, Text,TouchableOpacity, StyleSheet, Dimensions, NativeScrollEvent, NativeSyntheticEvent, ViewToken} from 'react-native'
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import { Image } from 'expo-image';
-import { LikeIcon,CommentIcon } from '../../constants/icon'
+import { LikeIcon,CommentIcon, OptionIcon } from '../../constants/icon'
 import SlideItem from './slideItem'
 import Paginaion from './pagination'
 import PageNum from './pageNum';
 import { Gesture, GestureDetector, GestureHandlerRootView, } from 'react-native-gesture-handler';
 import Animated, { useAnimatedStyle, useSharedValue, withDelay, withSpring } from 'react-native-reanimated';
 import { PostContent } from '../../types/community';
+import { useAuth } from '../../context/authContext';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -16,6 +17,8 @@ const PostWithPhoto = (props:PostContent) => {
   useEffect(()=>{
     console.log(props);
   },[props])
+
+  const {user} = useAuth()
   
 
   const [index, setIndex] = useState(0);
@@ -49,28 +52,7 @@ const PostWithPhoto = (props:PostContent) => {
   }).current;
 
 
-  const Slides = [
-    {
-      id: 1,
-      img: require('../../assets/dummyPhoto/BigMeal.jpg')
-  },
-  {
-      id: 2,
-      img: require('../../assets/dummyPhoto/Breakfast.jpg')
-  },
-  {
-      id: 3,
-      img: require('../../assets/dummyPhoto/Salmon.jpg')
-  },
-  {
-      id: 4,
-      img: require('../../assets/dummyPhoto/ShrimpBroc.jpg')
-  },
-  {
-      id: 5,
-      img: require('../../assets/dummyPhoto/ShrimpBroc.jpg')
-  }
-  ]
+  const Slides = [ require('../../assets/dummyPhoto/BigMeal.jpg'), require('../../assets/dummyPhoto/Breakfast.jpg'), require('../../assets/dummyPhoto/Salmon.jpg'), require('../../assets/dummyPhoto/ShrimpBroc.jpg'),require('../../assets/dummyPhoto/ShrimpBroc.jpg')]
   
 
   const scale = useSharedValue(0);
@@ -98,23 +80,29 @@ const PostWithPhoto = (props:PostContent) => {
       
     <View className=' flex-row gap-2 items-center justify-between bg-Background '>
 
-    <View className='my-2 items-center flex-row gap-2'>
-        <TouchableOpacity activeOpacity={0.6}  className='overflow-hidden rounded-full border border-gray'>
-          <Image
-          style={styles.image}
-          source={props.profile_img}
-          contentFit="cover"
-          transition={1000}/>
-        </TouchableOpacity>
-        <View>
-        <Text className='text-heading3 font-noto'>{props.username}</Text>
-        <Text className='text-detail font-notoLight'>11 may 2024</Text>
-        </View>
+      <View className='my-2 items-center flex-row gap-2'>
+          <TouchableOpacity activeOpacity={0.6}  className='overflow-hidden rounded-full border border-gray'>
+            <Image
+            style={styles.image}
+            source={props.profile_img}
+            contentFit="cover"
+            transition={1000}/>
+          </TouchableOpacity>
+          <View>
+          <Text className='text-heading3 font-noto'>{props.username}</Text>
+          <Text className='text-detail font-notoLight'>11 may 2024</Text>
+          </View>
 
-    </View>
-      <TouchableOpacity className="flex-row rounded-full bg-gray p-1 px-2">
-        <Text className="text-subText font-noto px-4 ">following</Text>
-      </TouchableOpacity>
+      </View>
+      {props._id !== user?._id ? (
+        <TouchableOpacity className="flex-row rounded-full p-1 px-2">
+          <OptionIcon width={24} height={24} color={'#CFCFCF'}/>
+        </TouchableOpacity>
+      ):(
+        <TouchableOpacity className="flex-row rounded-full bg-gray p-1 px-2">
+          <Text className="text-subText font-noto px-4 ">following</Text>
+        </TouchableOpacity>
+      )}
     </View>
 
     {props.photo &&
@@ -122,7 +110,7 @@ const PostWithPhoto = (props:PostContent) => {
       <View>
       
         <Animated.View >
-          <FlatList data={props.photo}
+          <FlatList data={Slides}
             renderItem={({item}) =>
               <View style={{width:screenWidth*0.93, height:screenWidth*0.93, padding:3, position:'relative' }}>
                 <SlideItem item={item} />
@@ -136,8 +124,8 @@ const PostWithPhoto = (props:PostContent) => {
             onViewableItemsChanged={handleOnViewableItemChanged}
             viewabilityConfig={viewabilityConfig}
             />
-          <PageNum currentIndex={index} total={props.photo.length}/>
-          <Paginaion data={props.photo} scrollX={scrollX}/>
+          <PageNum currentIndex={index} total={Slides.length}/>
+          <Paginaion data={Slides} scrollX={scrollX}/>
           <View style={{position:'absolute', width:'100%', height:'100%', alignItems:'center',justifyContent:'center'}}>
             <Animated.Image
               style={[styles.like, likeAnimated]}
@@ -157,7 +145,7 @@ const PostWithPhoto = (props:PostContent) => {
       {props.content}
     </Text>
 
-    <View className="mt-2 flex-row gap-2 items-center justify-between">
+    <View style={{paddingBottom:8}} className="mt-2 flex-row gap-2 items-center justify-between">
       <View style={{gap:14}} className=" items-end flex-row bg-rose-200">
         <TouchableOpacity className=" flex-row gap-1 items-center">
           <LikeIcon width={26} height={26} color={'#CFCFCF'}/>

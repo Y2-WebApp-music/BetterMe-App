@@ -27,7 +27,7 @@
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="BetterMe"/>
-        <data android:scheme="com.guynut.BetterMe"/>
+        <data android:scheme="com.guynut.betterme"/>
         <data android:scheme="exp+betterme"/>
       </intent-filter>
     </activity>
