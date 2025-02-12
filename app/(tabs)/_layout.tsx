@@ -1,7 +1,7 @@
 import { Tabs } from "expo-router";
 import React from "react";
 import Svg, { SvgProps } from 'react-native-svg';
-import { Text, View } from "react-native";
+import { Platform, Text, View } from "react-native";
 import { CalendarIcon, CaptureIcon, CommunityIcon, HomeIcon, MenuIcon } from "../../constants/icon";
 import Calendar from "./calendar/_layout";
 
@@ -30,6 +30,8 @@ const CameraIcon: React.FC<TabIconProps> = ({ icon: Icon, color, focused }) => {
   );
 };
 
+const NavHeight = Platform.OS === 'ios' ? 87 : 70
+
 const TabsLayout = () => {
   return (
       <Tabs
@@ -38,7 +40,7 @@ const TabsLayout = () => {
           tabBarActiveTintColor: '#1C60DE',
           tabBarInactiveTintColor: '#B8D0D2',
           tabBarStyle:{
-            height:87,
+            height:NavHeight,
             display:"flex",
             justifyContent:"center",
             alignItems:"center",
@@ -50,6 +52,7 @@ const TabsLayout = () => {
             elevation: 5,
           },
           animation:'shift',
+          tabBarHideOnKeyboard:true
         }}
       >
         <Tabs.Screen
