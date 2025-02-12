@@ -232,8 +232,8 @@ const Register = () => {
           activity,
           calorie_need,
         };
-        setUser(extendedUser)
         await AsyncStorage.setItem('@user', JSON.stringify(extendedUser));
+        setUser(extendedUser)
       } catch (error: any) {
         const errorMessage = error.message.replace('Firebase: ', '')
         setErr(errorMessage)

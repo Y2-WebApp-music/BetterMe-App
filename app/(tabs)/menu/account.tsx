@@ -61,6 +61,9 @@ const AccountSetting = () => {
   const [imageModal, setImageModal] = useState(false)
   const [passwordModal, setPasswordModal] = useState(false)
 
+  // console.log('user?.providerData[0].providerId ',user?.providerData[0].providerId);
+  
+
   const [dateModal,setDateModal] = useState(false)
   const updateDate = (date: Date) => {
     setForm((prevForm) => ({

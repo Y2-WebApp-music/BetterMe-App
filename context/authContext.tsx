@@ -6,6 +6,7 @@ import { GoogleAuthProvider, IdTokenResult, onAuthStateChanged, signInWithCreden
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { auth } from '../components/auth/firebaseConfig';
 import { UserData } from '../types/user';
+import LoadingBubble from '../components/auth/Loading';
 
 type AuthContextType = {
   user: UserData | null;
@@ -51,9 +52,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         });
         const userData = response.data;
 
-        if (userData.message === "User not found"){
-          user?.providerData[0].providerId !== 'password' && router.replace('/(auth)/googleRegis');
-        } else {
+        if (userData.message === "User not found" && user?.providerData[0].providerId === 'google.com'){
+          router.replace('/(auth)/googleRegis');
+        }
+        if (userData.message === "User not found") {
+          return <LoadingBubble />;
+        }
+        
+        else {
           const { _id, birth_date, gender, weight, height, activity, calorie_need } = response.data.user;
           const serverToken = response.data.token;
           const extendedUser: UserData = {
@@ -73,7 +79,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           await AsyncStorage.setItem('@user', JSON.stringify(extendedUser));
         }
       } catch (error) {
-        console.error('Can not get user data:', error);
+        console.warn('Can not get user data:', error);
       }
     };
 
