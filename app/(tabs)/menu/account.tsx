@@ -379,9 +379,9 @@ const AccountSetting = () => {
                     {/* <View style={{marginBottom: 4}}>
                       <Text className='text-subText text-detail'>email</Text>
                     </View> */}
-                    <View className='w-full flex justify-center border border-gray focus:border-primary rounded-normal'>
+                    <View className='w-full flex justify-center border border-gray rounded-normal'>
                       <Text
-                        className='flex-1 text-subText text-body font-noto'
+                        className='flex-1 text-subText text-detail font-noto'
                         style={{ width:"94%", textAlignVertical: "center", paddingHorizontal:10, paddingVertical:6, }}
                       >
                         {form.email}

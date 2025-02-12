@@ -27,6 +27,8 @@ export default function Welcome() {
     if (response?.type === 'success') {
       const { id_token } = response.params;
 
+      console.log('loginWithGoogle press');
+
       loginWithGoogle(id_token)
     }
   }, [response]);

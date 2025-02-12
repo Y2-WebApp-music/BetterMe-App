@@ -51,15 +51,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           firebase_uid:firebaseUser.uid
         });
         const userData = response.data;
+        console.log('user?.providerData[0].providerId ',firebaseUser?.providerData[0].providerId);
 
-        if (userData.message === "User not found" && user?.providerData[0].providerId === 'google.com'){
+        if (userData.message === "User not found" && firebaseUser?.providerData[0].providerId === 'google.com'){
+          console.warn('User not found and goto /(auth)/googleRegis');
           router.replace('/(auth)/googleRegis');
         }
         if (userData.message === "User not found") {
+          console.warn('User not found Loading.....');
           return <LoadingBubble />;
         }
         
         else {
+          console.warn('.....Have User in Data base.....');
           const { _id, birth_date, gender, weight, height, activity, calorie_need } = response.data.user;
           const serverToken = response.data.token;
           const extendedUser: UserData = {
