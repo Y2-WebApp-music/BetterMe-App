@@ -52,7 +52,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const userData = response.data;
 
         if (userData.message === "User not found"){
-          router.replace('/(auth)/googleRegis');
+          user?.providerData[0].providerId !== 'password' && router.replace('/(auth)/googleRegis');
         } else {
           const { _id, birth_date, gender, weight, height, activity, calorie_need } = response.data.user;
           const serverToken = response.data.token;

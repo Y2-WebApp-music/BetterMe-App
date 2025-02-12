@@ -52,6 +52,7 @@ const Register = () => {
     height: 0,
     activity: 0,
   });
+  const [creating, setCreating] = useState(false)
 
   // useEffect(() =>{
   //   console.log('form =>',form);
@@ -164,6 +165,7 @@ const Register = () => {
       const metadata = {
         contentType: 'image/jpeg',
       }
+      setCreating(true)
       try {
         const userCredential = await createUserWithEmailAndPassword(
           auth,
@@ -199,8 +201,6 @@ const Register = () => {
         })
         console.log('updateProfile Complete');
 
-        await AsyncStorage.setItem('@user', JSON.stringify(userCredential.user));
-
         const response = await axios.post(`${SERVER_URL}/user/register`, {
           firebase_uid: user.uid,
           email: form.email,
@@ -215,9 +215,11 @@ const Register = () => {
 
         // const res = response.data;
         // const extendedUser: UserData = { ...user, ...res };
+        console.log('Create User \n',response.data.user);
+        console.log('User token \n',response.data.token);
+        
         const { _id, birth_date, gender, weight, height, activity, calorie_need } = response.data.user;
         const serverToken = response.data.token;
-        // const { birth_date, gender, weight, height, activity, calorie_need } = response.data.user;
 
         const extendedUser: UserData = {
           ...user,
@@ -232,10 +234,12 @@ const Register = () => {
         };
         setUser(extendedUser)
         await AsyncStorage.setItem('@user', JSON.stringify(extendedUser));
-        router.replace('/(tabs)/home');
       } catch (error: any) {
         const errorMessage = error.message.replace('Firebase: ', '')
         setErr(errorMessage)
+      } finally {
+        setCreating(false)
+        router.replace('/(tabs)/home');
       }
     } else {
       setErr('please complete form')
@@ -255,7 +259,8 @@ const Register = () => {
           className='w-[92%] h-full'
           contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', }}
           showsVerticalScrollIndicator={false}
-        >
+          >
+          {!creating? (
           <View className='min-h-[70vh] w-full flex justify-start items-center'>
 
             <View className='w-full'>
@@ -466,6 +471,11 @@ const Register = () => {
             </View>
 
           </View>
+          ):(
+            <View className='min-h-[10vh] w-full flex justify-start items-center'>
+              <Text className='font-notoMedium text-subTitle animate-pulse text-primary'>Creating your account</Text>
+            </View>
+          )}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
