@@ -158,53 +158,82 @@ const TakePicture = () => {
   const getMealByAI = async () => {
     setStep(3);
     setWaiting(true);
+    
     try {
       if (!photo) return;
   
       const url = await handleImageUpload();
   
       // Compress and convert to blob (force it as JPEG)
-      const compressedImage = await ImageManipulator.manipulateAsync(photo, [], { compress: 0.5, format: ImageManipulator.SaveFormat.JPEG });
+      const compressedImage = await ImageManipulator.manipulateAsync(
+        photo,
+        [],
+        { compress: 0.5, format: ImageManipulator.SaveFormat.JPEG }
+      );
       const response = await fetch(compressedImage.uri);
       const blob = await response.blob();
   
-      console.log('type ', blob.type);
-      console.log('size ', blob.size);
+      console.log("Blob Type:", blob.type);
+      console.log("Blob Size:", blob.size);
   
       // Convert blob to base64 with image/jpeg type
       const reader = new FileReader();
       reader.onloadend = async () => {
-        if (reader.result && typeof reader.result === 'string') {
-          const base64Image = reader.result;
+        if (reader.result && typeof reader.result === "string") {
+          let base64Image = reader.result;
+          // Replace MIME type to ensure proper format
+          base64Image = base64Image.replace(/^data:image\/[^;]+/, "data:image/jpeg");
   
-          // Log the base64 string
-          console.log('Base64 Image String:', base64Image);
+          // Log Base64 image string
+          console.log("Base64 Image String:", base64Image.substring(0, 100) + "...");
   
-          const res = await axios.post(`${SERVER_URL}/meal/by-ai`, {
-            image: base64Image,
-            portion: detail,
-          });
+          try {
+            const res = await axios.post(`${SERVER_URL}/meal/by-ai`, {
+              image: base64Image,
+              portion: detail,
+            });
   
-          console.log('Imageurl ', url);
+            console.log("API Response:", res.data);
   
-          let mealData: MealAi | null = res.data;
-          mealData && setData((prev) => ({
-            ...prev,
-            food_name: mealData.food_name,
-            calorie: mealData.calorie,
-            protein: mealData.protein,
-            carbs: mealData.carbs,
-            fat: mealData.fat,
-          }));
-          console.log('data:', mealData);
-          mealData && mealData.food_name !== "นี่ไม่ใช่อาหาร" && url && postToDB(url, mealData.food_name, mealData.calorie, mealData.protein, mealData.carbs, mealData.fat);
+            let mealData: MealAi | null = res.data.data ?? res.data;
+            
+            if (mealData) {
+              console.log("Updating State with:", mealData);
+              setData((prev) => ({
+                ...prev,
+                food_name: mealData.food_name,
+                calorie: mealData.calorie || 0,
+                protein: mealData.protein || 0,
+                carbs: mealData.carbs || 0,
+                fat: mealData.fat || 0,
+              }));
+  
+              console.log("State Updated:", mealData);
+  
+              // Post data to DB if image URL is available
+              if (url) {
+                postToDB(url, mealData.food_name, mealData.calorie, mealData.protein, mealData.carbs, mealData.fat);
+              }
+            } else {
+              console.warn("Meal data is null or undefined!");
+            }
+          } catch (apiError) {
+            console.error("Error in API request:", apiError);
+          }
         }
       };
       reader.readAsDataURL(blob);
     } catch (err) {
-      console.error('Get Ai Fail:', err);
+      console.error("Get AI Fail:", err);
     }
   };
+  
+  // Debug state updates
+  useEffect(() => {
+    console.log("State Updated:", data);
+  }, [data]);
+  
+  
   
   
 

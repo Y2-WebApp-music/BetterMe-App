@@ -257,10 +257,10 @@ const AddMeal = () => {
             mealData && setForm({
               ...form,
               food_name: mealData.food_name,
-              calorie : mealData.calorie,
-              protein: mealData.protein,
-              carbs: mealData.carbs,
-              fat: mealData.fat,
+              calorie : mealData.calorie || 0,
+              protein: mealData.protein || 0,
+              carbs: mealData.carbs || 0,
+              fat: mealData.fat || 0,
               createByAI:true,
             })
 
@@ -273,6 +273,7 @@ const AddMeal = () => {
         console.error('Get Ai Fail:', err);
       }
   }
+  
 
   const [modalStep, setModalStep] = useState<"date" | "time">("date");
 
