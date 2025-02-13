@@ -174,11 +174,11 @@ const FoodSummary = () => {
             {mealSummary &&
               <FoodToday total_calorie={mealSummary?.total_calorie} total_protein={mealSummary?.total_protein} total_carbs={mealSummary?.total_carbs} total_fat={mealSummary?.total_fat}/>
             }
-            <MealCard meal_id={''} meal_date={new Date().toDateString()} food_name={'TestMeal'} calorie={435} createByAI={true}/>
+            {/* <MealCard meal_id={''} meal_date={new Date().toDateString()} food_name={'TestMeal'} calorie={435} createByAI={true}/> */}
           </View>
 
 
-          <View style={{height:1, width:'100%'}} className=' bg-gray mb-2'/>
+          <View style={{height:1, width:'100%',marginVertical:10}} className=' bg-gray mb-2'/>
 
           <SummaryHeader weeklyTotal={weeklyTotal} currentSunday={currentSunday} setCurrentSunday={setCurrentSunday}/>
 
