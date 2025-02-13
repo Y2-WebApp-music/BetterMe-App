@@ -197,7 +197,7 @@ const TakePicture = () => {
             fat: mealData.fat,
           }));
           console.log('data:', mealData);
-          url && mealData && postToDB(url, mealData.food_name, mealData.calorie, mealData.protein, mealData.carbs, mealData.fat);
+          mealData && mealData.food_name !== "นี่ไม่ใช่อาหาร" && url && postToDB(url, mealData.food_name, mealData.calorie, mealData.protein, mealData.carbs, mealData.fat);
         }
       };
       reader.readAsDataURL(blob);
