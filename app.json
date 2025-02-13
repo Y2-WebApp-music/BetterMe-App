@@ -23,7 +23,8 @@
         "backgroundColor": "#F3FEFF"
       },
       "package": "com.guynut.betterme",
-      "permissions": ["INTERNET"]
+      "permissions": ["INTERNET"],
+      "usesCleartextTraffic": true
     },
     "web": {
       "favicon": "./assets/Logo_BetterMe.png"

@@ -47,11 +47,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const fetchUserDetails = async (firebaseUser: User) => {
       try {
+        console.log('Try Login...');
         const response = await axios.post(`${SERVER_URL}/user/login`,{
           firebase_uid:firebaseUser.uid
         });
         const userData = response.data;
-        console.log('user?.providerData[0].providerId ',firebaseUser?.providerData[0].providerId);
 
         if (userData.message === "User not found" && firebaseUser?.providerData[0].providerId === 'google.com'){
           console.warn('User not found and goto /(auth)/googleRegis');

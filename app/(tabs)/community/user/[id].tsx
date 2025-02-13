@@ -11,6 +11,7 @@ import { homeGoalCardProp } from '../../../../types/goal'
 import PostWithPhoto from '../../../../components/Post/postWithPhoto';
 import PostOnlyText from '../../../../components/Post/postOnlyText';
 import { postDummy } from '../../../../types/community';
+import CommunityGoalCard from '../../../../components/goal/communityGoalCard';
 
 
 const screenWidth = Dimensions.get('window').width;
@@ -80,7 +81,7 @@ const Userprofile = () => {
         >
             <View className='mb-4 w-[92%] flex flex-row-reverse gap-2 items-center'>
               <View className='grow'>
-                <Text className='text-heading2 font-notoMedium'>Guy Nut</Text>
+                <Text className='text-heading2 font-notoMedium'>Someone</Text>
                 <Text className='text-subText font-not pb-1'>maybe.gmail.com</Text>
                 <Text className='text-subText font-noto pb-1'>333k post 3333 goal</Text>
                 <View>
@@ -92,7 +93,7 @@ const Userprofile = () => {
               <View style={styles.imageContainer}>
                 <Image
                   style={styles.image}
-                  source={user?.photoURL ? user?.photoURL : user?.gender === 1 ? require('../../../../assets/maleAvatar.png') : require('../../../../assets/femaleAvatar.png')}
+                  source={require('../../../../assets/maleAvatar.png')}
                   contentFit="cover"
                   transition={1000}
                 />
@@ -153,10 +154,9 @@ const Userprofile = () => {
                       <FlashList
                         data={inprogressGoal}
                         renderItem={({ item }) =>
-                          <HomeGoalCard
+                          <CommunityGoalCard
                             goal_id={item.goal_id} 
                             goal_name={item.goal_name} 
-                            end_date={item.end_date}
                             total_task={item.total_task} 
                             complete_task={item.complete_task}
                           />
@@ -175,10 +175,9 @@ const Userprofile = () => {
                       <FlashList
                         data={completeGoal}
                         renderItem={({ item }) =>
-                          <HomeGoalCard 
+                          <CommunityGoalCard 
                             goal_id={item.goal_id} 
                             goal_name={item.goal_name}
-                            end_date={item.end_date} 
                             total_task={item.total_task} 
                             complete_task={item.complete_task}
                           />

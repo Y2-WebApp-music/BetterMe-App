@@ -9,6 +9,7 @@ import { Gesture, GestureDetector, GestureHandlerRootView, } from 'react-native-
 import Animated, { useAnimatedStyle, useSharedValue, withDelay, withSpring } from 'react-native-reanimated';
 import { PostContent } from '../../types/community';
 import { useAuth } from '../../context/authContext';
+import { router } from 'expo-router';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -81,7 +82,7 @@ const PostWithPhoto = (props:PostContent) => {
     <View className=' flex-row gap-2 items-center justify-between bg-Background '>
 
       <View className='my-2 items-center flex-row gap-2'>
-          <TouchableOpacity activeOpacity={0.6}  className='overflow-hidden rounded-full border border-gray'>
+          <TouchableOpacity onPress={()=>{router.push(`/community/user/${props._id}`)}} activeOpacity={0.6}  className='overflow-hidden rounded-full border border-gray'>
             <Image
             style={styles.image}
             source={props.profile_img}
