@@ -104,6 +104,7 @@ const CommunityFeed = () => {
           <View className='flex grow'>
             <Text className='text-primary font-notoSemiBold text-subTitle'>Better Me</Text>
           </View>
+          
           <View className=' relative'>
             <TouchableOpacity activeOpacity={0.6} onPress={()=>{router.push('/community/search')}} className='p-[6px] rounded-full bg-primary'>
               <BellIcon width={24} height={24} color={'white'}/>

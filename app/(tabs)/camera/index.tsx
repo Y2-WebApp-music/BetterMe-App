@@ -156,52 +156,57 @@ const TakePicture = () => {
   };
 
   const getMealByAI = async () => {
-    setStep(3)
-    setWaiting(true)
-      try {
-        if (!photo) return;
-
-        const url = await handleImageUpload();
-    
-        // Compress and convert to blob
-        const compressedImage = await ImageManipulator.manipulateAsync(photo, [], { compress: 0.5 });
-        const response = await fetch(compressedImage.uri);
-        const blob = await response.blob();
-    
-        console.log('type ', blob.type);
-        console.log('size ', blob.size);
-    
-        // blob to base64
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-          if (reader.result && typeof reader.result === 'string') {
-            const base64Image = reader.result
-            
-    
-            const res = await axios.post(`${SERVER_URL}/meal/by-ai`, {
-              image: base64Image,
-              portion: detail,
-            });
-    
-            console.log('Imageurl ',url);
-            
-            let mealData:MealAi | null = res.data
-            mealData && setData((prev)=>({...prev,
-              food_name: mealData.food_name,
-              calorie : mealData.calorie,
-              protein: mealData.protein,
-              carbs: mealData.carbs,
-              fat: mealData.fat,
-            }))
-            console.log('data:', mealData);
-            url && mealData && postToDB(url, mealData.food_name, mealData.calorie, mealData.protein, mealData.carbs, mealData.fat)
-          }
-        };
-        reader.readAsDataURL(blob);
-      } catch (err) {
-        console.error('Get Ai Fail:', err);
-      }
-  }
+    setStep(3);
+    setWaiting(true);
+    try {
+      if (!photo) return;
+  
+      const url = await handleImageUpload();
+  
+      // Compress and convert to blob (force it as JPEG)
+      const compressedImage = await ImageManipulator.manipulateAsync(photo, [], { compress: 0.5, format: ImageManipulator.SaveFormat.JPEG });
+      const response = await fetch(compressedImage.uri);
+      const blob = await response.blob();
+  
+      console.log('type ', blob.type);
+      console.log('size ', blob.size);
+  
+      // Convert blob to base64 with image/jpeg type
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        if (reader.result && typeof reader.result === 'string') {
+          const base64Image = reader.result;
+  
+          // Log the base64 string
+          console.log('Base64 Image String:', base64Image);
+  
+          const res = await axios.post(`${SERVER_URL}/meal/by-ai`, {
+            image: base64Image,
+            portion: detail,
+          });
+  
+          console.log('Imageurl ', url);
+  
+          let mealData: MealAi | null = res.data;
+          mealData && setData((prev) => ({
+            ...prev,
+            food_name: mealData.food_name,
+            calorie: mealData.calorie,
+            protein: mealData.protein,
+            carbs: mealData.carbs,
+            fat: mealData.fat,
+          }));
+          console.log('data:', mealData);
+          url && mealData && postToDB(url, mealData.food_name, mealData.calorie, mealData.protein, mealData.carbs, mealData.fat);
+        }
+      };
+      reader.readAsDataURL(blob);
+    } catch (err) {
+      console.error('Get Ai Fail:', err);
+    }
+  };
+  
+  
 
   const postToDB = async (image_url:string ,Menu:string, Calorie: number, Protein: number, Carbs: number, Fat: number): Promise<void> => {
 
