@@ -12,12 +12,12 @@ export type Meal = {
   total_fat:number
 }
 
-const FoodToday = ({total_calorie, total_protein, total_carbs, total_fat}:MealSummaryCard) => {
+const CalendarFoodToday = ({total_calorie, total_protein, total_carbs, total_fat}:MealSummaryCard) => {
 
   const { user } = useAuth()
 
   return (
-    <TouchableOpacity onPress={()=>{router.push(`/calendar/weekCalendar`)}} activeOpacity={0.7} style={{paddingHorizontal:14, backgroundColor:'white' }} className='h-28 w-full rounded-normal border border-gray p-2 justify-center items-center flex-row gap-2'>
+    <View style={{paddingHorizontal:14, backgroundColor:'white' }} className='h-28 w-full rounded-normal border border-gray p-2 justify-center items-center flex-row gap-2'>
 
       <View style={{paddingLeft:6}} className='grow'>
         <View style={{ transform: [{ translateY: 8 }] }}>
@@ -40,15 +40,9 @@ const FoodToday = ({total_calorie, total_protein, total_carbs, total_fat}:MealSu
         </View>
       </View>
 
-      <View style={{paddingRight:0}} className='flex flex-row gap-1 items-center'>
-        {/* <PenIcon width={20} height={20} color={'#626262'}/> */}
-        <Text style={{color:'#CFCFCF'}} className='text-body font-noto text-DarkGray'>See more</Text>
-        <RightArrowIcon width={20} height={20} color={'#CFCFCF'}/>
-      </View>
-
-    </TouchableOpacity>
+    </View>
   )
 }
 
 
-export default FoodToday
+export default CalendarFoodToday
