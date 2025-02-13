@@ -13,6 +13,7 @@ import { SERVER_URL } from '@env';
 import PostOnlyText from '../../../components/Post/postOnlyText';
 import PostWithPhoto from '../../../components/Post/postWithPhoto';
 import { postDummy } from '../../../types/community';
+import CommunityGoalCard from '../../../components/goal/communityGoalCard';
 
 
 
@@ -189,10 +190,9 @@ const UserProfile = () => {
                       <FlashList
                         data={inprogressGoal}
                         renderItem={({ item }) =>
-                          <HomeGoalCard
+                          <CommunityGoalCard
                             goal_id={item.goal_id} 
                             goal_name={item.goal_name} 
-                            end_date={item.end_date}
                             total_task={item.total_task} 
                             complete_task={item.complete_task}
                           />
@@ -211,10 +211,9 @@ const UserProfile = () => {
                       <FlashList
                         data={completeGoal}
                         renderItem={({ item }) =>
-                          <HomeGoalCard 
+                          <CommunityGoalCard 
                             goal_id={item.goal_id} 
                             goal_name={item.goal_name}
-                            end_date={item.end_date} 
                             total_task={item.total_task} 
                             complete_task={item.complete_task}
                           />

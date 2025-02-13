@@ -160,6 +160,8 @@ const Register = () => {
 
   // Create User and Upload photo to Firebase
   const handleSubmit = async () => {
+    console.warn('Creating your account....');
+    
     if (form.gender && form.weight && form.height && form.activity != 0){
       let downloadURL:string | null = null;
       const metadata = {
@@ -173,17 +175,20 @@ const Register = () => {
           form.password,
         )
         const user = userCredential.user
+        console.log('==== userCredential createUserWithEmailAndPassword..... =====\n',user);
 
         const imageAsset = Asset.fromModule(
           form.gender === 1
             ? require('../../assets/maleAvatar.png')
             : require('../../assets/femaleAvatar.png')
         );
+        console.log('imageAsset....',imageAsset);
         await imageAsset.downloadAsync();
 
         const imagePath = imageAsset.localUri;
 
         // Check if the image is available
+        console.log('imagePath....',imagePath);
         if (imagePath) {
           // Read the file as Base64
           const fileUri = await FileSystem.readAsStringAsync(imagePath, { encoding: FileSystem.EncodingType.Base64 });
@@ -195,11 +200,12 @@ const Register = () => {
           console.log('Upload Complete', downloadURL);
         }
 
+        console.log('updateProfile....');
         await updateProfile(user, {
           displayName:form.username,
           photoURL: downloadURL || null,
         })
-        console.log('updateProfile Complete');
+        console.warn('Firebase Auth complete....');
 
         const response = await axios.post(`${SERVER_URL}/user/register`, {
           firebase_uid: user.uid,
@@ -235,6 +241,7 @@ const Register = () => {
         await AsyncStorage.setItem('@user', JSON.stringify(extendedUser));
         setUser(extendedUser)
       } catch (error: any) {
+        console.error('Register failed',error)
         const errorMessage = error.message.replace('Firebase: ', '')
         setErr(errorMessage)
       } finally {
