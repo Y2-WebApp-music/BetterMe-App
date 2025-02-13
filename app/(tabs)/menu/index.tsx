@@ -81,9 +81,11 @@ const Menu = () => {
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = useCallback(() => {
     setRefreshing(true);
+    getSummaryMeal();
+    getCountGoal();
     setTimeout(() => {
       setRefreshing(false);
-    }, 2000);
+    }, 500);
   }, []);
 
   return (

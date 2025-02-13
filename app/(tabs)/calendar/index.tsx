@@ -13,6 +13,7 @@ import PickMonthYearModal from '../../../components/modal/PickMonthYearModal';
 import axios from 'axios';
 import { SERVER_URL } from '@env';
 import { homeGoalCardProp } from '../../../types/goal';
+import CalendarFoodToday from '../../../components/food/calendarFoodToday';
 
 const MonthCalendar = () => {
 
@@ -216,7 +217,7 @@ const MonthCalendar = () => {
             <Text className='font-noto text-heading3'>{new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(selectedDate))}</Text>
             <SleepToday/>
             {mealSummary &&
-              <FoodToday total_calorie={mealSummary?.total_calorie} total_protein={mealSummary?.total_protein} total_carbs={mealSummary?.total_carbs} total_fat={mealSummary?.total_fat}/>
+              <CalendarFoodToday total_calorie={mealSummary?.total_calorie} total_protein={mealSummary?.total_protein} total_carbs={mealSummary?.total_carbs} total_fat={mealSummary?.total_fat}/>
             }
             <Text className='text-subText font-noto text-body mt-2'>In this day</Text>
             <View className='flex-row justify-start items-center gap-4'>

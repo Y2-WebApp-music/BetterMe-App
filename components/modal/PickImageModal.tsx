@@ -31,7 +31,7 @@ const PickImageModal = ({isOpen, setIsOpen, photo, setPhoto, update}:PickImageMo
 
       return () => clearTimeout(timer);
     }
-  }, [permission, requestPermission]);
+  }, [isOpen,permission, requestPermission]);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
