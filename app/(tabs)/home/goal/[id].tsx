@@ -367,17 +367,17 @@ export default function GoalScreen() {
               )}
             </View>
           </ScrollView>
+            <ConfirmDeleteModal
+              isOpen={openModal}
+              setIsOpen={setOpenModal}
+              title='goal'
+              detail={'This will delete delete permanently. You cannot undo this action.'}
+              handelDelete={deleteGoal}
+              deleteType={'Delete'}
+            />
         </View>
       </TouchableWithoutFeedback>
 
-      <ConfirmDeleteModal
-        isOpen={openModal}
-        setIsOpen={setOpenModal}
-        title='goal'
-        detail={'This will delete delete permanently. You cannot undo this action.'}
-        handelDelete={deleteGoal}
-        deleteType={'Delete'}
-      />
       </ScrollView>
     </SafeAreaView>
   );

@@ -79,9 +79,9 @@ const AddMeal = () => {
     }
   };
 
-  useEffect(()=>{
-    console.log('form \n',form);
-  },[form])
+  // useEffect(()=>{
+  //   console.log('form \n',form);
+  // },[form])
 
   const removeImage = () =>{
     setPhoto(null)

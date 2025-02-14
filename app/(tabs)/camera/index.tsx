@@ -212,7 +212,11 @@ const TakePicture = () => {
   
               // Post data to DB if image URL is available
               if (url) {
-                postToDB(url, mealData.food_name, mealData.calorie, mealData.protein, mealData.carbs, mealData.fat);
+                mealData.food_name !=="นี่ไม่ใช่อาหาร" ? (
+                  postToDB(url, mealData.food_name, mealData.calorie, mealData.protein, mealData.carbs, mealData.fat)
+                ):(
+                  setWaiting(false)
+                )
               }
             } else {
               console.warn("Meal data is null or undefined!");
@@ -246,10 +250,10 @@ const TakePicture = () => {
         food_name:Menu,
         image_url:image_url,
         portion:detail,
-        calorie:Calorie,
-        protein:Protein,
-        carbs:Carbs,
-        fat:Fat,
+        calorie:Calorie || 0,
+        protein:Protein || 0,
+        carbs:Carbs || 0,
+        fat:Fat || 0,
         createByAI:true
       });
 
