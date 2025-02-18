@@ -43,12 +43,17 @@ export default function GoalCreatePage() {
         if (data.message === "Goal not found") {
           return
         } else {
+
+          const taskList = data.task.map((task: any) => ({
+            ...task,
+            status: false,
+          }));
           setForm({
             goal_name:data.goal_name,
             description:data.description,
             start_date:new Date(),
             end_date:new Date(),
-            task:data.task,
+            task:taskList,
             create_by:user?._id,
             public_goal:data.public_goal,
           })
@@ -239,7 +244,7 @@ export default function GoalCreatePage() {
                 <Text className='text-subText'>{duration}</Text>
               </View>
               <View className='flex-row gap-3 items-end justify-center'>
-                <View className='mt-2 items-center' style={{marginTop: 10}}>
+                <View className='grow  mt-2 items-center' style={{marginTop: 10}}>
                   <Text className='text-subText text-detail'>start</Text>
                   <TouchableOpacity
                     onPress={()=>{setStartDateModal(true)}}
@@ -251,7 +256,7 @@ export default function GoalCreatePage() {
                   </TouchableOpacity>
                 </View>
                 <Text className='text-title font-noto text-subText'>-</Text>
-                <View className='mt-2 items-center' style={{marginTop: 10}}>
+                <View className='grow mt-2 items-center' style={{marginTop: 10}}>
                   <Text className='text-subText text-detail'>end</Text>
                   <TouchableOpacity
                     onPress={()=>{setEndDateModal(true)}}
