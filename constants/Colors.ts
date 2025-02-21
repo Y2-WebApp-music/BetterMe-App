@@ -5,20 +5,30 @@
 
 export const Colors = {
   light: {
-    background: '#F3FEFF',
-    primary: "#1c60de",
     text: "#000000",
     subText: "#626262",
     nonFocus: "#b8c2d2",
     white: "#ffffff",
-    red: "#f43168",
     gray: "#e8e8e8",
     Background: "#fbffff",
-    green: "#0dc47c",
-    yellow: "#fba742",
-    night: "#454ab6",
-    DarkGray: "#d9d9d9"
+    DarkGray: "#CFCFCF"
   },
   dark: {
+    text: "#fff",
+    subText: "#B1B1B1",
+    nonFocus: "#3E444E",
+    white: "#212121",
+    gray: "#333333",
+    Background: "#202020",
+    DarkGray: "#2F2F2F"
   },
+  primary: "#1c60de",
+  red: "#f43168",
+  green: "#0dc47c",
+  yellow: "#fba742",
+  night: "#454ab6",
 };
+
+
+
+
