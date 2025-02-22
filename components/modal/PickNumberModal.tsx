@@ -2,6 +2,8 @@ import { View, Text, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
 import Modal from './Modal'
 import { Picker } from '@react-native-picker/picker'
+import { useTheme } from '../../context/themeContext'
+import { useColorScheme } from 'react-native'
 
 type numberModalProp = {
   title:string
@@ -16,6 +18,9 @@ type numberModalProp = {
 }
 
 const PickNumberModal = ({title, min, max, start, dotMax, unit, isOpen, setIsOpen, setNumber}:numberModalProp) => {
+
+  const systemTheme = useColorScheme();
+  const { theme, colors } = useTheme();
 
   const [selectedNumber, setSelectedNumber] = useState<string>(start.toString());
   const [selectedNumberDot, setSelectedNumberDot] = useState("0");
@@ -36,9 +41,9 @@ const PickNumberModal = ({title, min, max, start, dotMax, unit, isOpen, setIsOpe
 
   return (
     <Modal isOpen={isOpen} setIsOpen={setIsOpen}>
-      <View className= 'w-full bg-white p-4 rounded-normal'>
+      <View style={{backgroundColor:colors.white}} className= 'w-full p-4 rounded-normal'>
         <View className='w-full items-center justify-center'>
-          <Text className='text-heading2 mt-2'>{title}</Text>
+          <Text style={{color:colors.text}} className='text-heading2 mt-2'>{title}</Text>
         </View>
         <View className='flex flex-row my-2 items-center justify-center'>
           <View className='flex flex-row items-center'>
@@ -48,20 +53,20 @@ const PickNumberModal = ({title, min, max, start, dotMax, unit, isOpen, setIsOpe
               style={{ width: 110 }}
             >
               {number.map((num) => (
-                <Picker.Item key={num} label={num} value={num} color='black'/>
+                <Picker.Item key={num} label={num} value={num} color={theme === "system" ? systemTheme == "dark"? 'white' :'black' : theme == "dark"? 'white' :'black' }/>
               ))}
             </Picker>
-            <View style={{width:4,height:4,backgroundColor:'black', borderRadius:50,transform:[{ translateY: 8 }]}}></View>
+            <View style={{width:4,height:4,backgroundColor:theme === "system" ? systemTheme == "dark"? 'white' :'black' : theme == "dark"? 'white' :'black', borderRadius:50,transform:[{ translateY: 8 }]}}></View>
             <Picker
               selectedValue={selectedNumberDot}
               onValueChange={handleNumberDotChange}
-              style={{ width: 100, color:'black' }}
+              style={{ width: 100, color:theme === "system" ? systemTheme == "dark"? 'white' :'black' : theme == "dark"? 'white' :'black' }}
             >
               {numberDot.map((num) => (
-                <Picker.Item key={num} label={num} value={num} color='black' />
+                <Picker.Item key={num} label={num} value={num} color={theme === "system" ? systemTheme == "dark"? 'white' :'black' : theme == "dark"? 'white' :'black' }/>
               ))}
             </Picker>
-            <Text className='translate-y-3 text-subText text-body'>{unit}</Text>
+            <Text style={{color:colors.subText}} className='translate-y-3 text-body'>{unit}</Text>
           </View>
         </View>
         <View className='w-full items-end justify-end'>

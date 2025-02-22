@@ -4,6 +4,7 @@ import Modal from './Modal'
 import { CaptureIcon, CloseIcon, GalleryIcon } from '../../constants/icon'
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
+import { useTheme } from '../../context/themeContext';
 
 type PickImageModalProp = {
   isOpen:boolean
@@ -17,6 +18,7 @@ const screenWidth = Dimensions.get('window').width;
 
 const PickImageModal = ({isOpen, setIsOpen, photo, setPhoto, update}:PickImageModalProp) => {
 
+  const { colors } = useTheme();
   // const [photo, setPhoto] = useState<string | null>(null);
   const [isOpenCamera, setIsOpenCamera] = useState(false)
 
@@ -73,17 +75,17 @@ const PickImageModal = ({isOpen, setIsOpen, photo, setPhoto, update}:PickImageMo
     <Modal isOpen={isOpen} setIsOpen={handleClose}>
       <View className='p-2'>
         <View className='w-full items-center'>
-          <Text className='text-heading2 font-noto'>Change Profile Image</Text>
+          <Text style={{color:colors.text}} className='text-heading2 font-noto'>Change Profile Image</Text>
         </View>
         {(!isOpenCamera && !photo) &&
           <View className='w-full flex-row  justify-center gap-4 mt-2'>
-            <TouchableOpacity activeOpacity={0.6} onPress={()=> setIsOpenCamera(!isOpenCamera)} style={{backgroundColor:'#f5f5f5', width:'48%'}} className='w-[48%] p-2 bg-neutral-100  rounded-normal justify-center items-center'>
-              <CaptureIcon width={44} height={44} color={'#CFCFCF'}/>
-              <Text className=' font-noto'>Take a photo</Text>
+            <TouchableOpacity activeOpacity={0.6} onPress={()=> setIsOpenCamera(!isOpenCamera)} style={{backgroundColor:colors.white, borderColor:colors.gray, width:'48%'}} className='w-[48%] p-2 border rounded-normal justify-center items-center'>
+              <CaptureIcon width={44} height={44} color={colors.darkGray}/>
+              <Text style={{color:colors.text}} className=' font-noto'>Take a photo</Text>
             </TouchableOpacity>
-            <TouchableOpacity activeOpacity={0.6} onPress={pickImage} style={{backgroundColor:'#f5f5f5' , width:'48%'}} className='w-[48%] p-2 bg-neutral-100  rounded-normal justify-center items-center'>
-              <GalleryIcon width={44} height={44} color={'#CFCFCF'}/>
-              <Text className=' font-noto'>Choose from gallery</Text>
+            <TouchableOpacity activeOpacity={0.6} onPress={pickImage} style={{backgroundColor:colors.white, borderColor:colors.gray, width:'48%'}} className='w-[48%] p-2 border rounded-normal justify-center items-center'>
+              <GalleryIcon width={44} height={44} color={colors.darkGray}/>
+              <Text style={{color:colors.text}} className=' font-noto'>Choose from gallery</Text>
             </TouchableOpacity>
           </View>
         }

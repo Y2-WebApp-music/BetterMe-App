@@ -37,10 +37,12 @@ type UserProp = {
 
 const screenWidth = Dimensions.get('window').width;
 import { ArrowIcon } from '../../../constants/icon';
+import { useTheme } from '../../../context/themeContext';
 
 
 const AccountSetting = () => {
 
+  const { colors } = useTheme();
   const { user, setUser, signOut } = useAuth();
   const [warning, setWarning] = useState(false)
   const [editing, setEditing] = useState(false)
@@ -299,7 +301,7 @@ const AccountSetting = () => {
   }
 
   return (
-      <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
+      <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-center items-center font-noto">
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={{ flex: 1, width:"100%",alignItems:'center' }}
@@ -313,9 +315,9 @@ const AccountSetting = () => {
               <View className='w-full'>
               <TouchableOpacity onPress={handleBack} className='will-change-contents w-fit flex flex-row items-center justify-start'>
                 <View>
-                  <LeftArrowIcon width={14} height={14} color={"black"} />
+                  <LeftArrowIcon width={14} height={14} color={colors.text} />
                 </View>
-                <Text>Back</Text>
+                <Text style={{color:colors.text}}>Back</Text>
               </TouchableOpacity>
               </View>
               <View className='mt-2'>
@@ -366,23 +368,20 @@ const AccountSetting = () => {
                       keyboardType="default"
                     />
                   ):(
-                    <View className='w-full mt-2 flex justify-center border border-gray focus:border-primary rounded-normal'>
+                    <View style={{borderColor:colors.gray}} className='w-full mt-2 flex justify-center border focus:border-primary rounded-normal'>
                       <Text
                         className='flex-1 text-text text-heading2 font-noto'
-                        style={{ width:"94%", textAlignVertical: "center", paddingHorizontal:10, paddingVertical:6, }}
+                        style={{ width:"94%", textAlignVertical: "center", paddingHorizontal:10, paddingVertical:6,color:colors.text }}
                       >
                         {form.username}
                       </Text>
                     </View>
                   )}
                   <View className='w-full' style={{marginTop: 6}}>
-                    {/* <View style={{marginBottom: 4}}>
-                      <Text className='text-subText text-detail'>email</Text>
-                    </View> */}
-                    <View className='w-full flex justify-center border border-gray rounded-normal'>
+                    <View style={{borderColor:colors.gray}} className='w-full flex justify-center border rounded-normal'>
                       <Text
-                        className='flex-1 text-subText text-detail font-noto'
-                        style={{ width:"94%", textAlignVertical: "center", paddingHorizontal:10, paddingVertical:6, }}
+                        className='flex-1 text-detail font-noto'
+                        style={{ width:"94%", textAlignVertical: "center", paddingHorizontal:10, paddingVertical:6,color:colors.subText }}
                       >
                         {form.email}
                       </Text>
@@ -390,10 +389,10 @@ const AccountSetting = () => {
                   </View>
                   {user?.providerData[0].providerId === 'password' &&
                     <View className='w-full' style={{marginTop: 6}}>
-                      <TouchableOpacity onPress={()=>setPasswordModal(!passwordModal)} activeOpacity={0.4} className='w-full flex justify-center border border-gray focus:border-primary rounded-normal'>
+                      <TouchableOpacity onPress={()=>setPasswordModal(!passwordModal)} activeOpacity={0.4} style={{borderColor:colors.gray}} className='w-full flex justify-center border focus:border-primary rounded-normal'>
                         <Text
-                          className='flex-1 text-subText text-body font-noto text-center'
-                          style={{ width:"94%", textAlignVertical: "center", paddingHorizontal:10, paddingVertical:6, }}
+                          className='flex-1 text-body font-noto text-center'
+                          style={{ width:"94%", textAlignVertical: "center", paddingHorizontal:10, paddingVertical:6, color:colors.subText }}
                         >
                           change password
                         </Text>
@@ -405,11 +404,11 @@ const AccountSetting = () => {
               {/* personal data */}
               <View className='mt-2 flex-col gap-2 items-center'>
                 <View className='w-full'>
-                  <Text className='text-body font-noto'>personal data</Text>
+                  <Text style={{color:colors.text}} className='text-body font-noto'>personal data</Text>
                 </View>
                 {editing? (
                   <View className='w-[92%]'>
-                    <Text className='text-subText text-detail'>date of birth</Text>
+                    <Text style={{color:colors.subText}} className='text-detail'>date of birth</Text>
                     <TouchableOpacity
                       onPress={()=>{setDateModal(true)}}
                       className='mt-1 w-full h-[5vh] p-2 flex justify-center border border-primary rounded-normal'
@@ -421,11 +420,11 @@ const AccountSetting = () => {
                   </View>
                 ):(
                   <View className='w-[92%]'>
-                    <Text className='text-subText text-detail'>date of birth</Text>
-                    <View className='w-full mt-2 flex justify-center border border-gray rounded-normal'>
+                    <Text style={{color:colors.subText}} className=' text-detail'>date of birth</Text>
+                    <View style={{borderColor:colors.gray}} className='w-full mt-2 flex justify-center border rounded-normal'>
                       <Text
-                        className='flex-1 text-text text-heading2 font-noto text-center'
-                        style={{ width:"94%", textAlignVertical: "center", paddingHorizontal:10, paddingVertical:6, }}
+                        className='flex-1 text-heading2 font-noto text-center'
+                        style={{ width:"94%", textAlignVertical: "center", paddingHorizontal:10, paddingVertical:6, color:colors.text }}
                       >
                         {new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(form.birth)}
                       </Text>
@@ -435,19 +434,20 @@ const AccountSetting = () => {
 
                   <View className='flex flex-row gap-2 h-max w-[92%] justify-center'>
                     <View className='w-[36%]'>
-                      <Text className='text-subText text-detail text-center'>gender</Text>
+                      <Text style={{color:colors.subText}} className=' text-detail text-center'>gender</Text>
                       {editing? (
                         <TouchableOpacity
                           onPress={()=>{setGenderModal(true)}}
-                          className={`border ${form.gender === 0? 'border-gray':'border-primary'} mt-1 w-fit p-2 flex flex-row justify-center items-end rounded-normal`}
+                          className={`border mt-1 w-fit p-2 flex flex-row justify-center items-end rounded-normal`}
+                          style={{borderColor:form.gender === 0?colors.gray:colors.primary}}
                         >
-                          <Text className={`${form.gender === 0? 'text-subText':'text-primary'} flex-1 text-center font-notoMedium text-heading2`}>
+                          <Text style={{color:form.gender === 0?colors.subText:colors.primary}} className={` flex-1 text-center font-notoMedium text-heading2`}>
                             {form.gender ? gender.find(a => a.id === form.gender)?.gender : ''}
                           </Text>
                         </TouchableOpacity>
                       ):(
-                        <View className={`border border-gray mt-1 w-fit p-2 flex flex-row justify-center items-end rounded-normal`}>
-                          <Text className={`text-text flex-1 text-center font-notoMedium text-heading2`}>
+                        <View style={{borderColor:colors.gray}} className={`border mt-1 w-fit p-2 flex flex-row justify-center items-end rounded-normal`}>
+                          <Text style={{color:colors.text}} className={` flex-1 text-center font-notoMedium text-heading2`}>
                             {form.gender ? gender.find(a => a.id === form.gender)?.gender : ''}
                           </Text>
                         </View>
@@ -455,48 +455,50 @@ const AccountSetting = () => {
 
                     </View>
                     <View className='w-[30%] '>
-                      <Text className='text-subText text-detail text-center'>weight</Text>
+                      <Text style={{color:colors.subText}} className='text-detail text-center'>weight</Text>
                       {editing? (
                         <TouchableOpacity
                           onPress={()=>{setWeightModal(true)}}
-                          className={`border ${form.weight === 0? 'border-gray':'border-primary'} mt-1 w-fit p-2 flex flex-row justify-center items-end rounded-normal`}
+                          className={`border mt-1 w-fit p-2 flex flex-row justify-center items-end rounded-normal`}
+                          style={{borderColor:form.weight === 0?colors.gray:colors.primary}}
                         >
-                          <Text className={`${form.weight === 0? 'text-subText':'text-primary'} flex-1 text-center font-notoMedium text-heading2`}>
+                          <Text style={{color:form.weight === 0?colors.subText:colors.primary}} className={`flex-1 text-center font-notoMedium text-heading2`}>
                             {form.weight}
                           </Text>
-                          <Text className='text-subText -translate-y-1'>kg</Text>
+                          <Text style={{color:colors.subText}} className=' -translate-y-1'>kg</Text>
                         </TouchableOpacity>
                       ):(
-                        <View className={`border border-gray mt-1 w-fit p-2 flex flex-row justify-center items-end rounded-normal`}>
-                          <Text className={`text-text flex-1 text-center font-notoMedium text-heading2`}>
+                        <View style={{borderColor:colors.gray}} className={`border mt-1 w-fit p-2 flex flex-row justify-center items-end rounded-normal`}>
+                          <Text style={{color:colors.text}} className={` flex-1 text-center font-notoMedium text-heading2`}>
                             {form.weight}
                           </Text>
                           <View style={{ transform: [{ translateY: -2 }]}}>
-                            <Text className='text-subText'>kg</Text>
+                            <Text style={{color:colors.subText}}>kg</Text>
                           </View>
                         </View>
                       )}
                     </View>
 
                     <View className='w-[30%] '>
-                      <Text className='text-subText text-detail text-center'>height</Text>
+                      <Text style={{color:colors.subText}} className=' text-detail text-center'>height</Text>
                       {editing? (
                         <TouchableOpacity
                           onPress={()=>{setHeightModal(true)}}
-                          className={`border ${form.height === 0? 'border-gray':'border-primary'} mt-1 w-fit p-2 flex flex-row justify-center items-end rounded-normal`}
+                          className={`border mt-1 w-fit p-2 flex flex-row justify-center items-end rounded-normal`}
+                          style={{borderColor:form.height === 0?colors.gray:colors.primary}}
                         >
-                          <Text className={`${form.height === 0? 'text-subText':'text-primary'} flex-1 text-center font-notoMedium text-heading2`}>
+                          <Text style={{color:form.height === 0?colors.subText:colors.primary}} className={` flex-1 text-center font-notoMedium text-heading2`}>
                             {form.height}
                           </Text>
-                          <Text className='text-subText -translate-y-1'>cm</Text>
+                          <Text style={{color:colors.subText}} className=' -translate-y-1'>cm</Text>
                         </TouchableOpacity>
                       ):(
-                        <View className={`border border-gray mt-1 w-fit p-2 flex flex-row justify-center items-end rounded-normal`}>
-                          <Text className={`text-text flex-1 text-center font-notoMedium text-heading2`}>
+                        <View style={{borderColor:colors.gray}} className={`border mt-1 w-fit p-2 flex flex-row justify-center items-end rounded-normal`}>
+                          <Text style={{color:colors.text}} className={` flex-1 text-center font-notoMedium text-heading2`}>
                             {form.height}
                           </Text>
                           <View style={{ transform: [{ translateY: -2 }]}}>
-                            <Text className='text-subText'>cm</Text>
+                            <Text style={{color:colors.subText}}>cm</Text>
                           </View>
                         </View>
                       )}
@@ -504,35 +506,37 @@ const AccountSetting = () => {
                   </View>
 
                 <View className='w-[92%]'>
-                  <Text className='text-subText text-detail'>your activity</Text>
+                  <Text style={{color:colors.subText}} className='text-detail'>your activity</Text>
                   {editing?(
                     <TouchableOpacity
                       onPress={()=>{setActivityModal(true)}}
-                      className={`${form.activity===0 ? 'border-gray' : 'border-primary'} mt-1 w-fit p-2 flex flex-row justify-center items-end border rounded-normal`}
+                      className={`mt-1 w-fit p-2 flex flex-row justify-center items-end border rounded-normal`}
+                      style={{borderColor:form.activity===0 ?colors.gray:colors.primary}}
                     >
-                      <Text className={`${form.activity===0 ? 'text-subText' : 'text-primary'} flex-1  text-center font-notoMedium text-heading2`}>
+                      <Text style={{color:form.activity===0 ? colors.subText: colors.primary}} className={`flex-1  text-center font-notoMedium text-heading2`}>
                         {form.activity ? activity.find(a => a.id === form.activity)?.title : 'Select an Activity'}
                       </Text>
                     </TouchableOpacity>
                   ):(
                     <View
-                      className={`border-gray mt-1 w-fit p-2 flex flex-row justify-center items-end border rounded-normal`}
+                      className={` mt-1 w-fit p-2 flex flex-row justify-center items-end border rounded-normal`}
+                      style={{borderColor:colors.gray}}
                     >
-                      <Text className={` text-text flex-1  text-center font-notoMedium text-heading2`}>
+                      <Text style={{color:colors.text}} className={`flex-1  text-center font-notoMedium text-heading2`}>
                         {form.activity ? activity.find(a => a.id === form.activity)?.title : 'Select an Activity'}
                       </Text>
                     </View>
                   )}
-                  <Text className='text-subText text-detail pl-2 mt-1'>
+                  <Text style={{color:colors.subText}} className=' text-detail pl-2 mt-1'>
                     {form.activity ? activity.find(a => a.id === form.activity)?.description : ''}
                   </Text>
                 </View>
 
                 <View className='w-full mt-2'>
-                  <Text className='text-xs font-noto text-subText'>We collect gender, weight, height, and activity level to calculate your daily caloric needs accurately.</Text>
+                  <Text style={{color:colors.subText}} className='text-xs font-noto'>We collect gender, weight, height, and activity level to calculate your daily caloric needs accurately.</Text>
                   <View className="items-start ml-6 mt-3">
-                    <View className="flex-col p-1 px-4 rounded-normal bg-white border border-gray items-center justify-center">
-                      <Text className="text-detail font-noto text-subText">Your daily calorie needs</Text>
+                    <View style={{backgroundColor:colors.white, borderColor:colors.gray}} className="flex-col p-1 px-4 rounded-normal border items-center justify-center">
+                      <Text style={{color:colors.subText}} className="text-detail font-noto">Your daily calorie needs</Text>
                       <View className="flex-row items-baseline">
                         <Text className="text-subTitle font-notoMedium text-green">{Math.floor(user?.calorie_need || 0)}</Text>
                         <Text className="text-detail font-noto text-green ml-1">cal</Text>
@@ -548,7 +552,7 @@ const AccountSetting = () => {
                 <View
                   style={{
                     height: 1,
-                    backgroundColor: '#CFCFCF',
+                    backgroundColor: colors.darkGray,
                     marginVertical: 20,
                     width: '100%',
                   }}
@@ -556,9 +560,10 @@ const AccountSetting = () => {
                 <View className=' pb-20'>
                   <TouchableOpacity
                     onPress={handleSignOut}
-                    className="flex flex-row items-center justify-center rounded-normal border border-gray p-1 px-4 bg-red-500"
+                    className="flex flex-row items-center justify-center rounded-normal border p-1 px-4 bg-red-500"
+                    style={{borderColor:colors.gray}}
                   >
-                    <Text className="text-subText text-heading2 font-notoMedium">Sign Out</Text>
+                    <Text style={{color:colors.subText}} className="text-heading2 font-notoMedium">Sign Out</Text>
                   </TouchableOpacity>
                 </View>
               </>}

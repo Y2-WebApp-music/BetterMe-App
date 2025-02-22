@@ -15,10 +15,12 @@ import { addDays, format, startOfWeek, subDays } from 'date-fns';
 import { MealSummaryCard, weekMealSummary } from '../../../types/food'
 import { FlashList } from '@shopify/flash-list'
 import { toDateId } from '@marceloterreiro/flash-calendar'
+import { useTheme } from '../../../context/themeContext'
 const getSundayDate = (date: Date): Date => startOfWeek(date, { weekStartsOn: 0 });
 
 const FoodSummary = () => {
 
+  const { colors } = useTheme();
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollHandler = useScrollViewOffset(scrollRef);
   const today = toDateId(new Date())
@@ -26,6 +28,7 @@ const FoodSummary = () => {
   const buttonStyle = useAnimatedStyle(() => {
     return {
       opacity: scrollHandler. value > 420 ? withTiming(1) : withTiming(0),
+      backgroundColor:colors.background
     }
   })
 
@@ -129,7 +132,7 @@ const FoodSummary = () => {
   );
 
   return (
-    <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
+    <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-center items-center font-noto">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1, width:"100%",alignItems:'center' }}
@@ -165,9 +168,9 @@ const FoodSummary = () => {
           <View className='gap-2'>
             <View className='flex-row mb-1'>
               <View className='grow'>
-                <Text className=' text-heading3 font-noto'>Meal today</Text>
+                <Text style={{color:colors.text}} className=' text-heading3 font-noto'>Meal today</Text>
               </View>
-              <Text className='text-subText font-noto'>
+              <Text style={{color:colors.subText}} className='font-noto'>
                 {new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date())}
               </Text>
             </View>
@@ -178,14 +181,14 @@ const FoodSummary = () => {
           </View>
 
 
-          <View style={{height:1, width:'100%',marginVertical:10}} className=' bg-gray mb-2'/>
+          <View style={{height:1, width:'100%',marginVertical:10, backgroundColor:colors.gray}} className=' mb-2'/>
 
           <SummaryHeader weeklyTotal={weeklyTotal} currentSunday={currentSunday} setCurrentSunday={setCurrentSunday}/>
 
-          <View className='p-4 bg-white border border-gray rounded-normal'>
+          <View style={{backgroundColor:colors.background, borderColor:colors.gray}} className='p-4 border rounded-normal'>
             <View className='flex flex-row gap-2 items-center mb-2'>
-              <FoodIcon width={15} height={15} color={'#0dc47c'}/>
-              <Text className='text-body font-noto '>calorie in week</Text>
+              <FoodIcon width={15} height={15} color={colors.green}/>
+              <Text style={{color:colors.text}} className='text-body font-noto '>calorie in week</Text>
             </View>
             <View >
               <WeekFoodChart graph={graph}/>
@@ -229,6 +232,8 @@ type SummaryHeaderProp = {
 
 const SummaryHeader = ({weeklyTotal, currentSunday, setCurrentSunday}:SummaryHeaderProp) => {
 
+  const { colors } = useTheme();
+
   const handlePrevWeek = (): void => {
     const prevSunday = subDays(currentSunday, 7);
     setCurrentSunday(prevSunday);
@@ -245,44 +250,44 @@ const SummaryHeader = ({weeklyTotal, currentSunday, setCurrentSunday}:SummaryHea
     <View className=''>
       <View className='flex-row items-center'>
         <View className='grow'>
-          <Text className='font-notoMedium text-heading2'>Summary</Text>
-          <Text className='font-noto text-heading3 pl-1'>
+          <Text style={{color:colors.text}} className='font-notoMedium text-heading2'>Summary</Text>
+          <Text style={{color:colors.text}} className='font-noto text-heading3 pl-1'>
             {format(currentSunday, 'd MMM yyyy')} - {format(endOfWeek, 'd MMM yyyy')}
           </Text>
         </View>
         <View className='flex-row gap-3 pr-2'>
           <TouchableOpacity onPress={handlePrevWeek}>
-            <BackwardIcon width={34} height={34} color={'#1c60de'}/>
+            <BackwardIcon width={34} height={34} color={colors.primary}/>
           </TouchableOpacity>
           <TouchableOpacity onPress={handleNextWeek}>
-            <ForwardIcon width={34} height={34} color={'#1c60de'}/>
+            <ForwardIcon width={34} height={34} color={colors.primary}/>
           </TouchableOpacity>
         </View>
       </View>
 
       <View>
         <View style={{ transform: [{ translateY: 6 }]}}>
-          <Text className='text-subText font-noto text-detail'>Total Calories</Text>
+          <Text style={{color:colors.subText}} className=' font-noto text-detail'>Total Calories</Text>
         </View>
         <View className='flex-row'>
           <View className='flex-row items-end'>
-            <Text className='text-green font-notoMedium text-subTitle'>{weeklyTotal.total_calorie}</Text>
-            <View style={{ transform: [{ translateY: -6 }]}}><Text className='text-subText font-noto text-body pl-1'>cal</Text></View>
+            <Text style={{color:colors.green}} className='font-notoMedium text-subTitle'>{weeklyTotal.total_calorie}</Text>
+            <View style={{ transform: [{ translateY: -6 }]}}><Text style={{color:colors.subText}} className='font-noto text-body pl-1'>cal</Text></View>
           </View>
           <View style={{ transform: [{ translateY: -6 }]}} className='flex-row items-end ml-3'>
-            <Text className='text-subText font-notoLight text-detail pl-1'>Protein :</Text>
-            <Text className='text-subText font-noto text-body pl-1'>{weeklyTotal.protein}</Text>
-            <Text className='text-subText font-noto text-detail pl-1'>g</Text>
+            <Text style={{color:colors.subText}} className=' font-notoLight text-detail pl-1'>Protein :</Text>
+            <Text style={{color:colors.subText}} className=' font-noto text-body pl-1'>{weeklyTotal.protein}</Text>
+            <Text style={{color:colors.subText}} className=' font-noto text-detail pl-1'>g</Text>
           </View>
           <View style={{ transform: [{ translateY: -6 }]}} className='flex-row items-end'>
-            <Text className='text-subText font-notoLight text-detail pl-1'>Carbs :</Text>
-            <Text className='text-subText font-noto text-body pl-1'>{weeklyTotal.carbs}</Text>
-            <Text className='text-subText font-noto text-detail pl-1'>g</Text>
+            <Text style={{color:colors.subText}} className=' font-notoLight text-detail pl-1'>Carbs :</Text>
+            <Text style={{color:colors.subText}} className=' font-noto text-body pl-1'>{weeklyTotal.carbs}</Text>
+            <Text style={{color:colors.subText}} className=' font-noto text-detail pl-1'>g</Text>
           </View>
           <View style={{ transform: [{ translateY: -6 }]}} className='flex-row items-end'>
-            <Text className='text-subText font-notoLight text-detail pl-1'>Fat :</Text>
-            <Text className='text-subText font-noto text-body pl-1'>{weeklyTotal.fat}</Text>
-            <Text className='text-subText font-noto text-detail pl-1'>g</Text>
+            <Text style={{color:colors.subText}} className=' font-notoLight text-detail pl-1'>Fat :</Text>
+            <Text style={{color:colors.subText}} className=' font-noto text-body pl-1'>{weeklyTotal.fat}</Text>
+            <Text style={{color:colors.subText}} className=' font-noto text-detail pl-1'>g</Text>
           </View>
         </View>
       </View>

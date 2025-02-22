@@ -320,7 +320,7 @@ export default function GoalCreatePage() {
               />
 
               <View className='mt-4 flex-col gap-2 pb-20'>
-                <Text>Task</Text>
+                <Text style={{color:colors.text}}>Task</Text>
 
                 <FlashList
                     data={form.task}

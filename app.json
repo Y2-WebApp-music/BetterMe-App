@@ -10,8 +10,7 @@
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/Starting.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#F3FEFF"
+      "resizeMode": "contain"
     },
     "ios": {
       "supportsTablet": true,
@@ -19,8 +18,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/Logo_BetterMe.png",
-        "backgroundColor": "#F3FEFF"
+        "foregroundImage": "./assets/Logo_BetterMe.png"
       },
       "package": "com.guynut.betterme",
       "permissions": ["INTERNET"],

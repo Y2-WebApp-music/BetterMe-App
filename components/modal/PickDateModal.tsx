@@ -2,6 +2,8 @@ import { View, Text, TouchableOpacity, Platform } from 'react-native'
 import React from 'react'
 import Modal from './Modal'
 import RNDateTimePicker from '@react-native-community/datetimepicker'
+import { useTheme } from '../../context/themeContext'
+import { useColorScheme } from 'react-native'
 
 type PickDateModalProp = {
   value:Date
@@ -13,6 +15,9 @@ type PickDateModalProp = {
 }
 
 const PickDateModal = ({value, isOpen, setIsOpen, setDate, minimumDate, maximumDate}:PickDateModalProp) => {
+
+  const systemTheme = useColorScheme();
+  const { theme, colors } = useTheme();
 
   const minimum = minimumDate? new Date() : new Date('1950, 0, 1');
   const lockDate = maximumDate? new Date() : new Date(new Date().setDate(new Date().getDate() + 10000));
@@ -45,16 +50,16 @@ const PickDateModal = ({value, isOpen, setIsOpen, setDate, minimumDate, maximumD
             onChange={handleDateChange}
             style={{}}
             locale="en-Gn"
-            themeVariant='light'
+            themeVariant={theme === "system" ? systemTheme == "dark"? 'dark' :'light' : theme == "dark"? 'dark' :'light' }
             // positiveButton={{label: 'OK', textColor: 'green'}}
             // negativeButtonLabel="Negative"
           />
         </Modal>
       ):(
         <Modal isOpen={isOpen} setIsOpen={setIsOpen}>
-          <View className= 'w-full bg-white h-fit p-4 rounded-normal'>
+          <View style={{backgroundColor:colors.white}} className= 'w-full h-fit p-4 rounded-normal'>
             <View className='w-full items-center justify-center'>
-                <Text className='text-heading2 mt-2'>Select Date</Text>
+                <Text style={{color:colors.text}} className='text-heading2 mt-2'>Select Date</Text>
             </View>
             <RNDateTimePicker
               display="spinner"
@@ -65,7 +70,7 @@ const PickDateModal = ({value, isOpen, setIsOpen, setDate, minimumDate, maximumD
               onChange={handleDateChange}
               style={{}}
               locale="en-Gn"
-              themeVariant='light'
+              themeVariant={theme === "system" ? systemTheme == "dark"? 'dark' :'light' : theme == "dark"? 'dark' :'light' }
               />
             <View className='w-full items-end justify-end'>
               <TouchableOpacity onPress={()=>{setIsOpen(false)}} className='will-change-contents flex flex-row items-center justify-center rounded-full p-1 px-6 bg-primary'>

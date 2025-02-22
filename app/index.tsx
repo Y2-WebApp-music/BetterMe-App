@@ -6,6 +6,7 @@ import LoadingBubble from "../components/auth/Loading";
 SplashScreen.preventAutoHideAsync();
 
 const App = () => {
+
   return <LoadingBubble />;
 };
 

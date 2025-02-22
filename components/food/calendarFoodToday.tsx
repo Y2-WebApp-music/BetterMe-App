@@ -36,9 +36,9 @@ const CalendarFoodToday = ({total_calorie, total_protein, total_carbs, total_fat
 
         </View>
         <View style={{ transform: [{ translateY: -10 }], flexDirection:'row', gap:12, marginTop:2 }}>
-          <Text style={{color:colors.darkGray}} className='text-detail font-notoLight'>Protein : {total_protein || 0}g</Text>
-          <Text style={{color:colors.darkGray}} className='text-detail font-notoLight'>Carbs : {total_carbs || 0}g</Text>
-          <Text style={{color:colors.darkGray}} className='text-detail font-notoLight'>Fat : {total_fat || 0}g</Text>
+          <Text style={{color:colors.subText}} className='text-detail font-notoLight'>Protein : {total_protein || 0}g</Text>
+          <Text style={{color:colors.subText}} className='text-detail font-notoLight'>Carbs : {total_carbs || 0}g</Text>
+          <Text style={{color:colors.subText}} className='text-detail font-notoLight'>Fat : {total_fat || 0}g</Text>
         </View>
       </View>
 

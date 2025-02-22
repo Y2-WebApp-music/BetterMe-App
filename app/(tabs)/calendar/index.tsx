@@ -282,11 +282,11 @@ const MonthCalendar = () => {
             <Text style={{color:colors.subText}} className=' font-noto text-body mt-2'>In this day</Text>
             <View className='flex-row justify-start items-center gap-4'>
               <TouchableOpacity onPress={()=>setViewMeal(true)} className={`p-1 px-2 ${viewMeal? 'bg-primary':'bg-transparent'} rounded-normal`}>
-                <Text style={{color:viewMeal? colors.text:colors.subText}}  className={` text-heading2 font-notoMedium`}>Meals</Text>
+                <Text style={{color:viewMeal? '#fff':colors.subText}}  className={` text-heading2 font-notoMedium`}>Meals</Text>
               </TouchableOpacity>
               <View className='h-full w-[1px] bg-subText rounded-full'/>
               <TouchableOpacity onPress={()=>setViewMeal(false)} className={`p-1 px-2 ${!viewMeal? 'bg-primary':'bg-transparent'} rounded-normal`}>
-                <Text style={{color:!viewMeal? colors.text:colors.subText}} className={` text-heading2 font-notoMedium`}>Goals</Text>
+                <Text style={{color:!viewMeal? '#fff':colors.subText}} className={` text-heading2 font-notoMedium`}>Goals</Text>
               </TouchableOpacity>
               <View className='grow'/>
               {viewMeal?(

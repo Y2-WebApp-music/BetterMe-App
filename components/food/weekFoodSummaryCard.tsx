@@ -7,10 +7,12 @@ import axios from 'axios';
 import { addDays, format, startOfWeek, subDays } from 'date-fns';
 import { useEffect, useState } from 'react';
 import { weekMealSummary } from '../../types/food';
+import { useTheme } from '../../context/themeContext';
 const getSundayDate = (date: Date): Date => startOfWeek(date, { weekStartsOn: 0 });
 
 const FoodSummary = () => {
 
+  const { colors } = useTheme();
   const [data, setData] = useState<weekMealSummary[]>([])
   const [currentSunday, setCurrentSunday] = useState<Date>(getSundayDate(new Date()));
   const [graph, setGraph] = useState([0,0,0,0,0,0,0])
@@ -96,31 +98,31 @@ const FoodSummary = () => {
   },[currentSunday])
 
   return (
-    <View style={{paddingHorizontal:15, paddingVertical:12, backgroundColor:'white' }}  className=' w-full rounded-normal border border-gray p-2 justify-center items-center flex-row gap-2'>
+    <View style={{paddingHorizontal:15, paddingVertical:12, backgroundColor:colors.white, borderColor:colors.gray }}  className=' w-full rounded-normal border p-2 justify-center items-center flex-row gap-2'>
       <View className='grow'>
         <View className='flex flex-row gap-2 items-center justify-between ' >
           <View className='flex flex-row gap-1 items-center'>
-            <FoodIcon width={15} height={15} color={'#0dc47c'}/>
-            <Text className='text-body font-noto '>calorie in week</Text>
+            <FoodIcon width={15} height={15} color={colors.green}/>
+            <Text style={{color:colors.text}} className='text-body font-noto '>calorie in week</Text>
           </View>
           <View style={{ transform: [{ translateY: 2 },{ translateX: 6 }]}} className='right-0 absolute flex flex-row gap-4 items-center'>
             <TouchableOpacity onPress={handlePrevWeek}>
-              <BackwardIcon width={34} height={34} color={'#CFCFCF'}/>
+              <BackwardIcon width={34} height={34} color={colors.darkGray}/>
             </TouchableOpacity>
             <TouchableOpacity onPress={handleNextWeek}>
-              <ForwardIcon width={34} height={34} color={'#CFCFCF'}/>
+              <ForwardIcon width={34} height={34} color={colors.darkGray}/>
             </TouchableOpacity>
             </View>
         </View>
         <View className='mt-2'>
           <View style={{marginLeft:4}}>
-            <Text className='font-noto text-subText'>
+            <Text style={{color:colors.subText}} className='font-noto'>
               {format(currentSunday, 'd MMM yyyy')} - {format(endOfWeek, 'd MMM yyyy')}
             </Text>
             <View style={{ transform: [{ translateY: -6 }] }} className='flex-row gap-1 items-end'>
-              <Text style={{color:'#0dc47c'}} className='text-title font-notoMedium'>{weeklyTotal.total_calorie}</Text>
+              <Text style={{color:colors.green}} className='text-title font-notoMedium'>{weeklyTotal.total_calorie}</Text>
               <View style={{ transform: [{ translateY: -10 }] }}>
-                <Text className='text-subText'>cal</Text>
+                <Text style={{color:colors.subText}}>cal</Text>
               </View>
             </View>
           </View>

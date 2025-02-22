@@ -26,26 +26,26 @@ const FoodToday = ({total_calorie, total_protein, total_carbs, total_fat}:MealSu
           <Text className='text-heading3 font-noto text-subText'>Total Calories</Text>
         </View>
         <View className='flex-row gap-1 items-end '>
-          <Text style={{color:'#0dc47c'}} className='text-title font-notoMedium'>{total_calorie || 0}</Text>
+          <Text style={{color:colors.green}} className='text-title font-notoMedium'>{total_calorie || 0}</Text>
           {/* <View style={{ transform: [{ translateY: -6 }] }}>
             <Text className='text-heading2 text-subText font-noto'>cal</Text>
           </View> */}
           <View style={{ transform: [{ translateY: -7 }], marginLeft:2 }}>
-            <Text className='text-subText font-notoLight text-body'>of {Math.floor(user?.calorie_need || 0)} cal</Text>
+            <Text style={{color:colors.subText}} className='font-notoLight text-body'>of {Math.floor(user?.calorie_need || 0)} cal</Text>
           </View>
 
         </View>
         <View style={{ transform: [{ translateY: -10 }], flexDirection:'row', gap:12, marginTop:2 }}>
-          <Text style={{color:'gray'}} className='text-detail font-notoLight'>Protein : {total_protein || 0}g</Text>
-          <Text style={{color:'gray'}} className='text-detail font-notoLight'>Carbs : {total_carbs || 0}g</Text>
-          <Text style={{color:'gray'}} className='text-detail font-notoLight'>Fat : {total_fat || 0}g</Text>
+          <Text style={{color:colors.subText}} className='text-detail font-notoLight'>Protein : {total_protein || 0}g</Text>
+          <Text style={{color:colors.subText}} className='text-detail font-notoLight'>Carbs : {total_carbs || 0}g</Text>
+          <Text style={{color:colors.subText}} className='text-detail font-notoLight'>Fat : {total_fat || 0}g</Text>
         </View>
       </View>
 
       <View style={{paddingRight:0}} className='flex flex-row gap-1 items-center'>
         {/* <PenIcon width={20} height={20} color={'#626262'}/> */}
-        <Text style={{color:'#CFCFCF'}} className='text-body font-noto text-DarkGray'>See more</Text>
-        <RightArrowIcon width={20} height={20} color={'#CFCFCF'}/>
+        <Text style={{color:colors.darkGray}} className='text-body font-noto'>See more</Text>
+        <RightArrowIcon width={20} height={20} color={colors.darkGray}/>
       </View>
 
     </TouchableOpacity>

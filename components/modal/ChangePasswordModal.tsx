@@ -5,6 +5,7 @@ import { Feather } from '@expo/vector-icons'
 import { auth } from '../auth/firebaseConfig'
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth'
 import { useAuth } from '../../context/authContext'
+import { useTheme } from '../../context/themeContext'
 
 type ChangePasswordModalProp = {
   isOpen: boolean
@@ -12,6 +13,8 @@ type ChangePasswordModalProp = {
 }
 
 const ChangePasswordModal = ({ isOpen, setIsOpen }: ChangePasswordModalProp) => {
+
+  const { colors } = useTheme();
   const [step, setStep] = useState(1)
   const [oldPassword, setOldPassword] = useState<string>('')
   const [password, setPassword] = useState({ password: '', confirmPassword: '' })
@@ -73,7 +76,7 @@ const ChangePasswordModal = ({ isOpen, setIsOpen }: ChangePasswordModalProp) => 
       <View className='p-2'>
         {step === 1 ? (
           <>
-            <Text className='font-noto text-heading2'>Please enter current password</Text>
+            <Text style={{color:colors.text}} className='font-noto text-heading2'>Please enter current password</Text>
             <FormInput value={oldPassword} handleChange={setOldPassword} keyboardType='password' />
             <View className='items-center mt-2'>
               <TouchableOpacity onPress={handleConfirmPassword} activeOpacity={0.6} className='p-1 px-6 w-fit rounded-full bg-primary items-center mt-2'>
@@ -83,14 +86,14 @@ const ChangePasswordModal = ({ isOpen, setIsOpen }: ChangePasswordModalProp) => 
           </>
         ) : (
           <>
-            <Text className='font-noto text-heading2'>New Password</Text>
+            <Text style={{color:colors.text}} className='font-noto text-heading2'>New Password</Text>
 
             <View className='mt-2'>
-              <Text className='font-noto text-subText text-detail'>New Password</Text>
+              <Text style={{color:colors.subText}} className='font-noto text-detail'>New Password</Text>
             </View>
             <FormInput value={password.password} handleChange={(text) => setPassword((prev) => ({ ...prev, password: text }))} keyboardType='password' />
             <View className='mt-2'>
-              <Text className='font-noto text-subText text-detail'>Confirm New Password</Text>
+              <Text style={{color:colors.subText}} className='font-noto text-detail'>Confirm New Password</Text>
             </View>
             <FormInput value={password.confirmPassword} handleChange={(text) => setPassword((prev) => ({ ...prev, confirmPassword: text }))} keyboardType='password' />
             <View className='items-center mt-2'>
@@ -106,6 +109,8 @@ const ChangePasswordModal = ({ isOpen, setIsOpen }: ChangePasswordModalProp) => 
 }
 
 const FormInput = ({ value, handleChange, keyboardType = 'text' }: { value: string; handleChange: (text: string) => void; keyboardType?: 'text' | 'password' }) => {
+
+  const { colors } = useTheme();
   const [showPassword, setShowPassword] = useState(false)
 
   const [isFocused, setIsFocused] = useState<boolean>(false)
@@ -113,7 +118,7 @@ const FormInput = ({ value, handleChange, keyboardType = 'text' }: { value: stri
     setShowPassword(prev => !prev)
   }
 
-  const borderColor = value || isFocused ? '#1C60DE' : '#E8E8E8'
+  const borderColor = value || isFocused ? colors.primary : colors.darkGray
 
 
   return (
@@ -128,7 +133,7 @@ const FormInput = ({ value, handleChange, keyboardType = 'text' }: { value: stri
         }}
         value={value}
         placeholder={keyboardType === 'password' ? 'Enter password' : 'Enter text'}
-        placeholderTextColor="#CFCFCF"
+        placeholderTextColor={colors.darkGray}
         onChangeText={handleChange}
         secureTextEntry={keyboardType === 'password' && !showPassword}
         onFocus={() => setIsFocused(true)}
@@ -136,7 +141,7 @@ const FormInput = ({ value, handleChange, keyboardType = 'text' }: { value: stri
       />
       {keyboardType === 'password' && (
         <TouchableOpacity onPress={togglePasswordVisibility}>
-          <Feather name={showPassword ? 'eye-off' : 'eye'} size={20} color="#E8E8E8" />
+          <Feather name={showPassword ? 'eye-off' : 'eye'} size={20} color={colors.darkGray} />
         </TouchableOpacity>
       )}
     </View>

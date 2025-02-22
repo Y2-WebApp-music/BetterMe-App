@@ -10,6 +10,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import PostOnlyText from '../../../components/Post/postOnlyText';
 import PostWithPhoto from '../../../components/Post/postWithPhoto';
 import { postDummy } from '../../../types/community';
+import { colors, useTheme } from '../../../context/themeContext';
 
 
 const screenWidth = Dimensions.get('window').width;
@@ -20,6 +21,7 @@ const SCROLL_DOWN_THRESHOLD = 60;
 
 const CommunityFeed = () => {
 
+  const { colors } = useTheme();
   const { user } = useAuth()
 
   const [refreshing, setRefreshing] = useState(false);
@@ -82,8 +84,8 @@ const CommunityFeed = () => {
 
 
   return (
-    <SafeAreaView className=" relative w-full h-full justify-center items-center bg-Background font-noto">
-      <View style={{position:'relative', left:0, width:'100%'}} className='bg-Background z-10'>
+    <SafeAreaView style={{backgroundColor:colors.background}} className=" relative w-full h-full justify-center items-center font-noto">
+      <View style={{position:'relative', left:0, width:'100%', backgroundColor:colors.background}} className=' z-10'>
       <Animated.View
         onLayout={(e)=> setHeaderHeight(e.nativeEvent.layout.height)}
         style={[
@@ -96,9 +98,10 @@ const CommunityFeed = () => {
             width: '100%',
             zIndex: 100,
             paddingTop: 50,
+            backgroundColor:colors.background
           },
         ]}
-        className='w-full items-center justify-center bg-Background'
+        className='w-full items-center justify-center'
       >
         <View className='w-[92%] flex-row gap-2 justify-start items-center mt-1'>
           <View className='flex grow'>
@@ -115,7 +118,7 @@ const CommunityFeed = () => {
             <SearchIcon width={24} height={24} color={'white'}/>
           </TouchableOpacity>
         </View>
-        <View className='w-full items-center border-b pb-2 border-gray'>
+        <View style={{borderColor:colors.gray}} className='w-full items-center border-b pb-2'>
           <View className='w-[92%] mt-1 flex-row gap-2 justify-start items-center'>
             <TouchableOpacity activeOpacity={0.6} onPress={()=>{router.push('/community/userProfile')}} className='overflow-hidden rounded-full border border-gray'>
               <Image
@@ -126,12 +129,12 @@ const CommunityFeed = () => {
               />
             </TouchableOpacity>
             <TouchableOpacity activeOpacity={0.6} onPress={()=>{router.push('/community/post/create')}} className='grow flex-row items-center rounded-full border border-primary p-2 px-4'>
-              <View style={{ transform: [{ translateY: 1 }]}} className='mr-auto text-nonFocus'>
-                <Text className='font-noto text-subText'>What are you doing?</Text>
+              <View style={{ transform: [{ translateY: 1 }], }} className='mr-auto'>
+                <Text style={{color:colors.subText}} className='font-noto'>What are you doing?</Text>
               </View>
-              <PenIcon width={24} height={24} color={'#1c60de'}/>
+              <PenIcon width={24} height={24} color={colors.nonFocus}/>
             </TouchableOpacity>
-            <GalleryIcon width={30} height={30} color={'#b8c2d2'}/>
+            <GalleryIcon width={30} height={30} color={colors.nonFocus}/>
           </View>
         </View>
       </Animated.View>
@@ -201,7 +204,7 @@ const CommunityFeed = () => {
               </View>
             ):(
               <View>
-                <Text>No post</Text>
+                <Text style={{color:colors.subText}}>No post</Text>
               </View>
             )
             }
@@ -210,7 +213,6 @@ const CommunityFeed = () => {
       </ScrollView>
 
       <View
-        className='bg-white'
         style={{
           position:'absolute',
           top:0,
@@ -218,6 +220,7 @@ const CommunityFeed = () => {
           right:0,
           height: insets.top,
           zIndex:100,
+          backgroundColor:colors.white
         }}
       />
     </SafeAreaView>
@@ -236,6 +239,7 @@ const styles = StyleSheet.create({
 
 
 const TagSection:React.FC = () => {
+  const { colors } = useTheme();
   const top = useSharedValue(0);
 
   const animatedStyle = useAnimatedStyle(() => {
@@ -253,12 +257,12 @@ const TagSection:React.FC = () => {
     <Animated.View
       style={[
         animatedStyle,
-        { width: '100%', alignItems: 'center', justifyContent: 'center', marginTop: 8 },
+        { width: '100%', alignItems: 'center', justifyContent: 'center', marginTop: 8, borderColor:colors.gray },
       ]}
-      className="border-b pb-2 border-gray"
+      className="border-b pb-2"
     >
       <View className="w-[92%]">
-        <Text className="text-detail text-subText">interest this tag?</Text>
+        <Text style={{color:colors.subText}} className="text-detail text-subText">interest this tag?</Text>
       </View>
       <View className="w-[92%] items-start mt-2 flex-row gap-2">
         <TouchableOpacity className="flex-row rounded-full bg-primary p-1 px-4">

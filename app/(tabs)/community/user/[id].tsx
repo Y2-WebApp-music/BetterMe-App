@@ -12,12 +12,14 @@ import PostWithPhoto from '../../../../components/Post/postWithPhoto';
 import PostOnlyText from '../../../../components/Post/postOnlyText';
 import { postDummy } from '../../../../types/community';
 import CommunityGoalCard from '../../../../components/goal/communityGoalCard';
+import { useTheme } from '../../../../context/themeContext';
 
 
 const screenWidth = Dimensions.get('window').width;
 
 const Userprofile = () => {
 
+  const { colors } = useTheme();
   const { id } = useLocalSearchParams();
   const [postList, setPostList] = useState<number[]>([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20])
 
@@ -60,7 +62,7 @@ const Userprofile = () => {
     }, []);
 
   return (
-    <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
+    <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-center items-center font-noto">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1, width:"100%",alignItems:'center' }}
@@ -81,12 +83,12 @@ const Userprofile = () => {
         >
             <View className='mb-4 w-[92%] flex flex-row-reverse gap-2 items-center'>
               <View className='grow'>
-                <Text className='text-heading2 font-notoMedium'>Someone</Text>
-                <Text className='text-subText font-not pb-1'>maybe.gmail.com</Text>
-                <Text className='text-subText font-noto pb-1'>333k post 3333 goal</Text>
+                <Text style={{color:colors.text}} className='text-heading2 font-notoMedium'>Someone</Text>
+                <Text style={{color:colors.subText}} className=' font-not pb-1'>maybe.gmail.com</Text>
+                <Text style={{color:colors.subText}} className=' font-noto pb-1'>333k post 3333 goal</Text>
                 <View>
-                  <TouchableOpacity onPress={()=>{router.push(`/community/index`)}} className=' bg-gray flex-row gap-2 p-2 px-4 justify-center items-center rounded-full'>
-                    <Text className='text-subText text-body font-notoMedium'>following</Text>
+                  <TouchableOpacity onPress={()=>{router.push(`/community/index`)}} style={{backgroundColor:colors.gray}} className=' flex-row gap-2 p-2 px-4 justify-center items-center rounded-full'>
+                    <Text style={{color:colors.text}} className=' text-body font-notoMedium'>following</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -100,19 +102,19 @@ const Userprofile = () => {
               </View>
             </View>
 
-            <View style={{height:1, width:'100%'}} className=' bg-gray my-3'/>
+            <View style={{height:1, width:'100%',backgroundColor:colors.gray}} className=' my-3'/>
 
             <View className='flex-row w-[92%] justify-start items-center gap-4'>
-              <TouchableOpacity onPress={()=>setViewPost(true)} className={`p-1 px-2 ${viewPost? 'bg-primary':'bg-transparent'} rounded-normal`}>
-                <Text className={`${viewPost? 'text-white':'text-subText'} text-heading2 font-notoMedium`}>post</Text>
+              <TouchableOpacity onPress={()=>setViewPost(true)} className={`p-1 px-4 ${viewPost? 'bg-primary':'bg-transparent'} rounded-normal`}>
+                <Text style={{color:viewPost?'#fff':colors.subText}} className={` text-heading2 font-notoMedium`}>post</Text>
               </TouchableOpacity>
-              <View className='h-full w-[1px] bg-gray rounded-full'/>
-              <TouchableOpacity onPress={()=>setViewPost(false)} className={`p-1 px-2 ${!viewPost? 'bg-primary':'bg-transparent'} rounded-normal`}>
-                <Text className={`${!viewPost? 'text-white':'text-subText'} text-heading2 font-notoMedium`}>goals</Text>
+              <View style={{backgroundColor:colors.gray}} className='h-full w-[1px] rounded-full'/>
+              <TouchableOpacity onPress={()=>setViewPost(false)} className={`p-1 px-4 ${!viewPost? 'bg-primary':'bg-transparent'} rounded-normal`}>
+                <Text style={{color:!viewPost?'#fff':colors.subText}} className={`text-heading2 font-notoMedium`}>goals</Text>
               </TouchableOpacity>
             </View>
 
-            <View style={{height:1, width:'100%'}} className=' bg-gray my-3'/>
+            <View style={{height:1, width:'100%',backgroundColor:colors.gray}} className=' my-3'/>
 
             {viewPost? (
               postList.length != 0 ? (
@@ -138,13 +140,13 @@ const Userprofile = () => {
             ):(
               <View className='w-[92%] justify-center items-center gap-2 mt-2 pb-16'>
                 <View className='flex-row items-center justify-center'>
-                  <Text className='text-heading text-yellow'>33</Text>
+                  <Text style={{color:colors.yellow}} className='text-heading'>33</Text>
                   <View style={{ transform: [{ translateY: 3 }]}}>
-                    <Text className='text-body font-noto text-text pl-3'>In progress</Text>
+                    <Text style={{color:colors.text}} className='text-body font-noto  pl-3'>In progress</Text>
                   </View>
-                  <Text className='text-heading text-green pl-4'>123</Text>
+                  <Text style={{color:colors.green}} className='text-heading pl-4'>123</Text>
                   <View style={{ transform: [{ translateY: 3 }]}}>
-                    <Text className='text-body font-noto text-text pl-3'>Complete</Text>
+                    <Text style={{color:colors.text}} className='text-body font-noto  pl-3'>Complete</Text>
                   </View>
                 </View>
                 <View className='w-full'>
@@ -165,12 +167,12 @@ const Userprofile = () => {
                       />
                     ) : (
                       <View style={{width:'100%', height:80, justifyContent:'center', alignContent:'center'}}>
-                        <Text className='font-noto text-subText text-heading3 text-center'>No In Progress Goal</Text>
+                        <Text style={{color:colors.subText}} className='font-noto text-heading3 text-center'>No In Progress Goal</Text>
                       </View>
                     )}
                   </View>
                   <View className='mt-2 flex-col gap-2'>
-                    <Text className='text-body text-green'>Completed</Text>
+                    <Text style={{color:colors.green}} className='text-body'>Completed</Text>
                     {completeGoal.length > 0 ? (
                       <FlashList
                         data={completeGoal}
@@ -186,7 +188,7 @@ const Userprofile = () => {
                       />
                     ) : (
                       <View style={{width:'100%', height:80, justifyContent:'center', alignContent:'center'}}>
-                        <Text className='font-noto text-subText text-heading3 text-center'>No Completed Goal</Text>
+                        <Text style={{color:colors.subText}} className='font-noto text-heading3 text-center'>No Completed Goal</Text>
                       </View>
                     )}
                   </View>

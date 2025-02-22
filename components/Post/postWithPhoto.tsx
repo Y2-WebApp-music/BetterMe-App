@@ -10,15 +10,13 @@ import Animated, { useAnimatedStyle, useSharedValue, withDelay, withSpring } fro
 import { PostContent } from '../../types/community';
 import { useAuth } from '../../context/authContext';
 import { router } from 'expo-router';
+import { useTheme } from '../../context/themeContext';
 
 const screenWidth = Dimensions.get('window').width;
 
 const PostWithPhoto = (props:PostContent) => {
-  
-  useEffect(()=>{
-    console.log(props);
-  },[props])
 
+  const { colors } = useTheme();
   const {user} = useAuth()
   
 
@@ -77,12 +75,12 @@ const PostWithPhoto = (props:PostContent) => {
   }));
 
   return (
-    <GestureHandlerRootView style={{paddingHorizontal:14, width:'100%', borderBottomWidth:1, borderColor:'#e8e8e8', paddingBottom:4}}>
+    <GestureHandlerRootView style={{paddingHorizontal:14, width:'100%', borderBottomWidth:1, borderColor:colors.gray, paddingBottom:4}}>
       
-    <View className=' flex-row gap-2 items-center justify-between bg-Background '>
+    <View style={{backgroundColor:colors.background}} className=' flex-row gap-2 items-center justify-between'>
 
       <View className='my-2 items-center flex-row gap-2'>
-          <TouchableOpacity onPress={()=>{router.push(`/community/user/${props._id}`)}} activeOpacity={0.6}  className='overflow-hidden rounded-full border border-gray'>
+          <TouchableOpacity onPress={()=>{router.push(`/community/user/${props._id}`)}} activeOpacity={0.6} style={{borderColor:colors.gray}}  className='overflow-hidden rounded-full border border-gray'>
             <Image
             style={styles.image}
             source={props.profile_img}
@@ -90,14 +88,14 @@ const PostWithPhoto = (props:PostContent) => {
             transition={1000}/>
           </TouchableOpacity>
           <View>
-          <Text className='text-heading3 font-noto'>{props.username}</Text>
-          <Text className='text-detail font-notoLight'>11 may 2024</Text>
+          <Text style={{color:colors.text}} className='text-heading3 font-noto'>{props.username}</Text>
+          <Text style={{color:colors.subText}} className='text-detail font-notoLight'>11 may 2024</Text>
           </View>
 
       </View>
       {props._id !== user?._id ? (
         <TouchableOpacity className="flex-row rounded-full p-1 px-2">
-          <OptionIcon width={24} height={24} color={'#CFCFCF'}/>
+          <OptionIcon width={24} height={24} color={colors.darkGray}/>
         </TouchableOpacity>
       ):(
         <TouchableOpacity className="flex-row rounded-full bg-gray p-1 px-2">
@@ -139,7 +137,7 @@ const PostWithPhoto = (props:PostContent) => {
     }
 
     <Text
-      style={{marginVertical:3}} className='text-body font-noto line-clamp-2'
+      style={{marginVertical:3, color:colors.text}} className='text-body font-noto line-clamp-2'
       numberOfLines={2}
       ellipsizeMode="tail"
     >
@@ -149,24 +147,24 @@ const PostWithPhoto = (props:PostContent) => {
     <View style={{paddingBottom:8}} className="mt-2 flex-row gap-2 items-center justify-between">
       <View style={{gap:14}} className=" items-end flex-row bg-rose-200">
         <TouchableOpacity className=" flex-row gap-1 items-center">
-          <LikeIcon width={26} height={26} color={'#CFCFCF'}/>
-          <Text className='text-body font-noto'>123k</Text>
+          <LikeIcon width={26} height={26} color={colors.darkGray}/>
+          <Text style={{color:colors.subText}} className='text-body font-noto'>123k</Text>
         </TouchableOpacity>
         <TouchableOpacity className=" flex-row gap-1 items-center">
-          <CommentIcon width={26} height={26}color={'#CFCFCF'}/>
-          <Text className='text-body font-noto'>567k</Text>
+          <CommentIcon width={26} height={26}color={colors.darkGray}/>
+          <Text style={{color:colors.subText}} className='text-body font-noto'>567k</Text>
         </TouchableOpacity>
       </View>
 
       <View className=" flex-row gap-1">
-          <TouchableOpacity className="rounded-full bg-gray p-1 px-2">
-            <Text className="text-subText text-detail font-noto">exercise</Text>
+          <TouchableOpacity style={{backgroundColor:colors.gray}} className="rounded-full p-1 px-2">
+            <Text style={{color:colors.subText}} className=" text-detail font-noto">exercise</Text>
           </TouchableOpacity>
-          <TouchableOpacity className="rounded-full bg-gray p-1 px-2">
-            <Text className="text-subText text-detail font-noto ">fitness</Text>
+          <TouchableOpacity style={{backgroundColor:colors.gray}} className="rounded-full p-1 px-2">
+            <Text style={{color:colors.subText}} className=" text-detail font-noto ">fitness</Text>
           </TouchableOpacity>
-          <TouchableOpacity className="rounded-full bg-gray p-1 px-2">
-            <Text className="text-subText text-detail font-noto">+2</Text>
+          <TouchableOpacity style={{backgroundColor:colors.gray}} className="rounded-full p-1 px-2">
+            <Text style={{color:colors.subText}} className=" text-detail font-noto">+2</Text>
           </TouchableOpacity>
       </View>
     </View>

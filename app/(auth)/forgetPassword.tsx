@@ -6,9 +6,11 @@ import { sendPasswordResetEmail } from 'firebase/auth'
 import { auth } from '../../components/auth/firebaseConfig'
 import Modal from '../../components/modal/Modal'
 import { router } from 'expo-router'
+import { useTheme } from '../../context/themeContext'
 
 const forgetPassword = () => {
 
+  const { colors } = useTheme();
   const [email, setEmail] = useState('')
   const [sended, setSended] = useState(false)
   const [err, setErr] = useState('')
@@ -37,7 +39,7 @@ const forgetPassword = () => {
   };
 
   return (
-    <SafeAreaView className="w-full h-full justify-start items-center bg-Background font-noto">
+    <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-start items-center font-noto">
       <View className='w-[92%] flex items-start mt-4'>
         <BackButton goto={'/welcome'}/>
       </View>
@@ -64,7 +66,7 @@ const forgetPassword = () => {
             {err? (
               <Text className='text-detail text-red font-noto mt-2'>{err}</Text>
             ):(
-              <Text className='text-detail text-subText font-notoLight mt-2'>please give an email, we will send link to reset your password to your email</Text>
+              <Text style={{color:colors.subText}} className='text-detail font-notoLight mt-2'>please give an email, we will send link to reset your password to your email</Text>
             )}
 
             <View className='w-full flex-row p-1 justify-center mt-8'>
@@ -76,10 +78,10 @@ const forgetPassword = () => {
           </View>
         </ScrollView>
         <Modal isOpen={sended} setIsOpen={setSended}>
-          <View className= 'w-full bg-white h-fit p-4 rounded-normal'>
+          <View style={{backgroundColor:colors.white}} className= 'w-full h-fit p-4 rounded-normal'>
             <View className='w-full items-start justify-center flex gap-2'>
-                <Text className='text-heading mt-2 text-green'>Password reset email sent!</Text>
-                <Text className='text-subText font-notoLight'>Please follow step in email and back to login</Text>
+                <Text style={{color:colors.green}} className='text-heading mt-2'>Password reset email sent!</Text>
+                <Text style={{color:colors.subText}} className=' font-notoLight'>Please follow step in email and back to login</Text>
             </View>
             <View className='mt-4 w-full items-end justify-end flex-row gap-4'>
               <TouchableOpacity style={{backgroundColor:'#1c60de'}} onPress={()=>{setSended(false); router.back();}} className='will-change-contents flex flex-row items-center justify-center rounded-full p-1 px-6 bg-primary'>

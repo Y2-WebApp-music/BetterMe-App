@@ -2,6 +2,7 @@ import { View, Text } from 'react-native'
 import React from 'react'
 import { BarChart } from 'react-native-gifted-charts'
 import { Dimensions } from 'react-native';
+import { useTheme } from '../../context/themeContext';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -20,14 +21,14 @@ const WeekFoodChart = ({graph}:WeekFoodChartProp) => {
   //   {value: 1869, label: 'Sun',labelTextStyle: {color: '#626262'},},
   // ];
 
+  const { colors } = useTheme();
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-  // แปลงข้อมูล graph ให้เป็นรูปแบบที่ BarChart ต้องการ
   const barData = graph.map((value, index) => ({
     value: value,
     label: days[index],
-    labelTextStyle: { color: '#626262' },
-    frontColor: value > 0 ? '#0DC47C' : '#DCDCDC', // สีเทาสำหรับค่าว่าง
+    labelTextStyle: { color: colors.subText },
+    frontColor: value > 0 ? colors.green : colors.background, // สีเทาสำหรับค่าว่าง
   }));
 
   const barWidth = screenWidth * 0.08;
@@ -46,12 +47,12 @@ const WeekFoodChart = ({graph}:WeekFoodChartProp) => {
         spacing={spacing}
         width={chartWidth}
         height={150}
-        frontColor="#0DC47C"
+        frontColor={colors.darkGray}
         data={barData}
         yAxisThickness={0}
-        yAxisTextStyle={{ color: '#626262', fontSize: 12, textAlign:'right' }}
+        yAxisTextStyle={{ color: colors.subText, fontSize: 12, textAlign:'right' }}
         xAxisThickness={1}
-        xAxisColor={'#CFCFCF'}
+        xAxisColor={colors.darkGray}
         animationDuration={300}
         isAnimated
         disablePress

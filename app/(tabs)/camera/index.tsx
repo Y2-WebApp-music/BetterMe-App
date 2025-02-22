@@ -17,10 +17,13 @@ import { firebaseStorage } from '../../../components/auth/firebaseConfig';
 import { format } from 'date-fns';
 import { MealAi } from '../../../types/food';
 import * as ImageManipulator from 'expo-image-manipulator';
+import { useTheme } from '../../../context/themeContext';
 
 const screenWidth = Dimensions.get('window').width;
 
 const TakePicture = () => {
+
+  const { colors } = useTheme();
   const { user } = useAuth()
 
   const cameraRef = useRef<CameraView | null>(null);
@@ -270,7 +273,7 @@ const TakePicture = () => {
   }
 
   return (
-    <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
+    <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-center items-center font-noto">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1, width:"100%",alignItems:'center' }}
@@ -290,7 +293,7 @@ const TakePicture = () => {
           {step === 1 &&
             <View >
               <Text className='text-title font-notoSemiBold text-primary'>Take a Photo!</Text>
-              <Text className='text-subText font-notoLight'>Snap a photo to identify your dishes. Learn nutritional facts and make healthier food choices every day!</Text>
+              <Text style={{color:colors.subText}} className='font-notoLight'>Snap a photo to identify your dishes. Learn nutritional facts and make healthier food choices every day!</Text>
               <View className='rounded-normal overflow-hidden mt-4'>
                 {permission && permission.granted?(
                   <CameraView
@@ -325,7 +328,7 @@ const TakePicture = () => {
           {(step === 2 && photo) &&
             <View>
               <Text className='text-title font-notoSemiBold text-primary'>Add portion?</Text>
-              <Text className='text-subText font-notoLight'>Ex. extra, large dish</Text>
+              <Text style={{color:colors.subText}} className='font-notoLight'>Ex. extra, large dish</Text>
               <View className=' relative rounded-normal overflow-hidden mt-4'>
                 <Image
                   style={styles.camera}
@@ -390,9 +393,10 @@ const TakePicture = () => {
                   <View>
                     <TouchableOpacity
                         onPress={handleAddFood}
-                        className='will-change-contents flex flex-row items-center justify-center p-1 px-4 rounded-full bg-gray'
+                        className='will-change-contents flex flex-row items-center justify-center p-1 px-4 rounded-full'
+                        style={{backgroundColor:colors.gray}}
                       >
-                        <Text className='w-fit text-subText text-heading3 font-notoMedium'>Add other food</Text>
+                        <Text style={{color:colors.subText}} className='w-fit text-heading3 font-notoMedium'>Add other food</Text>
                       </TouchableOpacity>
                   </View>
                 </View>
@@ -400,13 +404,13 @@ const TakePicture = () => {
                   <View className='grow justify-center'>
                     <Text className='text-heading font-noto'>{data.food_name}</Text>
                     {detail &&
-                      <Text className='text-subText font-noto -translate-y-1'>{detail}</Text>
+                      <Text style={{color:colors.subText}} className=' font-noto -translate-y-1'>{detail}</Text>
                     }
                   </View>
                   <View className='flex-row gap-1 items-end'>
                     <Text className='text-title font-notoMedium text-primary'>{data.calorie}</Text>
                     <View style={{transform:[{ translateY: -8 }]}}>
-                      <Text className='font-noto'>cal</Text>
+                      <Text style={{color:colors.text}} className='font-noto'>cal</Text>
                     </View>
                   </View>
                 </View>
@@ -419,30 +423,30 @@ const TakePicture = () => {
                   }
                 </View>
                 <View className='py-2'>
-                  <Text className='font-noto text-heading2'>Detail of this food</Text>
+                  <Text style={{color:colors.text}} className='font-noto text-heading2'>Detail of this food</Text>
                   <View className='flex gap-1' style={{transform:[{ translateY: -8 }]}}>
                     <View className='flex-row gap-6'>
                       <View className='flex-row gap-2 items-end'>
-                        <Text className='text-body text-subText w-[14vw]'>Carbs</Text>
+                        <Text style={{color:colors.subText}} className='text-body w-[14vw]'>Carbs</Text>
                         <View style={{transform:[{ translateY: 6 }]}}>
-                          <Text className='text-heading font-notoMedium w-[8vw]'>{data.carbs}</Text>
+                          <Text style={{color:colors.text}} className='text-heading font-notoMedium w-[8vw]'>{data.carbs}</Text>
                         </View>
-                        <Text className='text-body text-subText'>grams</Text>
+                        <Text style={{color:colors.subText}} className='text-body'>grams</Text>
                       </View>
                       <View className='flex-row gap-2 items-end'>
-                        <Text className='text-body text-subText w-[14vw]'>Protein</Text>
+                        <Text style={{color:colors.subText}} className='text-body  w-[14vw]'>Protein</Text>
                         <View style={{transform:[{ translateY: 6 }]}}>
-                          <Text className='text-heading font-notoMedium w-[8vw]'>{data.protein}</Text>
+                          <Text style={{color:colors.text}} className='text-heading font-notoMedium w-[8vw]'>{data.protein}</Text>
                         </View>
-                        <Text className='text-body text-subText'>grams</Text>
+                        <Text style={{color:colors.subText}} className='text-body'>grams</Text>
                       </View>
                     </View>
                     <View className='flex-row gap-2 items-end'>
-                      <Text className='text-body text-subText w-[14vw]'>Fat</Text>
+                      <Text style={{color:colors.subText}} className='text-body w-[14vw]'>Fat</Text>
                       <View style={{transform:[{ translateY: 6 }]}}>
-                        <Text className='text-heading font-notoMedium w-[8vw]'>{data.fat}</Text>
+                        <Text style={{color:colors.text}} className='text-heading font-notoMedium w-[8vw]'>{data.fat}</Text>
                       </View>
-                      <Text className='text-body text-subText'>grams</Text>
+                      <Text style={{color:colors.subText}} className='text-body'>grams</Text>
                     </View>
                   </View>
                 </View>
