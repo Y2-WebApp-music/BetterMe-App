@@ -5,6 +5,7 @@ import { Platform, Text, View } from "react-native";
 import { CalendarIcon, CaptureIcon, CommunityIcon, HomeIcon, MenuIcon } from "../../constants/icon";
 import Calendar from "./calendar/_layout";
 import { useTheme } from "../../context/themeContext";
+import { useColorScheme } from "react-native";
 
 interface TabIconProps {
   icon: React.FC<SvgProps>;
@@ -36,9 +37,12 @@ const CameraIcon: React.FC<TabIconProps> = ({ icon: Icon, color, focused }) => {
 const NavHeight = Platform.OS === 'ios' ? 87 : 70
 
 const TabsLayout = () => {
+
+  const systemTheme = useColorScheme();
   const { theme, colors } = useTheme();
 
   return (
+    <View style={{backgroundColor:colors.background}} className="flex-1">
       <Tabs
         screenOptions={{
           tabBarShowLabel: false,
@@ -51,14 +55,14 @@ const TabsLayout = () => {
             alignItems:"center",
             paddingTop:7,
             backgroundColor:colors.background,
-            shadowColor: theme === "dark" ? 'white':'#000',
+            shadowColor: theme === "system" ? systemTheme == "dark"? 'white' :'black' : theme == "dark"? 'white' :'black',
             shadowOffset: { width: 0, height: -3 },
             shadowOpacity: 0.1,
             shadowRadius: 3,
             elevation: 5,
           },
           animation:'shift',
-          tabBarHideOnKeyboard:true
+          tabBarHideOnKeyboard:true,
         }}
       >
         <Tabs.Screen
@@ -122,6 +126,7 @@ const TabsLayout = () => {
           }}
         />
       </Tabs>
+    </View>
   );
 };
 
