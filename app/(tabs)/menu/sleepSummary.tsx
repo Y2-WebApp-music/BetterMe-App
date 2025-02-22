@@ -1,14 +1,18 @@
 import { View, Text, SafeAreaView, KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import BackButton from '../../../components/Back'
 import { BackwardIcon, ForwardIcon, NightIcon } from '../../../constants/icon'
 import SleepToday from '../../../components/sleep/sleepToday'
 import WeekSleepChart from '../../../components/sleep/weekSleepChart'
 import SleepDaySummary from '../../../components/sleep/sleepDaySummary'
 import Animated, { useAnimatedRef, useAnimatedStyle, useScrollViewOffset, withTiming } from 'react-native-reanimated'
+import { useTheme } from '../../../context/themeContext'
+import EditSleepModal from '../../../components/modal/EditSleepModal'
+import { preventAutoHideAsync } from 'expo-router/build/utils/splash'
 
 const SleepSummary = () => {
 
+  const { colors } = useTheme();
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollHandler = useScrollViewOffset(scrollRef);
 
@@ -16,10 +20,17 @@ const SleepSummary = () => {
     return {
       opacity: scrollHandler. value > 330 ? withTiming(1) : withTiming(0),
     }
-  }) ;
+  });
+
+  const [editSleep, setEditSleep] = useState(true)
+  const [sleepData, setSleepData] = useState({
+    totalTime: 512,
+    startTime: new Date(),
+    endTime: new Date(),
+  })
 
   return (
-    <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
+    <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-center items-center font-noto">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1, width:"100%",alignItems:'center' }}
@@ -71,7 +82,7 @@ const SleepSummary = () => {
               <Text className='text-body font-noto'>Sleep Time</Text>
             </View>
             <View >
-              <WeekSleepChart/>
+              <WeekSleepChart graph={[4,5,3.4,5.6,6.7,0,3]}/>
             </View>
           </View>
 
@@ -86,6 +97,15 @@ const SleepSummary = () => {
           </View>
 
         </ScrollView>
+
+        <EditSleepModal
+          startDate={sleepData.startTime}
+          setStartDate={(newStartDate) => setSleepData((prev) => ({ ...prev, startTime: newStartDate }))}
+          endDate={sleepData.endTime}
+          setEndDate={(newEndDate) => setSleepData((prev) => ({ ...prev, endTime: newEndDate }))}
+          isOpen={editSleep}
+          setIsOpen={setEditSleep}
+        />
       </KeyboardAvoidingView>
     </SafeAreaView>
   )
