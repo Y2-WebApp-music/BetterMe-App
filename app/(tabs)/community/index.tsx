@@ -220,7 +220,7 @@ const CommunityFeed = () => {
           right:0,
           height: insets.top,
           zIndex:100,
-          backgroundColor:colors.white
+          backgroundColor:colors.background
         }}
       />
     </SafeAreaView>
