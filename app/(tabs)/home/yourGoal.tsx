@@ -10,9 +10,11 @@ import SearchInput from '../../../components/SearchInput'
 import axios from 'axios'
 import { SERVER_URL } from '@env'
 import { FlashList } from "@shopify/flash-list";
+import { useTheme } from '../../../context/themeContext'
 
 const YourGoal = () => {
 
+  const { colors } = useTheme();
   const { user } = useAuth()
   const [search, setSearch] = useState('')
 
@@ -140,7 +142,7 @@ const YourGoal = () => {
   );
 
   return (
-    <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
+    <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-center items-center font-noto">
       <View className='w-[92%] mt-4'>
         <View className='w-full'>
           <View className='max-w-[14vw]'>
@@ -166,16 +168,16 @@ const YourGoal = () => {
         */}
         <View className='flex w-full justify-center'>
           <View className='mt-3 w-full flex-row gap-2 items-center justify-center'>
-            <TouchableOpacity onPress={()=>{router.push('/home/goal/complete')}} className='flex-col p-1 px-4 min-w-28 rounded-normal bg-white border border-gray items-center justify-center'>
-              <Text className='font-noto text-body text-subText'>complete</Text>
+            <TouchableOpacity style={{backgroundColor:colors.white, borderColor:colors.gray}} onPress={()=>{router.push('/home/goal/complete')}} className='flex-col p-1 px-4 min-w-28 rounded-normal border items-center justify-center'>
+              <Text style={{color:colors.subText}} className='font-noto text-body'>complete</Text>
               <Text className='text-heading font-notoMedium text-green'>{summary.complete}</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={()=>{router.push('/home/goal/inprogress')}} className='flex-col p-1 px-4 min-w-28 rounded-normal bg-white border border-gray items-center justify-center'>
-              <Text className='font-noto text-body text-subText'>in progress</Text>
+            <TouchableOpacity style={{backgroundColor:colors.white, borderColor:colors.gray}} onPress={()=>{router.push('/home/goal/inprogress')}} className='flex-col p-1 px-4 min-w-28 rounded-normal border items-center justify-center'>
+              <Text style={{color:colors.subText}} className='font-noto text-body '>in progress</Text>
               <Text className='text-heading font-notoMedium text-yellow'>{summary.inprogress}</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={()=>{router.push('/home/goal/fail')}} className='flex-col p-1 px-4 min-w-28 rounded-normal bg-white border border-gray items-center justify-center'>
-              <Text className='font-noto text-body text-subText'>failed</Text>
+            <TouchableOpacity style={{backgroundColor:colors.white, borderColor:colors.gray}} onPress={()=>{router.push('/home/goal/fail')}} className='flex-col p-1 px-4 min-w-28 rounded-normal border items-center justify-center'>
+              <Text style={{color:colors.subText}} className='font-noto text-body '>failed</Text>
               <Text className='text-heading font-notoMedium text-red'>{summary.fail}</Text>
             </TouchableOpacity>
           </View>

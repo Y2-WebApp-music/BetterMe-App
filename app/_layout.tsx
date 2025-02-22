@@ -18,6 +18,7 @@ import ProtectedLogin from '../components/auth/ProtectedLogin';
 import { AuthProvider } from '../context/authContext';
 import 'react-native-reanimated'
 import 'react-native-gesture-handler'
+import { ThemeProvider } from '../context/themeContext';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -46,16 +47,18 @@ export default function RootLayout() {
   }
 
   return (
-    <AuthProvider>
-      <ProtectedLogin>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          <Stack.Screen name="welcome" options={{ headerShown: false }} />
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="oauthredirect" options={{ headerShown: false }} />
-        </Stack>
-      </ProtectedLogin>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <ProtectedLogin>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+            <Stack.Screen name="welcome" options={{ headerShown: false }} />
+            <Stack.Screen name="index" options={{ headerShown: false }} />
+            <Stack.Screen name="oauthredirect" options={{ headerShown: false }} />
+          </Stack>
+        </ProtectedLogin>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

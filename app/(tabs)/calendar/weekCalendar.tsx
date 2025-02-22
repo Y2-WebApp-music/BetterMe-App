@@ -17,8 +17,12 @@ import axios from 'axios'
 import { SERVER_URL } from '@env'
 import { homeGoalCardProp } from '../../../types/goal'
 import CalendarFoodToday from '../../../components/food/calendarFoodToday'
+import { useTheme } from '../../../context/themeContext'
 
 const WeekCalendar = () => {
+
+  const { colors } = useTheme();
+
   const [viewMeal, setViewMeal] = useState(true)
   const [openOption, setOpenOption] = useState(false)
   const [monthModal, setMonthModal] = useState(false)
@@ -112,29 +116,29 @@ const WeekCalendar = () => {
   },[selectedDate])
 
   return (
-    <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
+    <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-center items-center font-noto">
       <View className='w-[92%] relative h-auto mt-3 flex-row items-center'>
         <View className='flex-row gap-4 items-center justify-start pr-4'>
           <TouchableOpacity activeOpacity={0.6} onPress={()=>{setMonthModal(!monthModal)}} className="min-w-fit flex-col justify-center items-start">
-            <Text className="text-heading2 font-notoMedium ">{currentMonth.split(' ')[0]}</Text>
-            <Text className="text-body font-noto text-nonFocus">{currentMonth.split(' ')[1]}</Text>
+            <Text style={{color:colors.text}} className="text-heading2 font-notoMedium ">{currentMonth.split(' ')[0]}</Text>
+            <Text style={{color:colors.nonFocus}} className="text-body font-noto">{currentMonth.split(' ')[1]}</Text>
           </TouchableOpacity>
         </View>
-        <View className={`border ${selectedDate.setHours(0, 0, 0, 0).toString() === today.setHours(0, 0, 0, 0).toString()?'border-primary':'border-gray'} p-1 px-2 rounded-normal`}>
+        <View style={{borderColor:selectedDate.setHours(0, 0, 0, 0).toString() === today.setHours(0, 0, 0, 0).toString()?colors.primary : colors.subText}} className={`border p-1 px-2 rounded-normal`}>
           <TouchableOpacity onPress={goToToday}>
-            <Text className={`text-detail font-noto ${selectedDate.setHours(0, 0, 0, 0) === today.setHours(0, 0, 0, 0)? 'text-primary' : 'text-subText'}`}>Today</Text>
+            <Text style={{color:selectedDate.setHours(0, 0, 0, 0) === today.setHours(0, 0, 0, 0)? colors.primary : colors.subText}} className={`text-detail font-noto `}>Today</Text>
           </TouchableOpacity>
         </View>
         <View className='grow'></View>
         <TouchableOpacity onPress={()=>setOpenOption(!openOption)} className=' p-1 px-2 rounded-normal flex-row gap-1 items-center'>
-          <Text className='text-subText font-noto text-body'>Week</Text>
-          <ArrowIcon width={16} height={16} color={'#626262'} style={{transform:[openOption?{rotate:'180deg'}:{rotate:'0deg'}]}}/>
+          <Text style={{color:colors.subText}} className=' font-noto text-body'>Week</Text>
+          <ArrowIcon width={16} height={16} color={colors.darkGray} style={{transform:[openOption?{rotate:'180deg'}:{rotate:'0deg'}]}}/>
         </TouchableOpacity>
         {openOption && (
-          <View className='absolute z-20 right-2 top-12 min-h-24 min-w-32 bg-white rounded-normal border border-gray p-4 flex-col gap-2'>
-            <TouchableOpacity onPress={()=>{router.replace('/calendar/')}} className='p-2 px-4 border border-gray rounded-normal flex-row gap-2 justify-center items-center'>
-              <MenuIcon width={22} height={22} color={'#626262'}/>
-              <Text className='grow font-noto text-heading3 text-subText'>month</Text>
+          <View style={{backgroundColor:colors.white, borderColor:colors.gray}} className='absolute z-20 right-2 top-12 min-h-24 min-w-32 rounded-normal border p-4 flex-col gap-2'>
+            <TouchableOpacity onPress={()=>{router.replace('/calendar/')}} style={{borderColor:colors.gray}} className='p-2 px-4 border rounded-normal flex-row gap-2 justify-center items-center'>
+              <MenuIcon width={22} height={22} color={colors.darkGray}/>
+              <Text style={{color:colors.subText}} className='grow font-noto text-heading3'>month</Text>
             </TouchableOpacity>
             <TouchableOpacity className='p-2 px-4 border border-primary rounded-normal flex-row gap-2 justify-center items-center'>
               <GridIcon width={22} height={22} color={'#1C60DE'}/>

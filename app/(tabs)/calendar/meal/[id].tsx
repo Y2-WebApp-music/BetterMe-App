@@ -7,11 +7,13 @@ import axios from 'axios';
 import { SERVER_URL } from '@env';
 import { Meal } from '../../../../types/food';
 import { Image } from 'expo-image';
+import { useTheme } from '../../../../context/themeContext';
 
 const screenWidth = Dimensions.get('window').width;
 
 const MealPage = () => {
 
+  const { colors } = useTheme();
   const { id } = useLocalSearchParams();
 
   const [meal, setMeal] = useState<Meal>()
@@ -44,7 +46,7 @@ const MealPage = () => {
   );
 
   return (
-    <SafeAreaView className="w-full h-full justify-start items-center bg-Background font-noto" >
+    <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-start items-center font-noto" >
       <View className='w-[92%] mt-4 flex-row'>
         <View className=''>
           <View className='max-w-[14vw]'>
@@ -60,11 +62,11 @@ const MealPage = () => {
         <View className=''>
           <View className='w-full flex-row'>
             <View className='grow'>
-              <Text className='text-heading font-noto'>{meal?.food_name}</Text>
+              <Text style={{color:colors.text}} className='text-heading font-noto'>{meal?.food_name}</Text>
               {meal?.portion &&
-                <Text className='text-subText font-noto -translate-y-1'>{meal?.portion}</Text>
+                <Text style={{color:colors.subText}} className='font-noto -translate-y-1'>{meal?.portion}</Text>
               }
-              <Text className='text-subText font-noto -translate-y-1 mt-1'>
+              <Text style={{color:colors.subText}} className='font-noto -translate-y-1 mt-1'>
                 {new Intl.DateTimeFormat('en-GB', {
                       day: 'numeric',
                       month: 'long',
@@ -77,7 +79,7 @@ const MealPage = () => {
             <View className='flex-row gap-1 items-center'>
               <Text className='text-title font-notoMedium text-primary'>{meal?.calorie}</Text>
               <View style={{transform:[{ translateY: 4 }]}}>
-                <Text className='font-noto'>cal</Text>
+                <Text style={{color:colors.text}} className='font-noto'>cal</Text>
               </View>
             </View>
           </View>
@@ -94,30 +96,30 @@ const MealPage = () => {
           {/* </View> */}
 
           <View className='py-2'>
-            <Text className='font-noto text-heading2'>Detail of this food</Text>
+            <Text style={{color:colors.text}} className='font-noto text-heading2'>Detail of this food</Text>
             <View className='flex gap-1' style={{transform:[{ translateY: -8 }]}}>
               <View className='flex-row gap-6'>
                 <View className='flex-row gap-2 items-end'>
-                  <Text className='text-body text-subText w-[14vw]'>Carbs</Text>
+                  <Text style={{color:colors.subText}} className='text-body w-[14vw]'>Carbs</Text>
                   <View style={{transform:[{ translateY: 6 }]}}>
-                    <Text className='text-heading font-notoMedium w-[8vw]'> {meal?.carbs} </Text>
+                    <Text style={{color:colors.text}}className='text-heading font-notoMedium w-[8vw]'> {meal?.carbs} </Text>
                   </View>
-                  <Text className='text-body text-subText'>grams</Text>
+                  <Text style={{color:colors.subText}} className='text-body '>grams</Text>
                 </View>
                 <View className='flex-row gap-2 items-end'>
-                  <Text className='text-body text-subText w-[14vw]'>Protein</Text>
+                  <Text style={{color:colors.subText}} className='text-body w-[14vw]'>Protein</Text>
                   <View style={{transform:[{ translateY: 6 }]}}>
-                    <Text className='text-heading font-notoMedium w-[8vw]'> {meal?.protein} </Text>
+                    <Text style={{color:colors.text}} className='text-heading font-notoMedium w-[8vw]'> {meal?.protein} </Text>
                   </View>
-                  <Text className='text-body text-subText'>grams</Text>
+                  <Text style={{color:colors.subText}} className='text-body '>grams</Text>
                 </View>
               </View>
               <View className='flex-row gap-2 items-end'>
-                <Text className='text-body text-subText w-[14vw]'>Fat</Text>
+                <Text style={{color:colors.subText}} className='text-body w-[14vw]'>Fat</Text>
                 <View style={{transform:[{ translateY: 6 }]}}>
-                  <Text className='text-heading font-notoMedium w-[8vw]'> {meal?.fat} </Text>
+                  <Text style={{color:colors.text}} className='text-heading font-notoMedium w-[8vw]'> {meal?.fat} </Text>
                 </View>
-                <Text className='text-body text-subText'>grams</Text>
+                <Text style={{color:colors.subText}} className='text-body '>grams</Text>
               </View>
             </View>
           </View>

@@ -1,6 +1,7 @@
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
 import { Feather } from '@expo/vector-icons'
+import { useTheme } from '../context/themeContext'
 
 type TextInputProp = {
   name:string
@@ -11,6 +12,7 @@ type TextInputProp = {
 
 const FormInput:React.FC<TextInputProp> = ({name, value, handleChange, keyboardType}) => {
 
+  const { colors } = useTheme();
   const [showPassword,setShowPassword] = useState<boolean>(false)
   const [isFocused, setIsFocused] = useState<boolean>(false);
 
@@ -18,14 +20,14 @@ const FormInput:React.FC<TextInputProp> = ({name, value, handleChange, keyboardT
     setShowPassword(prev => !prev)
   }
 
-  const borderColor = value || isFocused ? '#1C60DE' : '#E8E8E8'
+  const borderColor = value || isFocused ? colors.primary : colors.gray
 
   return (
     <View className='w-full'
       style={{marginTop: 6}}
     >
       <View style={{marginBottom: 4}}>
-        <Text className='text-subText text-detail'>{name}</Text>
+        <Text style={{color:colors.subText}} className=' text-detail'>{name}</Text>
       </View>
       <View
         className='w-full flex justify-center border border-gray focus:border-primary rounded-normal'
@@ -45,7 +47,7 @@ const FormInput:React.FC<TextInputProp> = ({name, value, handleChange, keyboardT
           }}
           value={value}
           placeholder={name}
-          placeholderTextColor="#CFCFCF"
+          placeholderTextColor={colors.darkGray}
           onChangeText={handleChange}
           secureTextEntry={keyboardType === 'password' && !showPassword}
           onFocus={() => setIsFocused(true)}
@@ -56,7 +58,7 @@ const FormInput:React.FC<TextInputProp> = ({name, value, handleChange, keyboardT
             <Feather
               name={showPassword ? 'eye-off' : 'eye'}
               size={20}
-              color="#E8E8E8"
+              color={colors.darkGray}
             />
           </TouchableOpacity>
         )}

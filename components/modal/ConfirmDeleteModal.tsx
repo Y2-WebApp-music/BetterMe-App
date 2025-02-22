@@ -1,6 +1,7 @@
 import { View, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
 import Modal from './Modal'
+import { useTheme } from '../../context/themeContext'
 
 
 type ConfirmModalProp = {
@@ -13,12 +14,15 @@ type ConfirmModalProp = {
 }
 
 const ConfirmDeleteModal = ({title, detail, deleteType, isOpen, setIsOpen, handelDelete}:ConfirmModalProp) => {
+
+  const { theme, colors } = useTheme();
+
   return (
     <Modal isOpen={isOpen} setIsOpen={setIsOpen}>
-      <View className= 'w-full bg-white h-fit p-4 rounded-normal'>
+      <View style={{backgroundColor:colors.white}} className= 'w-full h-fit p-4 rounded-normal'>
         <View className='w-full items-start justify-center flex gap-2'>
-            <Text className='text-heading mt-2'>{deleteType} this {title}?</Text>
-            <Text className='text-subText font-notoLight'>{detail}</Text>
+            <Text style={{color:colors.text}} className='text-heading mt-2'>{deleteType} this {title}?</Text>
+            <Text style={{color:colors.subText}} className=' font-notoLight'>{detail}</Text>
         </View>
         <View className='mt-4 w-full items-center justify-center flex-row gap-4'>
           <TouchableOpacity style={{backgroundColor:'#f43168'}} onPress={handelDelete} className='will-change-contents flex flex-row items-center justify-center rounded-full p-1 px-6 bg-red'>

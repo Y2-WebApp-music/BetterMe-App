@@ -4,6 +4,7 @@ import Svg, { SvgProps } from 'react-native-svg';
 import { Platform, Text, View } from "react-native";
 import { CalendarIcon, CaptureIcon, CommunityIcon, HomeIcon, MenuIcon } from "../../constants/icon";
 import Calendar from "./calendar/_layout";
+import { useTheme } from "../../context/themeContext";
 
 interface TabIconProps {
   icon: React.FC<SvgProps>;
@@ -13,18 +14,20 @@ interface TabIconProps {
 }
 
 const TabIcon: React.FC<TabIconProps> = ({ icon: Icon, color, name, focused }) => {
+  const { colors } = useTheme();
   return (
     <View className="flex items-center justify-center w-[80px] p-1">
       <Icon width={30} height={30} color={color || (focused ? 'blue' : 'gray')} />
-      <Text className={`${focused?"text-primary":"text-nonFocus"} text-sm w-max`}>
+      <Text style={{color:focused?colors.primary:colors.nonFocus}} className={`${focused?"text-primary":"text-nonFocus"} text-sm w-max`}>
         {name}
       </Text>
     </View>
   );
 };
 const CameraIcon: React.FC<TabIconProps> = ({ icon: Icon, color, focused }) => {
+  const { colors } = useTheme();
   return (
-    <View className={`${focused? 'w-[64px] h-[64px] bg-white border-4 border-primary':'w-[58px] h-[58px] bg-primary'} flex items-center justify-center rounded-[24px] p-1 -translate-y-1`}>
+    <View style={{backgroundColor:focused?'white':colors.primary}} className={`${focused? 'w-[64px] h-[64px] border-4 border-primary':'w-[58px] h-[58px] bg-primary'} flex items-center justify-center rounded-[24px] p-1 -translate-y-1`}>
       <Icon width={40} height={40} color={(focused ? color : 'white')} />
     </View>
   );
@@ -33,19 +36,22 @@ const CameraIcon: React.FC<TabIconProps> = ({ icon: Icon, color, focused }) => {
 const NavHeight = Platform.OS === 'ios' ? 87 : 70
 
 const TabsLayout = () => {
+  const { theme, colors } = useTheme();
+
   return (
       <Tabs
         screenOptions={{
           tabBarShowLabel: false,
-          tabBarActiveTintColor: '#1C60DE',
-          tabBarInactiveTintColor: '#B8D0D2',
+          tabBarActiveTintColor: colors.primary,
+          tabBarInactiveTintColor: colors.nonFocus,
           tabBarStyle:{
             height:NavHeight,
             display:"flex",
             justifyContent:"center",
             alignItems:"center",
             paddingTop:7,
-            shadowColor: '#000',
+            backgroundColor:colors.background,
+            shadowColor: theme === "dark" ? 'white':'#000',
             shadowOffset: { width: 0, height: -3 },
             shadowOpacity: 0.1,
             shadowRadius: 3,

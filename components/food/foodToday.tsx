@@ -3,6 +3,7 @@ import { PenIcon, RightArrowIcon  } from '../../constants/icon'
 import { MealSummaryCard } from '../../types/food'
 import { useAuth } from '../../context/authContext'
 import { router } from 'expo-router'
+import { useTheme } from '../../context/themeContext'
 
 
 export type Meal = {
@@ -14,10 +15,11 @@ export type Meal = {
 
 const FoodToday = ({total_calorie, total_protein, total_carbs, total_fat}:MealSummaryCard) => {
 
+  const { colors } = useTheme();
   const { user } = useAuth()
 
   return (
-    <TouchableOpacity onPress={()=>{router.push(`/calendar/weekCalendar`)}} activeOpacity={0.7} style={{paddingHorizontal:14, backgroundColor:'white' }} className='h-28 w-full rounded-normal border border-gray p-2 justify-center items-center flex-row gap-2'>
+    <TouchableOpacity onPress={()=>{router.push(`/calendar/weekCalendar`)}} activeOpacity={0.7} style={{paddingHorizontal:14, backgroundColor:colors.white, borderColor:colors.gray }} className='h-28 w-full rounded-normal border p-2 justify-center items-center flex-row gap-2'>
 
       <View style={{paddingLeft:6}} className='grow'>
         <View style={{ transform: [{ translateY: 8 }] }}>

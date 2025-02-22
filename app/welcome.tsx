@@ -8,9 +8,11 @@ import { auth } from '../components/auth/firebaseConfig';
 import FormInput from '../components/FormInput';
 import { GoogleIcon } from '../constants/icon';
 import { useAuth } from '../context/authContext';
+import { useTheme } from '../context/themeContext';
 
 export default function Welcome() {
 
+  const { colors } = useTheme();
   const { loginWithGoogle } = useAuth()
 
   const [form,setForm]= useState({
@@ -44,7 +46,7 @@ export default function Welcome() {
   }
 
   return (
-    <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
+    <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-center items-center font-noto">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1, width:"100%",alignItems:'center' }}
@@ -76,7 +78,7 @@ export default function Welcome() {
                 keyboardType="password"
               />
               <View className='w-full flex items-end mt-1'>
-                <Link href="/(auth)/forgetPassword" relativeToDirectory className='text-subText'>forget password?</Link>
+                <Link href="/(auth)/forgetPassword" relativeToDirectory style={{color:colors.subText}}>forget password?</Link>
               </View>
               {err && <Text className='text-detail text-red absolute bottom-0'>{err}</Text>}
             </View>
@@ -85,18 +87,19 @@ export default function Welcome() {
               <TouchableOpacity onPress={handleSubmit} className='flex flex-row items-center justify-center rounded-full p-1 px-4 bg-primary'>
                 <Text className='text-white text-heading2 font-notoMedium'>Login</Text>
               </TouchableOpacity>
-              <Text className='text-subText'>Or continue with</Text>
+              <Text style={{color:colors.subText}}>Or continue with</Text>
               <TouchableOpacity
                 onPress={()=> promptAsync()}
-                className='flex flex-row items-center justify-center border border-gray rounded-full p-2 px-4'
+                className='flex flex-row items-center justify-center border rounded-full p-2 px-4'
+                style={{borderColor:colors.gray}}
               >
                 <GoogleIcon width={26} height={26}/>
-                <Text>Google</Text>
+                <Text style={{color:colors.text}}>Google</Text>
               </TouchableOpacity>
             </View>
 
             <View className='w-full flex justify-start items-start mt-16'>
-              <Text className='text-subText'>Don’t you have an account?</Text>
+              <Text style={{color:colors.subText}}>Don’t you have an account?</Text>
               <Link href="/(auth)/register" relativeToDirectory className='text-primary text-heading2 font-notoSemiBold'>Create your account</Link>
             </View>
 

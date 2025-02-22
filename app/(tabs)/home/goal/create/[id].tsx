@@ -12,9 +12,11 @@ import { SERVER_URL } from '@env';
 import { FlashList } from '@shopify/flash-list';
 import WarningModal from '../../../../../components/modal/WarningModal';
 import RNDateTimePicker from '@react-native-community/datetimepicker';
+import { useTheme } from '../../../../../context/themeContext';
 
 export default function GoalCreatePage() {
 
+  const { colors } = useTheme();
   const { id } = useLocalSearchParams();
   const { user } = useAuth()
 
@@ -196,7 +198,7 @@ export default function GoalCreatePage() {
   },[id])
 
   return (
-    <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
+    <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-center items-center font-noto">
       {!isConfirming?(
       <>
       <View className='w-[92%] mt-4'>
@@ -240,12 +242,12 @@ export default function GoalCreatePage() {
 
             <View className='mt-4'>
               <View className='flex-row'>
-                <Text className='grow text-subText'>Date</Text>
-                <Text className='text-subText'>{duration}</Text>
+                <Text style={{color:colors.subText}} className='grow '>Date</Text>
+                <Text style={{color:colors.subText}} >{duration}</Text>
               </View>
               <View className='flex-row gap-3 items-end justify-center'>
                 <View className='grow  mt-2 items-center' style={{marginTop: 10}}>
-                  <Text className='text-subText text-detail'>start</Text>
+                  <Text style={{color:colors.subText}} className=' text-detail'>start</Text>
                   <TouchableOpacity
                     onPress={()=>{setStartDateModal(true)}}
                     className='w-full h-[5vh] px-4 p-2 flex justify-center border border-primary rounded-normal'
@@ -255,9 +257,9 @@ export default function GoalCreatePage() {
                     </Text>
                   </TouchableOpacity>
                 </View>
-                <Text className='text-title font-noto text-subText'>-</Text>
+                <Text style={{color:colors.subText}} className='text-title font-noto '>-</Text>
                 <View className='grow mt-2 items-center' style={{marginTop: 10}}>
-                  <Text className='text-subText text-detail'>end</Text>
+                  <Text style={{color:colors.subText}} className=' text-detail'>end</Text>
                   <TouchableOpacity
                     onPress={()=>{setEndDateModal(true)}}
                     className='w-full h-[5vh] px-4 p-2 flex justify-center border border-primary rounded-normal'
@@ -326,8 +328,8 @@ export default function GoalCreatePage() {
                     <View key={index} style={{marginBottom:12}} className="flex-row gap-2 items-center">
                       <View className="rounded-full h-3 w-3 bg-primary"></View>
                       <View
-                        className="grow flex justify-center border border-gray focus:border-primary rounded-normal"
-                        style={{ height: 44 }}
+                        className="grow flex justify-center border focus:border-primary rounded-normal"
+                        style={{ height: 44, borderColor:colors.gray }}
                       >
                         <TextInput
                           className="flex-1 px-2 text-primary text-heading2 flex-wrap"
@@ -337,7 +339,7 @@ export default function GoalCreatePage() {
                             textAlignVertical: 'center',
                           }}
                           placeholder="Task name..."
-                          placeholderTextColor="#CFCFCF"
+                          placeholderTextColor={colors.darkGray}
                           multiline={true}
                           numberOfLines={4}
                           value={item.task_name}
@@ -349,7 +351,7 @@ export default function GoalCreatePage() {
                         />
                       </View>
                       <TouchableOpacity onPress={() => removeTask(index)}>
-                        <CloseIcon width={26} height={26} color="#CFCFCF" />
+                        <CloseIcon width={26} height={26} color={colors.darkGray} />
                       </TouchableOpacity>
                     </View>
                     }
@@ -371,7 +373,7 @@ export default function GoalCreatePage() {
             </View>
 
             <View className='min-h-24 min-w-32 p-4 flex-col gap-2 pb-20'>
-              <TouchableOpacity onPress={()=>{setForm((prev) => ({...prev,public_goal: !prev.public_goal}))}} className='p-2 px-4 border border-gray rounded-normal flex-row gap-2 justify-center items-center'>
+              <TouchableOpacity onPress={()=>{setForm((prev) => ({...prev,public_goal: !prev.public_goal}))}} style={{borderColor:colors.gray}} className='p-2 px-4 border rounded-normal flex-row gap-2 justify-center items-center'>
                 <Switch
                   trackColor={{false: '#fff', true: '#0DC47C'}}
                   thumbColor={form.public_goal ? '#FFF' : '#fff'}
@@ -379,7 +381,7 @@ export default function GoalCreatePage() {
                   onValueChange={()=>{setForm((prev) => ({...prev,public_goal: !prev.public_goal}))}}
                   value={form.public_goal}
                 />
-                <Text className='font-noto text-heading3 text-subText'>public this goal</Text>
+                <Text style={{color:colors.subText}} className='font-noto text-heading3 '>public this goal</Text>
               </TouchableOpacity>
             </View>
 
@@ -391,7 +393,7 @@ export default function GoalCreatePage() {
           <View className='flex-1 justify-center items-center'>
             <Text className='font-notoMedium text-title text-primary'>{countdown}</Text>
             <Text className='font-notoMedium text-subTitle animate-pulse text-primary'>Creating</Text>
-            <TouchableOpacity onPress={handleCancel} className='mt-12 p-1 px-4 rounded-full bg-nonFocus justify-center items-center'>
+            <TouchableOpacity onPress={handleCancel} style={{backgroundColor:colors.nonFocus}} className='mt-12 p-1 px-4 rounded-full justify-center items-center'>
               <Text className='text-white font-noto text-heading2'>Cancel</Text>
             </TouchableOpacity>
           </View>
@@ -399,46 +401,3 @@ export default function GoalCreatePage() {
     </SafeAreaView>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    marginTop: 8,
-  },
-  taskRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  bullet: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#007AFF',
-    marginRight: 8,
-  },
-  textInput: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#CFCFCF',
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    fontSize: 16,
-    color: '#333',
-    textAlignVertical: 'top',
-  },
-  center: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  addButton: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 16,
-  },
-  addButtonText: {
-    color: 'white',
-    fontSize: 16,
-  },
-});

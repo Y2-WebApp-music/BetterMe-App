@@ -1,7 +1,8 @@
-import { View, Text, TouchableOpacity } from 'react-native'
+import { View, Text, TouchableOpacity, useColorScheme } from 'react-native'
 import React from 'react'
 import Modal from './Modal'
 import RNDateTimePicker from '@react-native-community/datetimepicker'
+import { useTheme } from '../../context/themeContext'
 
 type PickDateTimeModalProp = {
   value:Date
@@ -13,6 +14,9 @@ type PickDateTimeModalProp = {
 
 const PickDateTimeModal = ({value, isOpen, setIsOpen, setDate, maximumDate}:PickDateTimeModalProp) => {
 
+  const systemTheme = useColorScheme();
+  const { theme, colors } = useTheme();
+
   const lockDate = maximumDate? new Date() : new Date(new Date().setDate(new Date().getDate() + 10000));
 
   const handleDateChange = (event: any, selectedDate: Date | undefined) => {
@@ -23,9 +27,9 @@ const PickDateTimeModal = ({value, isOpen, setIsOpen, setDate, maximumDate}:Pick
 
   return (
     <Modal isOpen={isOpen} setIsOpen={setIsOpen}>
-      <View className= 'w-full bg-white h-fit p-4 rounded-normal'>
+      <View style={{backgroundColor:colors.white}} className= 'w-full h-fit p-4 rounded-normal'>
         <View className='w-full items-center justify-center'>
-            <Text className='text-heading2 mt-2'>Select Date</Text>
+            <Text style={{color:colors.text}} className='text-heading2 mt-2'>Select Date</Text>
         </View>
         <RNDateTimePicker
           display="spinner"
@@ -35,7 +39,7 @@ const PickDateTimeModal = ({value, isOpen, setIsOpen, setDate, maximumDate}:Pick
           onChange={handleDateChange}
           style={{}}
           locale="en-Gn"
-          themeVariant='light'
+          themeVariant={theme === "system" ? systemTheme == "dark"? 'dark' :'light' : theme == "dark"? 'dark' :'light' }
         />
         <View className='w-full items-end justify-end'>
           <TouchableOpacity onPress={()=>{setIsOpen(false)}} className='will-change-contents flex flex-row items-center justify-center rounded-full p-1 px-6 bg-primary'>

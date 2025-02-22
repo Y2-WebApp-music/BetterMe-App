@@ -3,7 +3,7 @@ import axios from 'axios';
 import { format } from 'date-fns';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Dimensions, RefreshControl, SafeAreaView, ScrollView, Switch, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import { Dimensions, RefreshControl, SafeAreaView, ScrollView, Switch, Text, TouchableOpacity, TouchableWithoutFeedback, useColorScheme, View } from 'react-native';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import Animated, { useAnimatedProps, useSharedValue, withTiming } from 'react-native-reanimated';
 import Svg, { Circle } from 'react-native-svg';
@@ -13,6 +13,7 @@ import { useAuth } from '../../../../context/authContext';
 import { GoalData, Task } from '../../../../types/goal';
 import { FlashList } from '@shopify/flash-list';
 import ConfirmDeleteModal from '../../../../components/modal/ConfirmDeleteModal';
+import { useTheme } from '../../../../context/themeContext';
 
 const { width } = Dimensions.get('window');
 const circle_length = width * 0.62;
@@ -21,6 +22,9 @@ const r = circle_length / (2 * Math.PI);
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 export default function GoalScreen() {
+
+  const systemTheme = useColorScheme();
+  const { theme, colors } = useTheme();
   const { user } = useAuth()
   const { id } = useLocalSearchParams();
 
@@ -192,7 +196,7 @@ export default function GoalScreen() {
   }
 
   return (
-    <SafeAreaView className="w-full h-full justify-start items-center bg-Background font-noto" >
+    <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-start items-center font-noto" >
       <ScrollView
             className='w-full h-auto pb-20'
             contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start',alignItems:'center', marginTop:0}}
@@ -210,11 +214,11 @@ export default function GoalScreen() {
               </View>
               <View className='grow relative'>
                 <TouchableOpacity className='items-end' onPress={toggleOptions}>
-                  <OptionIcon width={22} height={22} color={'#626262'}/>
+                  <OptionIcon width={22} height={22} color={colors.darkGray}/>
                 </TouchableOpacity>
                 {isOptionsVisible && (
-                <View className='absolute z-20 right-0 top-6 min-h-24 min-w-32 bg-white rounded-normal border border-gray p-4 flex-col gap-2'>
-                  <TouchableOpacity onPress={toggleSwitch} className='p-2 px-4 border border-gray rounded-normal flex-row gap-2 justify-center items-center'>
+                <View style={{backgroundColor:colors.white, borderColor:colors.gray}} className='absolute z-20 right-0 top-6 min-h-24 min-w-32 rounded-normal border p-4 flex-col gap-2'>
+                  <TouchableOpacity onPress={toggleSwitch} style={{borderColor:colors.gray}} className='p-2 px-4 border rounded-normal flex-row gap-2 justify-center items-center'>
                     <Switch
                       trackColor={{false: '#fff', true: '#0DC47C'}}
                       thumbColor={goalData.public_goal ? '#FFF' : '#fff'}
@@ -222,11 +226,11 @@ export default function GoalScreen() {
                       onValueChange={toggleSwitch}
                       value={goalData.public_goal}
                     />
-                    <Text className='font-noto text-heading3 text-subText'>public this goal</Text>
+                    <Text style={{color:colors.subText}} className='font-noto text-heading3'>public this goal</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={()=>{setOpenModal(!openModal)}} className='p-2 px-4 border border-gray rounded-normal flex-row gap-2 justify-center items-center'>
-                    <DeleteIcon width={26} height={26} color={'#E8E8E8'} />
-                    <Text className='font-noto text-heading3 text-subText'>delete this goal</Text>
+                  <TouchableOpacity onPress={()=>{setOpenModal(!openModal)}} style={{borderColor:colors.gray}} className='p-2 px-4 border rounded-normal flex-row gap-2 justify-center items-center'>
+                    <DeleteIcon width={26} height={26} color={colors.darkGray} />
+                    <Text style={{color:colors.subText}} className='font-noto text-heading3'>delete this goal</Text>
                   </TouchableOpacity>
                 </View>
                 )}
@@ -273,7 +277,7 @@ export default function GoalScreen() {
                         cx={circle_length/5.6}
                         cy={circle_length/5.6}
                         r={r-5}
-                        fill="#FBFFFF"
+                        fill={colors.background}
                         stroke='none'
                       />
                     </Svg>
@@ -296,15 +300,15 @@ export default function GoalScreen() {
               ):(
                 <>
                   <View className='w-full'>
-                    <Text className='text-subText font-noto text-body'>{goalData.description}</Text>
+                    <Text style={{color:colors.subText}} className=' font-noto text-body'>{goalData.description}</Text>
                     <View className='flex-col pl-1'>
-                      <Text className='text-subText font-notoLight text-[1rem]'>Create :{format(goalData.start_date,'d MMMM yyyy')}</Text>
-                      <Text className='text-subText font-notoLight text-[1rem]'>End : {format(goalData.end_date,'d MMMM yyyy')}</Text>
+                      <Text style={{color:colors.subText}} className=' font-notoLight text-[1rem]'>Create :{format(goalData.start_date,'d MMMM yyyy')}</Text>
+                      <Text style={{color:colors.subText}} className=' font-notoLight text-[1rem]'>End : {format(goalData.end_date,'d MMMM yyyy')}</Text>
                     </View>
                   </View>
                   <View className='flex-row justify-start items-center mt-1'>
-                    <Text className='grow text-heading3'>Task List</Text>
-                    <Text className='text-subText font-noto'>{goalData.complete_task}/{goalData.total_task} completed</Text>
+                    <Text style={{color:colors.text}} className='grow text-heading3'>Task List</Text>
+                    <Text style={{color:colors.subText}} className=' font-noto'>{goalData.complete_task}/{goalData.total_task} completed</Text>
                   </View>
                 </>
               )}
@@ -334,10 +338,11 @@ export default function GoalScreen() {
                         <BouncyCheckbox
                           size={25}
                           fillColor="#0DC47C"
-                          unFillColor="#FFFFFF"
-                          textComponent={<TextCheckBox taskName={item.task_name} isChecked={item.status} />}
+                          // unFillColor={colors.white}
+                          unFillColor={theme === "system" ? systemTheme == "dark"?colors.text:'#FFFFFF' : theme == "dark"?colors.text:'#FFFFFF'}
+                          textComponent={<TextCheckBox taskName={item.task_name} isChecked={item.status} colors={"#fff"}/>}
                           textContainerStyle={{ marginLeft: 20 }}
-                          iconStyle={{ borderColor: "#0DC47C", borderRadius: 6 }}
+                          iconStyle={{ borderColor: colors.gray, borderRadius: 6 }}
                           innerIconStyle={{ borderWidth: 2, borderRadius: 6, borderColor: '#E8E8E8' }}
                           isChecked={item.status}
                           useBuiltInState={false}
@@ -383,8 +388,14 @@ export default function GoalScreen() {
   );
 }
 
-const TextCheckBox = ({ taskName, isChecked }: { taskName: string; isChecked: boolean }) => (
+const TextCheckBox = ({ taskName, isChecked, colors }: { taskName: string; isChecked: boolean; colors:string }) => (
+
   <View className="w-full">
-    <Text className={`pl-3 w-[97%] font-noto text-body ${isChecked? 'text-green line-through':'text-text'}`}>{taskName}</Text>
+    <Text
+      className={`pl-3 w-[97%] font-noto text-body ${isChecked? 'text-green line-through':{colors}}`}
+      style={{ color: !isChecked ? colors : "#0dc47c" }}
+    >
+      {taskName}
+    </Text>
   </View>
 );

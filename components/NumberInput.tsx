@@ -1,6 +1,7 @@
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
 import { Feather } from '@expo/vector-icons'
+import { useTheme } from '../context/themeContext'
 
 type TextInputProp = {
   name:string
@@ -10,15 +11,16 @@ type TextInputProp = {
 
 const NumberInput:React.FC<TextInputProp> = ({name, value, handleChange}) => {
 
+  const { colors } = useTheme()
   const [isFocused, setIsFocused] = useState<boolean>(false);
 
-  const borderColor = value || isFocused ? '#1C60DE' : '#E8E8E8'
+  const borderColor = value || isFocused ? colors.primary : colors.gray
 
   return (
     <View className='w-full mt-2'
       style={{marginTop: 10}}
     >
-      <Text className='text-subText text-detail'>{name}</Text>
+      <Text style={{color:colors.subText}} className=' text-detail'>{name}</Text>
       <View
         className='w-full flex justify-center border border-gray focus:border-primary rounded-normal'
         style={[

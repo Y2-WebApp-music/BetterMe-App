@@ -3,6 +3,7 @@ import React from 'react'
 import { AddIcon } from '../../constants/icon'
 import { GoalCreateCardProp } from '../../types/goal'
 import { router } from 'expo-router'
+import { useTheme } from '../../context/themeContext'
 
 export const calculateDuration = (start_date: string | Date, end_date: string | Date) => {
   const start = new Date(start_date);
@@ -23,14 +24,15 @@ export const calculateDuration = (start_date: string | Date, end_date: string | 
 
 const GoalCreateCard = ({goal_id, goal_name, start_date, end_date, total_task, create_by}:GoalCreateCardProp) => {
 
+  const { colors } = useTheme();
   const duration = calculateDuration(start_date, end_date)
 
   return (
-    <TouchableOpacity onPress={()=>{router.push(`/home/goal/create/${goal_id}`)}} style={{marginBottom: 8}} className='h-32 p-4 w-full justify-center rounded-normal border border-gray bg-white flex-row'>
+    <TouchableOpacity onPress={()=>{router.push(`/home/goal/create/${goal_id}`)}} style={{marginBottom: 8, backgroundColor:colors.background,borderColor:colors.gray}} className='h-32 p-4 w-full justify-center rounded-normal border border-gray bg-white flex-row'>
       <View style={{width:'89%', height:'100%'}} className='flex justify-center items-start'>
         <View style={{width:'100%', height:'70%'}} className='justify-center'>
           <Text
-            style={{overflow: 'hidden',}}
+            style={{overflow: 'hidden', color:colors.text}}
             numberOfLines={2}
             ellipsizeMode="tail"
             className='font-noto text-heading2 line-clamp-2'
@@ -38,8 +40,8 @@ const GoalCreateCard = ({goal_id, goal_name, start_date, end_date, total_task, c
             {goal_name}
           </Text>
         </View>
-        <Text className='text-detail text-subText font-noto'>create by : {create_by}</Text>
-        <Text className='text-detail text-subText font-noto'>{total_task} Task duration : {duration}</Text>
+        <Text style={{color:colors.subText}} className='text-detail font-noto'>create by : {create_by}</Text>
+        <Text style={{color:colors.subText}} className='text-detail font-noto'>{total_task} Task duration : {duration}</Text>
       </View>
       <View style={{width:'10%', height:'100%'}} className=' justify-center items-end'>
         <AddIcon color={'#1C60DE'}/>

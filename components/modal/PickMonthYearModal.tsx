@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import Modal from './Modal'
 import { Picker } from '@react-native-picker/picker'
 import { BackwardIcon, ForwardIcon } from '../../constants/icon'
+import { useTheme } from '../../context/themeContext'
 
 type PickMonthYearProp = {
   isOpen:boolean
@@ -14,6 +15,8 @@ type PickMonthYearProp = {
 }
 
 const PickMonthYearModal = ({selectedDate, setSelectedDate, currentMonth, setCurrentMonthYear, isOpen, setIsOpen}:PickMonthYearProp) => {
+
+  const { colors } = useTheme();
   const months = ['January','February','March','April','May','June','July','August','September','October','November','December']
 
   const getFirstSunday = (year: number, month: number) => {
@@ -40,10 +43,10 @@ const PickMonthYearModal = ({selectedDate, setSelectedDate, currentMonth, setCur
 
   return (
     <Modal isOpen={isOpen} setIsOpen={setIsOpen}>
-      <View className= 'w-full bg-white p-4 rounded-normal'>
+      <View style={{backgroundColor:colors.white}} className= 'w-full  p-4 rounded-normal'>
         <View className='flex-row'>
           <View className='grow'>
-            <Text className='font-notoMedium text-heading'>{currentMonth.split(' ')[1]}</Text>
+            <Text style={{color:colors.text}} className='font-notoMedium text-heading'>{currentMonth.split(' ')[1]}</Text>
           </View>
           <View className='flex-row gap-3'>
             <TouchableOpacity
@@ -53,7 +56,7 @@ const PickMonthYearModal = ({selectedDate, setSelectedDate, currentMonth, setCur
                 )
               }
             >
-              <BackwardIcon width={34} height={34} color={'#1c60de'} />
+              <BackwardIcon width={34} height={34} color={colors.primary} />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() =>
@@ -62,7 +65,7 @@ const PickMonthYearModal = ({selectedDate, setSelectedDate, currentMonth, setCur
                 )
               }
             >
-              <ForwardIcon width={34} height={34} color={'#1c60de'} />
+              <ForwardIcon width={34} height={34} color={colors.primary} />
             </TouchableOpacity>
           </View>
         </View>
@@ -72,12 +75,12 @@ const PickMonthYearModal = ({selectedDate, setSelectedDate, currentMonth, setCur
               key={i}
               style={{
                 width: '32%',
-                backgroundColor:currentMonth.split(' ')[0] === months[i]? '#1c60de':'#fff'
+                backgroundColor:currentMonth.split(' ')[0] === months[i]? colors.primary:colors.white
               }}
               className='rounded-normal p-2'
               onPress={() => handleMonthSelect(i)}
             >
-              <Text className={`font-notoMedium text-body ${currentMonth.split(' ')[0] === months[i]? 'text-white':'text-subText'}  text-center`}>{text}</Text>
+              <Text style={{color:currentMonth.split(' ')[0] === months[i]? '#fff':colors.subText}} className={`font-notoMedium text-body  text-center`}>{text}</Text>
             </TouchableOpacity>
           ))}
         </View>

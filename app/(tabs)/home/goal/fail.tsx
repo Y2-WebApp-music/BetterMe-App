@@ -8,9 +8,11 @@ import axios from 'axios';
 import { SERVER_URL } from '@env';
 import { useAuth } from '../../../../context/authContext';
 import { useFocusEffect } from 'expo-router';
+import { useTheme } from '../../../../context/themeContext';
 
 const Fail = () => {
 
+  const { colors } = useTheme();
   const { user } = useAuth()
   const [goal, setGoal] = useState<homeGoalCardProp[]>([])
   const [isEmpty, setIsEmpty] = useState<boolean>(false)
@@ -57,7 +59,7 @@ const Fail = () => {
   }, []);
 
   return (
-    <SafeAreaView className="w-full h-full justify-start items-center bg-Background font-noto" >
+    <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-start items-center font-noto" >
       <View className='w-[92%] mt-4'>
         <View className='w-full'>
           <View className='max-w-[14vw]'>
@@ -81,7 +83,7 @@ const Fail = () => {
         <View className=''>
           {isEmpty? (
             <View className='flex flex-row gap-2 h-[60vh] items-center justify-center'>
-              <Text className='font-noto text-subText text-heading2'>No goal</Text>
+              <Text style={{color:colors.subText}} className='font-noto text-heading2'>No goal</Text>
             </View>
           ):(
             <View className='mt-2 flex-col gap-2'>

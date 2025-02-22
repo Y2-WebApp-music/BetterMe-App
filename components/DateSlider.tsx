@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import PagerView from 'react-native-pager-view';
 import { startOfWeek, endOfWeek, addWeeks, subWeeks, format, isToday } from 'date-fns';
+import { useTheme } from '../context/themeContext';
 
 const generateWeeksForMonth = (start: Date, end: Date) => {
   const weeks = [];
@@ -26,6 +27,8 @@ type DateSliderProps = {
 };
 
 const DateSlider = ({ selectedDate, setSelectedDate, setCurrentMonthYear }: DateSliderProps) => {
+
+  const { colors } = useTheme();
   const startDate = new Date('2024-10-01');
   const endDate = new Date('2025-03-01');
   const [dates, setDates] = useState(generateWeeksForMonth(startDate, endDate));
@@ -66,6 +69,50 @@ const DateSlider = ({ selectedDate, setSelectedDate, setCurrentMonthYear }: Date
     setSelectedDate(day);
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      width: '100%',
+      height: 50,
+    },
+    weekContainer: {
+      justifyContent: 'flex-start',
+      alignItems: 'center',
+      paddingHorizontal: 12,
+      overflow: 'hidden',
+      maxHeight: 50,
+    },
+    week: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: 2,
+      width: '100%',
+    },
+    day: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      width: 40,
+      height: 40,
+      backgroundColor: colors.background,
+      borderRadius: 9999,
+      margin: 2,
+    },
+    today: {
+      backgroundColor: colors.nonFocus,
+    },
+    todayText: {
+      color: 'white',
+      fontWeight: 'bold',
+    },
+    dayText: {
+      color: colors.nonFocus,
+      fontWeight: 'bold',
+    },
+    selected: {
+      backgroundColor: colors.primary,
+    },
+  });
+
   return (
     <PagerView
       style={styles.container}
@@ -103,49 +150,5 @@ const DateSlider = ({ selectedDate, setSelectedDate, setCurrentMonthYear }: Date
     </PagerView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-    height: 50,
-  },
-  weekContainer: {
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    overflow: 'hidden',
-    maxHeight: 50,
-  },
-  week: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 2,
-    width: '100%',
-  },
-  day: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 40,
-    height: 40,
-    backgroundColor: '#fbffff',
-    borderRadius: 9999,
-    margin: 2,
-  },
-  today: {
-    backgroundColor: '#B8C2D2',
-  },
-  todayText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  dayText: {
-    color: '#B8C2D2',
-    fontWeight: 'bold',
-  },
-  selected: {
-    backgroundColor: '#1C60DE',
-  },
-});
 
 export default DateSlider;

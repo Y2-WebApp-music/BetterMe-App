@@ -10,10 +10,12 @@ import { FlashList } from '@shopify/flash-list';
 import { useAuth } from '../../../context/authContext';
 import { SERVER_URL } from '@env';
 import axios from 'axios';
+import { useTheme } from '../../../context/themeContext';
 
 const CreateGoal = () => {
 
   const { user } = useAuth()
+  const { colors } = useTheme();
 
   const [refreshing, setRefreshing] = useState(false);
   const [goal,setGoal] = useState<GoalCreateCardProp[]>([])
@@ -61,7 +63,7 @@ const CreateGoal = () => {
 
   const [search, setSearch] = useState('')
   return (
-    <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
+    <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-center items-center font-noto">
       <View className='w-[92%] mt-4'>
         <View className='w-full'>
           <View className='max-w-[14vw]'>

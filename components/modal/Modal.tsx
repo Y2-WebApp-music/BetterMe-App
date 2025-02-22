@@ -1,5 +1,6 @@
 import { Modal as RNmodal, View, ModalProps, KeyboardAvoidingView, Platform, SafeAreaView, TouchableWithoutFeedback, Keyboard } from 'react-native'
 import React, { useState } from 'react'
+import { useTheme } from '../../context/themeContext'
 
 type DatePickerProp = ModalProps & {
   isOpen:boolean
@@ -8,6 +9,8 @@ type DatePickerProp = ModalProps & {
 }
 
 const Modal = ({isOpen, setIsOpen, withInput, children, ...rest}:DatePickerProp) => {
+
+  const { colors } = useTheme();
 
   const content = withInput ? (
     <KeyboardAvoidingView
@@ -19,9 +22,9 @@ const Modal = ({isOpen, setIsOpen, withInput, children, ...rest}:DatePickerProp)
       <View className="w-full h-full justify-center items-center"
         >
           <View
-            className="w-[92%] px-2 rounded-normal p-2 border border-gray"
+            className="w-[92%] px-2 rounded-normal p-2 border"
             onStartShouldSetResponder={() => true}
-            style={{backgroundColor:'white'}}
+            style={{backgroundColor:colors.white, borderColor:colors.gray}}
           >
             {children}
           </View>
@@ -34,9 +37,9 @@ const Modal = ({isOpen, setIsOpen, withInput, children, ...rest}:DatePickerProp)
         <View className="w-full h-full justify-center items-center"
         >
           <View
-            className="w-[92%] px-2 rounded-normal p-2 border border-gray"
+            className="w-[92%] px-2 rounded-normal p-2 border"
             onStartShouldSetResponder={() => true}
-            style={{backgroundColor:'white'}}
+            style={{backgroundColor:colors.white, borderColor:colors.gray}}
           >
             {children}
           </View>

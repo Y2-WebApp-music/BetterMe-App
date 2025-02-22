@@ -12,11 +12,14 @@ import { SERVER_URL } from '@env';
 import axios from 'axios';
 import { FlashList } from "@shopify/flash-list";
 import { toDateId } from '@marceloterreiro/flash-calendar';
+import { colors, ThemeMode } from '../../../constants/Colors';
+import { useTheme } from '../../../context/themeContext';
 
 const screenWidth = Dimensions.get('window').width;
 
 const Home = () => {
 
+  const { colors } = useTheme();
   const { user } = useAuth();
   const today = toDateId(new Date())
 
@@ -99,7 +102,7 @@ const Home = () => {
   );
 
   return (
-    <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
+    <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-center items-center font-noto">
       <ScrollView
           className='w-[92%] h-auto'
           contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', marginTop:14}}
@@ -127,8 +130,8 @@ const Home = () => {
               }
             </View>
             <View className='grow'>
-              <Text className='text-heading2 font-notoMedium'>{user?.displayName}</Text>
-              <Text className='text-subText font-noto'>{user?.email}</Text>
+              <Text style={{color:colors.text}} className='text-heading2 font-notoMedium'>{user?.displayName}</Text>
+              <Text style={{color:colors.subText}} className='font-noto'>{user?.email}</Text>
             </View>
           </View>
 
@@ -139,8 +142,8 @@ const Home = () => {
           */}
           <View className='flex-col gap-2'>
             <View className='w-full flex-row gap-2 '>
-              <Text className='grow font-noto'>Today</Text>
-              <Text className='text-subText font-noto'>
+              <Text style={{color:colors.text}} className='grow font-noto'>Today</Text>
+              <Text style={{color:colors.subText}} className='font-noto'>
                 {new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date())}
               </Text>
             </View>
@@ -156,8 +159,8 @@ const Home = () => {
           <View className='mt-3 pb-16'>
             <View className='flex flex-row gap-2 items-center'>
               <View className='grow'>
-                <Text className='text-heading2 font-noto'>Goals Today</Text>
-                <Text className='text-body font-noto text-subText'>{sortedGoalData.length} goals todo</Text>
+                <Text style={{color:colors.text}} className='text-heading2 font-noto'>Goals Today</Text>
+                <Text style={{color:colors.subText}} className='text-body font-noto'>{sortedGoalData.length} goals todo</Text>
               </View>
               <View>
                 <TouchableOpacity onPress={()=>{router.push('/home/createGoal')}} className=' bg-primary flex-row gap-2 p-1 px-4 justify-center items-center rounded-full'>

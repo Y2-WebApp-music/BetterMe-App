@@ -2,8 +2,10 @@ import { View, Text, Animated, TouchableWithoutFeedback, Easing } from 'react-na
 import React, { useRef, useState } from 'react'
 import { DayIcon, NightIcon } from '../../constants/icon'
 import { StyleSheet } from 'react-native'
+import { useTheme } from '../../context/themeContext'
 
 const SleepGoal = () => {
+  const { colors } = useTheme();
 
   const [toggle, setToggle] = useState(false)
 
@@ -37,21 +39,21 @@ const SleepGoal = () => {
 
 
   return (
-    <View style={{paddingHorizontal:20, backgroundColor:'white' }} className='h-28 w-full rounded-normal border border-gray p-2 justify-center items-center flex-row gap-2'>
+    <View style={{paddingHorizontal:20, backgroundColor:colors.white, borderColor:colors.gray }} className='h-28 w-full rounded-normal border p-2 justify-center items-center flex-row gap-2'>
       <NightIcon width={36} height={36} color={'#454AB6'}/>
 
       <View style={{paddingLeft:10}} className='grow'>
         <View style={{ transform: [{ translateY: 8 }] }}>
-          <Text className='text-subText font-noto'>Sleep time</Text>
+          <Text style={{color:colors.subText}} className=' font-noto'>Sleep time</Text>
         </View>
         <View className='flex-row gap-1 items-end'>
-          <Text style={{color:'#454ab6'}} className='text-title font-notoMedium'>3</Text>
+          <Text style={{color:colors.night}} className='text-title font-notoMedium'>3</Text>
           <View style={{ transform: [{ translateY: -10 }] }}>
-            <Text className='text-subText'>h</Text>
+            <Text style={{color:colors.subText}}>h</Text>
           </View>
-          <Text style={{color:'#454ab6'}} className='text-title text-night font-notoMedium'>33</Text>
+          <Text style={{color:colors.night}} className='text-title text-night font-notoMedium'>33</Text>
           <View style={{ transform: [{ translateY: -10 }] }}>
-            <Text className='text-subText'>m</Text>
+            <Text style={{color:colors.subText}} >m</Text>
           </View>
         </View>
       </View>
@@ -83,9 +85,9 @@ const SleepGoal = () => {
           </Animated.View>
         </TouchableWithoutFeedback>
         {toggle?(
-          <Text className='font-noto text-subText text-detail'>Sleeping</Text>
+          <Text style={{color:colors.subText}} className='font-noto text-detail'>Sleeping</Text>
         ):(
-          <Text className='font-noto text-subText text-detail'>Waking</Text>
+          <Text style={{color:colors.subText}} className='font-noto text-detail'>Waking</Text>
         )}
       </View>
     </View>

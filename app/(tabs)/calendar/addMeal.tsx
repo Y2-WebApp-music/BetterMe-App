@@ -18,6 +18,7 @@ import { SERVER_URL } from '@env';
 import axios from 'axios';
 import RNDateTimePicker from '@react-native-community/datetimepicker';
 import * as ImageManipulator from 'expo-image-manipulator';
+import { useTheme } from '../../../context/themeContext';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -35,7 +36,10 @@ type MealProp = {
 }
 
 const AddMeal = () => {
+
+  const { colors } = useTheme();
   const { user } = useAuth()
+
   const [photo, setPhoto] = useState<string | null>(null);
   const [downloadURL, setDownloadURL] = useState<string | null>(null);
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -278,7 +282,7 @@ const AddMeal = () => {
   const [modalStep, setModalStep] = useState<"date" | "time">("date");
 
   return (
-    <SafeAreaView className="w-full h-full justify-start items-center bg-Background font-noto">
+    <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-start items-center font-noto">
       {!waiting?(
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -305,7 +309,7 @@ const AddMeal = () => {
             }
           </View>
           {!photo &&
-            <Text className='text-subText font-notoLight'>Snap a photo to identify your dishes or choose from gallery. Learn nutritional facts</Text>
+            <Text style={{color:colors.subText}} className=' font-notoLight'>Snap a photo to identify your dishes or choose from gallery. Learn nutritional facts</Text>
           }
           </View>
         </View>
@@ -318,7 +322,7 @@ const AddMeal = () => {
             left: 0,
             right: 0,
             height: cameraSize,
-            backgroundColor: '#fbffff',
+            backgroundColor: colors.background,
             zIndex: 1,
           }}
           onStartShouldSetResponder={() => {
@@ -450,7 +454,7 @@ const AddMeal = () => {
                       })}
                     />
                   </View>
-                  <Text className='text-detail text-subText'>grams</Text>
+                  <Text style={{color:colors.subText}} className='text-detail'>grams</Text>
                 </View>
                 <View className="grow flex-row items-end gap-1">
                   <View className='grow'>
@@ -465,7 +469,7 @@ const AddMeal = () => {
                       })}
                     />
                   </View>
-                  <Text className='text-detail text-subText'>grams</Text>
+                  <Text style={{color:colors.subText}} className='text-detail'>grams</Text>
                 </View>
                 <View className="grow flex-row items-end gap-1">
                   <View className='grow'>
@@ -480,22 +484,22 @@ const AddMeal = () => {
                       })}
                     />
                   </View>
-                  <Text className='text-detail text-subText'>grams</Text>
+                  <Text style={{color:colors.subText}} className='text-detail'>grams</Text>
                 </View>
               </View>
 
               <View style={{marginTop: 0}} className='flex-row gap-4'>
                 <View className='mt-2 grow' style={{marginTop: 7}}>
-                  <Text className='text-subText text-detail'>total calorie</Text>
+                  <Text style={{color:colors.subText}} className=' text-detail'>total calorie</Text>
                   <View className='flex-row gap-1 items-end'>
                     <Text className='text-primary text-center font-notoMedium text-subTitle'> {form.calorie} </Text>
                     <View style={{transform:[{translateY:-8}]}}>
-                      <Text className='text-body text-subText'>Cal</Text>
+                      <Text style={{color:colors.subText}} className='text-body '>Cal</Text>
                     </View>
                   </View>
                 </View>
                 <View className='grow mt-2'>
-                  <Text className='text-subText text-detail'>Meal time</Text>
+                  <Text style={{color:colors.subText}} className=' text-detail'>Meal time</Text>
                   <TouchableOpacity
                     onPress={()=>{setOpenModal(true)}}
                     className='w-full h-[5vh] p-2 flex justify-center border border-primary rounded-normal'
@@ -538,7 +542,7 @@ const AddMeal = () => {
       ):(<View className='flex-1 justify-center items-center'>
             <Text className='font-notoMedium text-title text-primary'>{countdown}</Text>
             <Text className='font-notoMedium text-subTitle animate-pulse text-primary'>Creating</Text>
-            <TouchableOpacity onPress={handleCancel} className='mt-12 p-1 px-4 rounded-full bg-nonFocus justify-center items-center'>
+            <TouchableOpacity onPress={handleCancel} style={{backgroundColor:colors.nonFocus}} className='mt-12 p-1 px-4 rounded-full justify-center items-center'>
               <Text className='text-white font-noto text-heading2'>Cancel</Text>
             </TouchableOpacity>
           </View>

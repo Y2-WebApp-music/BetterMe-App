@@ -14,9 +14,11 @@ import axios from 'axios';
 import { SERVER_URL } from '@env';
 import { homeGoalCardProp } from '../../../types/goal';
 import CalendarFoodToday from '../../../components/food/calendarFoodToday';
+import { useTheme } from '../../../context/themeContext';
 
 const MonthCalendar = () => {
 
+  const { colors } = useTheme();
   const today = toDateId(new Date());
   const [selectedDate, setSelectedDate] = useState(today);
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -146,12 +148,70 @@ const MonthCalendar = () => {
     getSummaryMeal()
   },[selectedDate])
 
+  const linearAccent = colors.primary; // Use the primary color from theme for accent color
+
+  const linearTheme: CalendarTheme = {
+    rowMonth: {
+      content: {
+        textAlign: "left",
+        color: colors.text, // Use the text color from theme
+        fontWeight: "700",
+        display: 'none',
+      },
+    },
+    itemWeekName: { content: { color: colors.subText } },
+    itemDayContainer: {
+      activeDayFiller: {
+        backgroundColor: linearAccent, // Use dynamic accent color
+      },
+    },
+    itemDay: {
+      idle: ({ isPressed, isWeekend }) => ({
+        container: {
+          backgroundColor: isPressed ? linearAccent : "transparent",
+          borderRadius: 99,
+        },
+        content: {
+          color: isWeekend && !isPressed ? colors.text : colors.text, // Use theme text color
+          fontSize: 14,
+          fontWeight: 600,
+          fontFamily: 'noto-sans-thai',
+        },
+      }),
+      today: ({ isPressed }) => ({
+        container: {
+          borderColor: "rgba(0, 0, 0, 0)",
+          borderRadius: isPressed ? 99 : 99,
+          backgroundColor: isPressed ? linearAccent : "#B8C2D2",
+        },
+        content: {
+          color: isPressed ? colors.text : "rgba(255, 255, 255, 1)",
+          fontSize: 16,
+          fontWeight: 600,
+          fontFamily: 'noto-sans-thai',
+        },
+      }),
+      active: ({ isEndOfRange, isStartOfRange }) => ({
+        container: {
+          backgroundColor: linearAccent,
+          borderTopLeftRadius: isStartOfRange ? 99 : 20,
+          borderBottomLeftRadius: isStartOfRange ? 99 : 20,
+          borderTopRightRadius: isEndOfRange ? 99 : 20,
+          borderBottomRightRadius: isEndOfRange ? 99 : 20,
+        },
+        content: {
+          color: "#ffffff",
+        },
+      }),
+    },
+  };
+
   return (
-    <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
+    <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-center items-center font-noto">
       <View className='w-[98%] relative px-2 h-auto mt-3 flex-row items-center'>
-        <View className={`absolute top-3 left-4 border ${selectedDate === today?'border-primary':'border-gray'} p-1 px-2 rounded-normal`}>
+        <View style={{borderColor:selectedDate === today?colors.primary:colors.gray}} className={`absolute top-3 left-4 border p-1 px-2 rounded-normal`}>
           <TouchableOpacity onPress={goToToday}>
-            <Text className={`text-detail font-noto ${selectedDate === today ? 'text-primary' : 'text-subText'}`}>Today</Text>
+            <Text style={{color:selectedDate === today ?colors.primary:colors.subText}} className={`text-detail font-noto`}>Today</Text>
           </TouchableOpacity>
         </View>
         <View className='grow flex-row gap-4 items-center justify-center'>
@@ -159,26 +219,26 @@ const MonthCalendar = () => {
             <BackwardIcon color={'#1C60DE'}/>
           </TouchableOpacity>
           <TouchableOpacity onPress={()=>{setMonthModal(!monthModal)}} className="w-[26vw] flex-col justify-center items-center">
-            <Text className="text-heading2 font-notoMedium">{monthName}</Text>
-            <Text className="text-body text-nonFocus">{year}</Text>
+            <Text style={{color:colors.text}} className="text-heading2 font-notoMedium">{monthName}</Text>
+            <Text style={{color:colors.nonFocus}} className="text-body">{year}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={goToNextMonth}>
             <ForwardIcon color={'#1C60DE'}/>
           </TouchableOpacity>
         </View>
         <TouchableOpacity onPress={()=>setOpenOption(!openOption)} className='absolute top-3 right-2 p-1 px-2 rounded-normal flex-row gap-1 items-center'>
-          <Text className='text-subText font-noto text-body'>Month</Text>
-          <ArrowIcon width={16} height={16} color={'#626262'} style={{transform:[openOption?{rotate:'180deg'}:{rotate:'0deg'}]}}/>
+          <Text style={{color:colors.subText}} className=' font-noto text-body'>Month</Text>
+          <ArrowIcon width={16} height={16} color={colors.darkGray} style={{transform:[openOption?{rotate:'180deg'}:{rotate:'0deg'}]}}/>
         </TouchableOpacity>
         {openOption && (
-          <View className='absolute z-20 right-2 top-12 min-h-24 min-w-32 bg-white rounded-normal border border-gray p-4 flex-col gap-2'>
+          <View style={{backgroundColor:colors.white, borderColor:colors.gray}} className='absolute z-20 right-2 top-12 min-h-24 min-w-32 rounded-normal border p-4 flex-col gap-2'>
             <TouchableOpacity className='p-2 px-4 border border-primary rounded-normal flex-row gap-2 justify-center items-center'>
               <MenuIcon width={22} height={22} color={'#1C60DE'}/>
               <Text className='grow font-noto text-heading3 text-primary'>month</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={()=>{router.replace('/calendar/weekCalendar')}} className='p-2 px-4 border border-gray rounded-normal flex-row gap-2 justify-center items-center'>
-              <GridIcon width={22} height={22} color={'#626262'}/>
-              <Text className='grow font-noto text-heading3 text-subText'>week</Text>
+            <TouchableOpacity onPress={()=>{router.replace('/calendar/weekCalendar')}} style={{borderColor:colors.gray}} className='p-2 px-4 border rounded-normal flex-row gap-2 justify-center items-center'>
+              <GridIcon width={22} height={22} color={colors.darkGray}/>
+              <Text style={{color:colors.subText}} className='grow font-noto text-heading3 '>week</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -210,23 +270,23 @@ const MonthCalendar = () => {
               />
             </View>
             <View className='flex justify-center items-center'>
-              <View className='bg-nonFocus h-1 w-[20vw] rounded-full'></View>
+              <View style={{backgroundColor:colors.nonFocus}} className='h-1 w-[20vw] rounded-full'></View>
             </View>
           </View>
           <View style={{ transform: [{ translateY: -18 }] }} className='flex-col gap-2'>
-            <Text className='font-noto text-heading3'>{new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(selectedDate))}</Text>
+            <Text style={{color:colors.text}} className='font-noto text-heading3'>{new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(selectedDate))}</Text>
             <SleepToday/>
             {mealSummary &&
               <CalendarFoodToday total_calorie={mealSummary?.total_calorie} total_protein={mealSummary?.total_protein} total_carbs={mealSummary?.total_carbs} total_fat={mealSummary?.total_fat}/>
             }
-            <Text className='text-subText font-noto text-body mt-2'>In this day</Text>
+            <Text style={{color:colors.subText}} className=' font-noto text-body mt-2'>In this day</Text>
             <View className='flex-row justify-start items-center gap-4'>
               <TouchableOpacity onPress={()=>setViewMeal(true)} className={`p-1 px-2 ${viewMeal? 'bg-primary':'bg-transparent'} rounded-normal`}>
-                <Text className={`${viewMeal? 'text-white':'text-subText'} text-heading2 font-notoMedium`}>Meals</Text>
+                <Text style={{color:viewMeal? colors.text:colors.subText}}  className={` text-heading2 font-notoMedium`}>Meals</Text>
               </TouchableOpacity>
               <View className='h-full w-[1px] bg-subText rounded-full'/>
               <TouchableOpacity onPress={()=>setViewMeal(false)} className={`p-1 px-2 ${!viewMeal? 'bg-primary':'bg-transparent'} rounded-normal`}>
-                <Text className={`${!viewMeal? 'text-white':'text-subText'} text-heading2 font-notoMedium`}>Goals</Text>
+                <Text style={{color:!viewMeal? colors.text:colors.subText}} className={` text-heading2 font-notoMedium`}>Goals</Text>
               </TouchableOpacity>
               <View className='grow'/>
               {viewMeal?(
@@ -273,84 +333,5 @@ const MonthCalendar = () => {
     </SafeAreaView>
   )
 }
-
-const goalDataDummy = [
-  {
-    goal_id:'1',
-    goal_name:'Title Test 1',
-    total_task:8,
-    complete_task:3,
-  },
-  {
-    goal_id:'2',
-    goal_name:'Title Test 2',
-    total_task:8,
-    complete_task:3,
-  },
-  {
-    goal_id:'3',
-    goal_name:'Title Test 3',
-    total_task:8,
-    complete_task:3,
-  },
-]
-
-const linearAccent = "#1C60DE";
-
-const linearTheme: CalendarTheme = {
-  rowMonth: {
-    content: {
-      textAlign: "left",
-      color: "rgba(0, 0, 0, 1)",
-      fontWeight: "700",
-      display:'none',
-    },
-  },
-  itemWeekName: { content: { color: "#B8C2D2" } },
-  itemDayContainer: {
-    activeDayFiller: {
-      backgroundColor: linearAccent,
-    },
-  },
-  itemDay: {
-    idle: ({ isPressed, isWeekend }) => ({
-      container: {
-        backgroundColor: isPressed ? linearAccent : "transparent",
-        borderRadius: 99,
-      },
-      content: {
-        color: isWeekend && !isPressed ? "rgba(0, 0, 0, 1)" : "#000",
-        fontSize:14,
-        fontWeight:600,
-        fontFamily:'noto-sans-thai',
-      },
-    }),
-    today: ({ isPressed }) => ({
-      container: {
-        borderColor: "rgba(0, 0, 0, 0)",
-        borderRadius: isPressed ? 99 : 99,
-        backgroundColor: isPressed ? linearAccent : "#B8C2D2",
-      },
-      content: {
-        color: isPressed ? "#000" : "rgba(255, 255, 255, 1)",
-        fontSize:16,
-        fontWeight:600,
-        fontFamily:'noto-sans-thai'
-      },
-    }),
-    active: ({ isEndOfRange, isStartOfRange }) => ({
-      container: {
-        backgroundColor: linearAccent,
-        borderTopLeftRadius: isStartOfRange ? 99 : 20,
-        borderBottomLeftRadius: isStartOfRange ? 99 : 20,
-        borderTopRightRadius: isEndOfRange ? 99 : 20,
-        borderBottomRightRadius: isEndOfRange ? 99 : 20,
-      },
-      content: {
-        color: "#ffffff",
-      },
-    }),
-  },
-};
 
 export default MonthCalendar

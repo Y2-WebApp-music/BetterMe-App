@@ -3,9 +3,12 @@ import React, { useEffect, useRef } from 'react'
 import { router } from 'expo-router'
 import { homeGoalCardProp } from '../../types/goal'
 import { format } from 'date-fns'
+import { useTheme } from '../../context/themeContext'
 
 
 const HomeGoalCard = ({goal_id, goal_name, end_date, total_task, complete_task}:homeGoalCardProp) => {
+
+  const { colors } = useTheme();
 
   const percent = total_task > 0 ? Math.round((complete_task / total_task) * 100) : 0;
   const today = new Date();
@@ -34,13 +37,13 @@ const HomeGoalCard = ({goal_id, goal_name, end_date, total_task, complete_task}:
   });
 
   return (
-    <TouchableOpacity  onPress={()=>{router.push(`/home/goal/${goal_id}`)}} style={{marginBottom: 8}} className='h-32 w-full bg-white rounded-normal border border-gray justify-center items-center'>
+    <TouchableOpacity  onPress={()=>{router.push(`/home/goal/${goal_id}`)}} style={{marginBottom: 8, backgroundColor:colors.background, borderColor:colors.gray}} className='h-32 w-full rounded-normal border justify-center items-center'>
       <View className='w-[92%] h-32 flex-col gap-1 justify-center'>
         <View className='flex-col w-full h-[80%]'>
           <View className='w-full h-[78%] flex-row items-center justify-center gap-1'>
             <View style={{width:'78%', height:'100%'}}>
               <Text
-                style={{overflow: 'hidden',}}
+                style={{overflow: 'hidden',color:colors.text}}
                 numberOfLines={2}
                 ellipsizeMode="tail"
                 className='font-noto text-heading2 line-clamp-2 '
@@ -53,8 +56,8 @@ const HomeGoalCard = ({goal_id, goal_name, end_date, total_task, complete_task}:
             </View>
           </View>
           <View className='flex-row w-full'>
-            <Text className='text-detail font-noto text-subText grow'>end : {format(end_date, 'd MMMM yyyy')}</Text>
-            <Text className='text-detail font-noto text-subText'>{complete_task}/{total_task} completed</Text>
+            <Text style={{color:colors.subText}} className='text-detail font-noto grow'>end : {format(end_date, 'd MMMM yyyy')}</Text>
+            <Text style={{color:colors.subText}} className='text-detail font-not'>{complete_task}/{total_task} completed</Text>
           </View>
         </View>
         <View className='h-[20%] relative'>
