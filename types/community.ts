@@ -45,6 +45,16 @@ export type CommunityGoal = CommunityUser & {
   complete_task: number
 };
 
+export type searchGoalCard = {
+  goal_id: string
+  goal_name: string
+  total_task: number
+  end_date: string
+  start_date: string;
+  complete_task: number;
+  create_by:string;
+}
+
 export const TagCommunity = [
   { id: 1, text: 'clean food' },
   { id: 2, text: 'weight training' },
