@@ -1,16 +1,19 @@
-import { View, Text, SafeAreaView, ScrollView, RefreshControl, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator } from 'react-native'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { View, Text, SafeAreaView, ScrollView, RefreshControl, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator, Button } from 'react-native'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { router } from 'expo-router';
 import { Image } from 'expo-image';
 import { useAuth } from '../../../context/authContext';
 import { AddIcon, BellIcon, GalleryIcon, PenIcon, SearchIcon, UserIcon } from '../../../constants/icon';
 import { FlashList } from '@shopify/flash-list';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring, WithSpringConfig, WithTimingConfig } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import PostOnlyText from '../../../components/Post/postOnlyText';
 import PostWithPhoto from '../../../components/Post/postWithPhoto';
 import { postDummy } from '../../../types/community';
 import { colors, useTheme } from '../../../context/themeContext';
+import CommentBottomModal from '../../../components/modal/CommentBottomModal';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { BottomSheetBackdrop, BottomSheetFooter, BottomSheetModal, BottomSheetModalProvider, BottomSheetTextInput, BottomSheetView, useBottomSheetModal } from '@gorhom/bottom-sheet/src';
 
 
 const screenWidth = Dimensions.get('window').width;
@@ -39,11 +42,12 @@ const CommunityFeed = () => {
   const scrollYRef = useRef(0)
   const scrollBuffer = useRef(0);
   const top = useSharedValue(0)
-  const [isAtTop, setIsAtTop] = useState(true);
   const [headerHeight, setHeaderHeight] = useState(0)
 
   const headerStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: withSpring(top.value - 50, { damping: 30, stiffness: 300 }) }],
+    transform: [{
+      translateY: withSpring(top.value - 50, { damping: 30, stiffness: 300 }) 
+    }]
   }));
 
   const handleScroll = (e:any) => {
@@ -54,7 +58,7 @@ const CommunityFeed = () => {
 
     if (scrollY <= 0) {
       top.value = 0;
-    } 
+    }
     else if (scrollDirection > 0 && scrollDirection < 200) {
       top.value = Math.max(-HEADER_HEIGHT, top.value - scrollDirection);
     }
@@ -82,6 +86,14 @@ const CommunityFeed = () => {
     scrollYRef.current = scrollY;
   };
 
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+
+  const { dismiss } = useBottomSheetModal();
+
+  const handleOpenPress = () => {
+    console.log('handleOpenPress ');
+    bottomSheetModalRef.current?.present();
+  };
 
   return (
     <SafeAreaView style={{backgroundColor:colors.background}} className=" relative w-full h-full justify-center items-center font-noto">
@@ -96,7 +108,7 @@ const CommunityFeed = () => {
             top: 0,
             left: 0,
             width: '100%',
-            zIndex: 100,
+            zIndex: 1,
             paddingTop: 50,
             backgroundColor:colors.background
           },
@@ -163,29 +175,6 @@ const CommunityFeed = () => {
         <TagSection/>
 
         <View className="flex-1 mb-4 mt-1 flex flex-col gap-2 items-center w-full pb-5">
-            {/* <TouchableOpacity onPress={()=>{router.push('/community/userProfile')}} className=' bg-primary flex-row gap-2 p-1 px-4 justify-center items-center rounded-full'>
-              <Text className='text-body text-white font-notoMedium'>User Profile</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={()=>{router.push('/community/user/123')}} className=' bg-primary flex-row gap-2 p-1 px-4 justify-center items-center rounded-full'>
-              <Text className='text-body text-white font-notoMedium'>see other user Profile</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={()=>{router.push('/community/user/goal/123')}} className=' bg-primary flex-row gap-2 p-1 px-4 justify-center items-center rounded-full'>
-              <Text className='text-body text-white font-notoMedium'>user goal</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={()=>{router.push('/community/post/create')}} className=' bg-primary flex-row gap-2 p-1 px-4 justify-center items-center rounded-full'>
-              <Text className='text-body text-white font-notoMedium'>Create Post</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={()=>{router.push('/community/post/edit/123')}} className=' bg-primary flex-row gap-2 p-1 px-4 justify-center items-center rounded-full'>
-              <Text className='text-body text-white font-notoMedium'>Edit Post</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={()=>{router.push('/community/post/123')}} className=' bg-primary flex-row gap-2 p-1 px-4 justify-center items-center rounded-full'>
-              <Text className='text-body text-white font-notoMedium'>See Post</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={()=>{router.push('/community/search')}} className=' bg-primary flex-row gap-2 p-1 px-4 justify-center items-center rounded-full'>
-              <Text className='text-body text-white font-notoMedium'>Search in Community</Text>
-            </TouchableOpacity> */}
 
             {postList.length != 0 ? (
               <View className='w-full'>
@@ -193,7 +182,19 @@ const CommunityFeed = () => {
                   data={postDummy}
                   renderItem={({ item }) => (
                     item.photo? (
-                      <PostWithPhoto _id={item._id} username={item.username} profile_img={item.profile_img} post_id={item.post_id} date={item.date} content={item.content} tag={item.tag} like={item.like} comment={item.comment} photo={item.photo} />
+                      <PostWithPhoto
+                        _id={item._id}
+                        username={item.username}
+                        profile_img={item.profile_img}
+                        post_id={item.post_id}
+                        date={item.date}
+                        content={item.content}
+                        tag={item.tag}
+                        like={item.like}
+                        comment={item.comment}
+                        photo={item.photo}
+                        openComment={handleOpenPress}
+                      />
                     ):(
                       <PostOnlyText/>
                     )
@@ -212,28 +213,42 @@ const CommunityFeed = () => {
         </View>
       </ScrollView>
 
-      <View
-        style={{
-          position:'absolute',
-          top:0,
-          left:0,
-          right:0,
-          height: insets.top,
-          zIndex:100,
-          backgroundColor:colors.background
-        }}
-      />
-    </SafeAreaView>
+      <View style={{ position:'absolute', top:0, left:0, right:0, height: insets.top, zIndex:100, backgroundColor:colors.background }} />
+        <CommentBottomModal ref={bottomSheetModalRef} />
+      </SafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
   image: {
-    // flex: 1,
     justifyContent: 'center',
     width:screenWidth * 0.11,
     height:screenWidth * 0.11,
     alignContent:'center',
+  },
+  contentContainer: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  input: {
+    borderRadius: 99,
+    fontSize: 16,
+    lineHeight: 20,
+    padding:10,
+    borderWidth:1,
+    borderColor:'#e8e8e8',
+    backgroundColor: 'white',
+  },
+  footerContainer: {
+    padding: 12,
+    margin: 12,
+    borderRadius: 12,
+    backgroundColor: '#80f',
+  },
+  footerText: {
+    textAlign: 'center',
+    color: 'white',
+    fontWeight: '800',
   },
 });
 

@@ -11,10 +11,15 @@ import { PostContent } from '../../types/community';
 import { useAuth } from '../../context/authContext';
 import { router } from 'expo-router';
 import { useTheme } from '../../context/themeContext';
+import CommentBottomModal from '../modal/CommentBottomModal';
 
 const screenWidth = Dimensions.get('window').width;
 
-const PostWithPhoto = (props:PostContent) => {
+type PostWithPhotoProp = {
+  openComment : () => void
+}
+
+const PostWithPhoto = ({ openComment, ...props }: PostContent & PostWithPhotoProp) => {
 
   const { colors } = useTheme();
   const {user} = useAuth()
@@ -145,12 +150,12 @@ const PostWithPhoto = (props:PostContent) => {
     </Text>
 
     <View style={{paddingBottom:8}} className="mt-2 flex-row gap-2 items-center justify-between">
-      <View style={{gap:14}} className=" items-end flex-row bg-rose-200">
+      <View style={{gap:14}} className=" items-end flex-row">
         <TouchableOpacity className=" flex-row gap-1 items-center">
           <LikeIcon width={26} height={26} color={colors.darkGray}/>
           <Text style={{color:colors.subText}} className='text-body font-noto'>123k</Text>
         </TouchableOpacity>
-        <TouchableOpacity className=" flex-row gap-1 items-center">
+        <TouchableOpacity onPress={openComment} className=" flex-row gap-1 items-center">
           <CommentIcon width={26} height={26}color={colors.darkGray}/>
           <Text style={{color:colors.subText}} className='text-body font-noto'>567k</Text>
         </TouchableOpacity>
