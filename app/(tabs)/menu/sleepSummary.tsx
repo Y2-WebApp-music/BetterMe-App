@@ -22,13 +22,6 @@ const SleepSummary = () => {
     }
   });
 
-  const [editSleep, setEditSleep] = useState(true)
-  const [sleepData, setSleepData] = useState({
-    totalTime: 512,
-    startTime: new Date(),
-    endTime: new Date(),
-  })
-
   return (
     <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-center items-center font-noto">
       <KeyboardAvoidingView
@@ -97,15 +90,6 @@ const SleepSummary = () => {
           </View>
 
         </ScrollView>
-
-        <EditSleepModal
-          startDate={sleepData.startTime}
-          setStartDate={(newStartDate) => setSleepData((prev) => ({ ...prev, startTime: newStartDate }))}
-          endDate={sleepData.endTime}
-          setEndDate={(newEndDate) => setSleepData((prev) => ({ ...prev, endTime: newEndDate }))}
-          isOpen={editSleep}
-          setIsOpen={setEditSleep}
-        />
       </KeyboardAvoidingView>
     </SafeAreaView>
   )

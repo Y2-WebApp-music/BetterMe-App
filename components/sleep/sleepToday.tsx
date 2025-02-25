@@ -1,10 +1,39 @@
-import { View, Text } from 'react-native'
+import { View, Text, TouchableOpacity } from 'react-native'
 import { DayIcon, NightIcon, PenIcon  } from '../../constants/icon'
 import { useTheme } from '../../context/themeContext';
+import EditSleepModal from '../modal/EditSleepModal';
+import { useEffect, useState } from 'react';
 
 const SleepToday = () => {
 
   const { colors } = useTheme();
+  const [editSleep, setEditSleep] = useState(false)
+  const [sleepData, setSleepData] = useState({
+    totalTime: 512,
+    date: (() => {
+      const now = new Date();
+      now.setDate(now.getDate() - 1);
+      return now;
+    })(),
+    start_time: (() => {
+      const now = new Date();
+      now.setDate(now.getDate() - 1);
+      now.setHours(22, 0, 0, 0);
+      return now;
+    })(),
+    end_time: (() => {
+      const now = new Date();
+      now.setDate(now.getDate());
+      now.setHours(7, 0, 0, 0);
+      return now;
+    })(),
+  })
+
+  useEffect(()=>{
+    console.log('sleepData start_time',sleepData.start_time.toLocaleString());
+    console.log('sleepData end_time',sleepData.end_time.toLocaleString());
+  },[sleepData])
+  
 
   return (
     <View style={{paddingHorizontal:14, backgroundColor:colors.white, borderColor:colors.gray }} className='h-[5.5rem] w-full rounded-normal border  p-2 justify-center items-center flex-row gap-2'>
@@ -32,7 +61,7 @@ const SleepToday = () => {
               <Text style={{color:colors.subText}} className=' font-noto'>Sleep</Text>
           </View>
           <View style={{ transform: [{ translateX: 4 }] }} className='flex-row gap-1 items-end'>
-            <Text style={{color: colors.darkGray}} className='text-heading3 '>33:32</Text>
+            <Text style={{color: colors.subText}} className='text-heading3 '>33:32</Text>
           </View>
         </View>
       </View>
@@ -43,16 +72,24 @@ const SleepToday = () => {
             <Text style={{color:colors.subText}} className=' font-noto'>Wake Up</Text>
         </View>
         <View style={{ transform: [{ translateX: -6 }], justifyContent:'center' }} className='flex-row gap-1'>
-          <Text style={{color: colors.darkGray}} className='text-heading3'>33:33</Text>
+          <Text style={{color: colors.subText}} className='text-heading3'>33:33</Text>
         </View>
       </View>
 
-      <View className='flex flex-row gap-1 items-center'>
+      <TouchableOpacity onPress={()=>{setEditSleep(true)}} className='flex flex-row gap-1 items-center'>
         <PenIcon width={20} height={20} color={colors.darkGray}/>
         <Text style={{color:colors.darkGray}} className='text-body font'>Edit</Text>
-      </View>
+      </TouchableOpacity>
 
-      
+      <EditSleepModal
+          date={sleepData.date}
+          startTime={sleepData.start_time}
+          setStartTime={(newStart) => setSleepData((prev) => ({ ...prev, start_time: newStart }))}
+          endTime={sleepData.end_time}
+          setEndTime={(newEnd) => setSleepData((prev) => ({ ...prev, end_time: newEnd }))}
+          isOpen={editSleep}
+          setIsOpen={setEditSleep}
+        />
 
     </View>
   )

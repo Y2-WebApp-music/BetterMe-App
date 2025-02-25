@@ -1,7 +1,7 @@
 import { Image } from 'expo-image';
 import { router, useFocusEffect } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Dimensions, RefreshControl, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Button, Dimensions, RefreshControl, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import HomeGoalCard from '../../../components/goal/homeGoalCard';
 import { AddIcon } from '../../../constants/icon';
 import { useAuth } from '../../../context/authContext';
@@ -14,6 +14,10 @@ import { FlashList } from "@shopify/flash-list";
 import { toDateId } from '@marceloterreiro/flash-calendar';
 import { colors, ThemeMode } from '../../../constants/Colors';
 import { useTheme } from '../../../context/themeContext';
+import MorningModal from '../../../components/modal/MorningModal';
+import CommentBottomModal from '../../../components/modal/CommentBottomModal';
+import BottomSheet from '@gorhom/bottom-sheet/src';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -26,6 +30,8 @@ const Home = () => {
   const [isNoGoal, setIsNoGoal] = useState(false)
   const [todayGoal, setTodayGoal] = useState<homeGoalCardProp[]>([])
   const [totalCal, setTotalCal] = useState(0)
+
+  const [morning, setMorning] = useState(true)
 
   const getTodayGoal = async () => {
     try {
@@ -135,6 +141,17 @@ const Home = () => {
             </View>
           </View>
 
+          {/* <View className='flex-1'> */}
+          {/* <GestureHandlerRootView style={{ flex: 1}}>
+            <BottomSheet >
+              <View>
+                <Text>Hi user</Text>
+              </View>
+            </BottomSheet>
+          </GestureHandlerRootView> */}
+          
+          {/* </View> */}
+
           {/*
           =============================
           ======== Today Quest ========
@@ -193,6 +210,7 @@ const Home = () => {
             </View>
           </View>
         </ScrollView>
+        <MorningModal isOpen={morning} setIsOpen={setMorning}/>
     </SafeAreaView>
   )
 }

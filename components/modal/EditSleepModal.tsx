@@ -1,46 +1,83 @@
-import { View, Text, TouchableOpacity, Platform } from 'react-native'
-import React from 'react'
-import Modal from './Modal'
-import { useTheme } from '../../context/themeContext'
-import RNDateTimePicker from '@react-native-community/datetimepicker'
-import { useColorScheme } from 'react-native'
 import { format } from 'date-fns'
-import { DayIcon, NightIcon } from '../../constants/icon'
-
+import React, { useEffect } from 'react'
+import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import Animated, { isSharedValue, useAnimatedProps, useAnimatedStyle, useDerivedValue, useSharedValue, withTiming } from 'react-native-reanimated'
+import { ReText } from 'react-native-redash'
+import { useTheme } from '../../context/themeContext'
+import CircularSlider from '../sleep/CircularSlider/CircularSlider'
+import {
+  PADDING,
+  PI,
+  SIZE,
+  TAU,
+  absoluteDuration,
+  formatDuration2,
+  formatDurationHour,
+  formatDurationMinute,
+  preFormatDuration,
+  radToMinutes,
+} from "../sleep/CircularSlider/Constants"
+import Label from '../sleep/CircularSlider/Label'
+import Modal from './Modal'
 
 type EditSleepModalProp = {
-  startDate:Date
-  setStartDate:(value:Date) => void
-  endDate:Date
-  setEndDate:(value:Date) => void
+  date:Date
+  startTime:Date
+  setStartTime:(value:Date) => void
+  endTime:Date
+  setEndTime:(value:Date) => void
   isOpen:boolean
   setIsOpen:(isOpen:boolean) => void
 }
 
-const EditSleepModal = ({startDate, setStartDate, endDate, setEndDate, isOpen, setIsOpen}:EditSleepModalProp) => {
+const EditSleepModal = ({date, startTime, setStartTime, endTime, setEndTime, isOpen, setIsOpen}:EditSleepModalProp) => {
 
-  const systemTheme = useColorScheme();
-  const { theme, colors } = useTheme();
+  const { colors } = useTheme();
 
-  const toggleDatePicker = () => {
-    setIsOpen(!isOpen)
-  }
-
-  const handleDateChange = (type: "start" | "end") => (
-    event: any,
-    selectedDate?: Date
-  ) => {
-    if (selectedDate) {
-      if (Platform.OS === "android") {
-        toggleDatePicker();
-      }
-      if (type === "start") {
-        setStartDate(selectedDate);
-      } else {
-        setEndDate(selectedDate);
-      }
-    }
+  const timeToAngle = (time:Date) => {
+    const minutes = time.getMinutes() + time.getHours() * 60;
+    const normalized = minutes / (24 * 60) ;
+    return (-(normalized * 2 * Math.PI) + Math.PI/2);
   };
+  
+  const startAngle = timeToAngle(startTime);
+  const endAngle = timeToAngle(endTime);
+
+  const start = useSharedValue(startAngle)
+  const end = useSharedValue(endAngle)
+
+  const angleToTime = (angle: number, baseDate: Date) => {
+
+    const minute = Math.floor(((angle - PI / 2 + TAU) % TAU) * (24 * 60) / TAU)
+    
+    const { hours, minutes } = preFormatDuration(minute)
+    // console.log(preFormatDuration(minute));
+    
+    const newTime = new Date(baseDate);
+    newTime.setHours(hours, minutes, 0, 0);
+  
+    return newTime;
+  };
+  
+  const handleConfirmPress = () => {
+    const newStartTime = angleToTime(start.value, startTime);
+    const newEndTime = angleToTime(end.value, endTime);
+  
+    setStartTime(newStartTime);
+    setEndTime(newEndTime);
+  
+    setIsOpen(false);
+  };
+
+  const durationHour = useDerivedValue(() => {
+    const d = absoluteDuration(start.value, end.value);
+    return formatDurationHour(radToMinutes(d)+ 360 );
+  });
+  const durationMinute = useDerivedValue(() => {
+    const d = absoluteDuration(start.value, end.value);
+    return formatDurationMinute(radToMinutes(d)+ 360 );
+  });
 
   return (
     <Modal isOpen={isOpen} setIsOpen={setIsOpen}>
@@ -48,23 +85,29 @@ const EditSleepModal = ({startDate, setStartDate, endDate, setEndDate, isOpen, s
         <View className='flex-row'>
           <View className='grow items-start justify-center'>
             <Text style={{color:colors.subText}} className='text-body mt-2'>Edit Sleep time</Text>
-            <Text style={{color:colors.text}} className='text-heading mt-2'>{format(startDate,'dd MMM YYY')}</Text>
+            <Text style={{color:colors.text}} className='text-heading mt-2'>{format(date,'dd MMM yyy')}</Text>
           </View>
+
           <View className='items-start justify-center'>
             <Text style={{color:colors.subText}} className='text-body mt-2'>Total Time</Text>
             <View className='flex-row gap-1 items-end'>
-              <Text style={{color:colors.night}} className='text-subTitle font-notoMedium'>7</Text>
-              <Text style={{color:colors.subText, transform:[{translateY:-6}]}} className='text-body font-noto'>h</Text>
-              <Text style={{color:colors.night}} className='text-subTitle font-notoMedium'>23</Text>
-              <Text style={{color:colors.subText, transform:[{translateY:-6}]}} className='text-body font-noto'>h</Text>
+              <ReText style={{color:colors.night, fontSize:32, fontWeight:600}} text={durationHour} />
+              <View style={{transform:[{translateY:0}]}}>
+                <Text style={{color:colors.subText}} className='text-body font-noto'>h</Text>
+              </View>
+              <ReText style={{color:colors.night, fontSize:32, fontWeight:600}} text={durationMinute} />
+              <View style={{transform:[{translateY:0}]}}>
+                <Text style={{color:colors.subText}} className='text-body font-noto'>m</Text>
+              </View>
             </View>
           </View>
+
         </View>
 
-        <View className="flex-row gap-2 mt-4 justify-center">
+        {/* <View className="flex-row gap-2 mt-4 justify-center">
           {[
-            { label: "Sleep", date: startDate, onChange: handleDateChange("start"), icon: 'NightIcon' },
-            { label: "Wake up", date: endDate, onChange: handleDateChange("end"), icon: 'DayIcon' },
+            { label: "Sleep", date: startTime, onChange: handleDateChange("start"), icon: 'NightIcon' },
+            { label: "Wake up", date: endTime, onChange: handleDateChange("end"), icon: 'DayIcon' },
           ].map(({ label, date, onChange, icon }, index) => (
             <View style={{width:'40%'}} key={index} className="items-start justify-center">
               <View className='flex-row gap-1 items-end justify-center my-2'>
@@ -93,19 +136,45 @@ const EditSleepModal = ({startDate, setStartDate, endDate, setEndDate, isOpen, s
               </View>
             </View>
           ))}
+        </View> */}
+
+        <View style={{ height:SIZE+6, width:SIZE+6, display:'flex', justifyContent:'center', alignItems:'center'}}>
+          <GestureHandlerRootView style={{flex:1}}>
+            <CircularSlider start={start} end={end}/>
+          </GestureHandlerRootView>
         </View>
 
-        <View className='w-full items-end justify-end flex-row gap-3 mt-4'>
-          <TouchableOpacity onPress={()=>{setIsOpen(false)}} style={{backgroundColor:colors.nonFocus}} className='will-change-contents flex flex-row items-center justify-center rounded-full p-1 px-6 bg-primary'>
-            <Text style={{color:colors.white}} className='w-fit text-heading2 font-notoMedium'>Cancel</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={()=>{setIsOpen(false)}} className='will-change-contents flex flex-row items-center justify-center rounded-full p-1 px-6 bg-primary'>
-            <Text className='w-fit text-white text-heading2 font-notoMedium'>Update</Text>
+        <View style={styles.values}>
+          <Label theta={start} label="BEDTIME" icon="moon" iconColor="night"/>
+          <Label theta={end} label="WAKE UP" icon="sunny" iconColor="yellow"/>
+        </View>
+
+        <View className='w-full items-end justify-center flex-row gap-3 mt-4'>
+          <TouchableOpacity onPress={handleConfirmPress} className='will-change-contents flex flex-row items-center justify-center rounded-full p-1 px-6 bg-primary'>
+            <Text className='w-fit text-white text-heading2 font-notoMedium'>Confirm</Text>
           </TouchableOpacity>
         </View>
       </View>
     </Modal>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "#2C2B2D",
+    borderRadius: 16,
+    padding: PADDING,
+  },
+  values: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  duration: {
+    fontFamily: "SFProRounded-Medium",
+    fontSize: 26,
+    textAlign: "center",
+    color: "red",
+  },
+});
 
 export default EditSleepModal
