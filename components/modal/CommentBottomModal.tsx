@@ -1,12 +1,14 @@
 import { StyleSheet, View, Text, Button, KeyboardAvoidingView, Platform } from "react-native";
 import React, { forwardRef, memo, useCallback, useMemo, useRef } from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import BottomSheet, { BottomSheetBackdrop, BottomSheetFlashList, BottomSheetFooter, BottomSheetModal, BottomSheetModalProvider, BottomSheetTextInput, BottomSheetView, useBottomSheet, useBottomSheetModal } from '@gorhom/bottom-sheet/src';
+import BottomSheet, { BottomSheetBackdrop, BottomSheetFlashList, BottomSheetFooter, BottomSheetModal, BottomSheetModalProvider, BottomSheetTextInput, BottomSheetView, TouchableOpacity, useBottomSheet, useBottomSheetModal } from '@gorhom/bottom-sheet/src';
 import BottomModal from "./BottomModal";
 import { Dimensions } from "react-native";
 import { useTheme } from "../../context/themeContext";
 import { Image } from "expo-image";
 import { useAuth } from "../../context/authContext";
+import { FlashList } from "@shopify/flash-list";
+import { AntDesign as Icon } from '@expo/vector-icons';
 
 
 const screenWidth = Dimensions.get('window').width;
@@ -91,8 +93,8 @@ const CommentBottomModal = forwardRef<Ref>((props, ref:any) => {
           <View className='mb-2'>
             <Text style={{color:colors.text}} className='text-heading2'>Comment</Text>
           </View>
-          <View className='w-full flex-row gap-1 items-center justify-center px-2'>
-            <View className='rounded-full overflow-hidden'>
+          <View className=' overflow-hidden flex-row gap-1 items-center justify-center px-1'>
+            <View className=' rounded-full overflow-hidden'>
               <Image
                 style={styles.image}
                 source={user?.photoURL ? user?.photoURL : user?.gender === 1 ? require('../../assets/maleAvatar.png') : require('../../assets/femaleAvatar.png')}
@@ -100,16 +102,28 @@ const CommentBottomModal = forwardRef<Ref>((props, ref:any) => {
                 transition={10}
               />
             </View>
-            <View className='grow'>
-              <BottomSheetTextInput style={[styles.input, {backgroundColor:colors.white, borderColor:colors.gray}]} placeholder='write some comment..'/>
+            <View style={{flex:1, backgroundColor:colors.white, borderWidth:1, borderRadius:99 ,borderColor:colors.gray, padding:4, paddingHorizontal:10}} className='grow flex-row gap-1'>
+              <BottomSheetTextInput style={[styles.input, {width:'84%', color:colors.text}]} className='grow' placeholder='write some comment..'/>
+              <TouchableOpacity activeOpacity={0.7} style={{width:'16%', display:'flex', alignItems:'center', backgroundColor:colors.primary, borderRadius:99, paddingVertical:4}}>
+                <Icon name={'arrowup'} color={'#fff'} size={28} />
+              </TouchableOpacity>
             </View>
           </View>
         </BottomSheetView>
+        {/* <BottomSheetView style={{flex:1,paddingBottom:100, paddingTop:4}}>
+          <FlashList
+            data={data}
+            renderItem={({ item }) =>
+              <MemoizedRenderItem item={item} />
+            }
+            estimatedItemSize={200}
+          />
+        </BottomSheetView> */}
         <BottomSheetFlashList
           data={data}
           keyExtractor={keyExtractor}
           renderItem={({ item }) => <MemoizedRenderItem item={item} />}
-          estimatedItemSize={43.3}
+          estimatedItemSize={200}
           contentContainerStyle={{paddingBottom:100, paddingTop:4}}
         />
       </BottomSheetModal>
@@ -129,11 +143,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   input: {
-    borderRadius: 99,
     fontSize: 16,
     lineHeight: 20,
-    padding:10,
-    borderWidth:1,
   },
   footerContainer: {
     padding: 12,
@@ -147,9 +158,14 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   itemContainer: {
-    marginTop:10,
     padding: 6,
-    margin: 6,
+    marginHorizontal: 6,
+    marginVertical: 4,
+    height:60,
+    borderRadius:20,
+    display:'flex',
+    alignItems:'center',
+    justifyContent:'center',
     backgroundColor: "#eee",
   },
 });

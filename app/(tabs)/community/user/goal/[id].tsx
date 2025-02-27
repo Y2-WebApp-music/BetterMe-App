@@ -12,6 +12,7 @@ import { useAuth } from '../../../../../context/authContext';
 import { GoalData, Task } from '../../../../../types/goal';
 import BackButton from '../../../../../components/Back';
 import { DeleteIcon, OptionIcon } from '../../../../../constants/icon';
+import { useTheme } from '../../../../../context/themeContext';
 
 const { width } = Dimensions.get('window');
 const circle_length = width * 0.62;
@@ -19,11 +20,25 @@ const r = circle_length / (2 * Math.PI);
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
+type CommunityGoalScreenProp = {
+  end_date: string
+  description: string;
+  start_date: string;
+  task: Task[];
+  complete_task: number;
+  goal_id: string
+  goal_name: string
+  total_task: number
+  username:string
+  profile_img:string
+}
+
 export default function CommunityGoalScreen() {
   const { user } = useAuth()
   const { id } = useLocalSearchParams();
+  const { colors } = useTheme();
 
-  const [goalData, setGoalData] = useState<GoalData>({
+  const [goalData, setGoalData] = useState<CommunityGoalScreenProp>({
     goal_id:'1',
     goal_name:'goal_name',
     description:'description',
@@ -34,14 +49,30 @@ export default function CommunityGoalScreen() {
         task_name:'Task 1',
         status:false
       },
+      {
+        task_name:'Task 2',
+        status:true
+      },
+      {
+        task_name:'Task 3',
+        status:false
+      },
+      {
+        task_name:'Task 4',
+        status:true
+      },
+      {
+        task_name:'Task 5',
+        status:false
+      },
     ],
-    public_goal:true,
-    create_by:'b3drtknfbxfd5oitw45ngjdkx',
     total_task:12,
-    complete_task:9
+    complete_task:7,
+    username:'43grentrgfbhisojgrbdfxkngbhirtofgx',
+    profile_img:'https://picsum.photos/400',
   })
 
-  const [isLoad, setIsLoad] = useState(true)
+  const [isLoad, setIsLoad] = useState(false)
   const [err, setErr] = useState<string | null>('')
 
   // Fetch Data Here
@@ -50,7 +81,7 @@ export default function CommunityGoalScreen() {
       const response = await axios.get(`${SERVER_URL}/goal/detail/${id}`);
       const data = response.data;
 
-      const transformedData: GoalData = {
+      const transformedData: CommunityGoalScreenProp = {
         goal_id: data.goal_id,
         goal_name: data.goal_name,
         description: data.description,
@@ -59,8 +90,8 @@ export default function CommunityGoalScreen() {
         task: data.task,
         total_task: data.task.length,
         complete_task: data.task.filter((task: Task) => task.status).length,
-        public_goal: data.public_goal,
-        create_by: data.create_by
+        username:'AAAA',
+        profile_img:'eddddd'
       };
 
       setGoalData(transformedData);
@@ -72,9 +103,9 @@ export default function CommunityGoalScreen() {
     }
   };
 
-  useEffect(() => {
-    fetchGoalData();
-  }, []);
+  // useEffect(() => {
+  //   fetchGoalData();
+  // }, []);
 
   // useEffect(()=>{
   //   console.log('========================================================================');
@@ -108,7 +139,7 @@ export default function CommunityGoalScreen() {
 
 
   return (
-    <SafeAreaView className="w-full h-full justify-start items-center bg-Background font-noto" >
+    <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-start items-center font-noto" >
       <ScrollView
             className='w-full h-auto pb-20'
             contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start',alignItems:'center', marginTop:0}}
@@ -224,8 +255,8 @@ export default function CommunityGoalScreen() {
                     data={goalData.task}
                     renderItem={({ item, index }) => (
                       <View style={{ marginBottom: 12 }}>
-                        <View className={`h-2 w-2 rounded-full ${item.status? 'bg-green':'bg-gray'} `}/>
-                        <Text>{item.task_name}</Text>
+                        <View style={{}} className={`h-2 w-2 rounded-full`}/>
+                        <Text style={{color:item.status? colors.green : colors.text}}>{item.task_name}</Text>
                       </View>
                     )}
                     estimatedItemSize={200}
