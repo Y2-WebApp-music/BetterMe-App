@@ -104,7 +104,9 @@ const PostWithPhoto = ({ openComment, ...props }: PostContent & PostWithPhotoPro
           <OptionIcon width={24} height={24} color={colors.darkGray}/>
         </TouchableOpacity>
       ):( */}
+      <View className='mb-4'>
         <FollowButton/>
+      </View>
       {/* )} */}
     </View>
 

@@ -14,7 +14,6 @@ import { colors, useTheme } from '../../../context/themeContext';
 import CommentBottomModal from '../../../components/modal/CommentBottomModal';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetBackdrop, BottomSheetFooter, BottomSheetModal, BottomSheetModalProvider, BottomSheetTextInput, BottomSheetView, useBottomSheetModal } from '@gorhom/bottom-sheet/src';
-import FollowButton from '../../../components/Post/followButton';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -176,7 +175,6 @@ const CommunityFeed = () => {
 
         {/* test to post */}
         <PenIcon width={24} height={24} color={colors.nonFocus} onPress={()=>{router.push('/community/post/id')}}/>
-        <FollowButton/>
 
         <View className="flex-1 mb-4 mt-1 flex flex-col gap-2 items-center w-full pb-5">
 

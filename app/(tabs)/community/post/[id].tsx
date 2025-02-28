@@ -47,7 +47,8 @@ const CommunityPost = () => {
           <FlashList
             data={postDummy}
             renderItem={({ item }) =>
-            <DisplayComment 
+            <DisplayComment
+              _id={item._id}
               username={item.username}
               profile_img={item.profile_img}
               content={item.content}

@@ -3,6 +3,7 @@ import React from 'react'
 import { Image } from 'expo-image';
 import { LikeIcon,CommentIcon } from '../../constants/icon'
 import { useTheme } from '../../context/themeContext';
+import FollowButton from './followButton';
 
 const PostOnlyText = () => {
 
@@ -37,9 +38,9 @@ const PostOnlyText = () => {
         </View>
 
     </View>
-      <TouchableOpacity style={{backgroundColor:colors.gray}} className="flex-row rounded-full p-1 px-2">
-        <Text style={{color:colors.subText}} className="font-noto px-4 ">following</Text>
-      </TouchableOpacity>
+    <View className='mb-4'>
+      <FollowButton/>
+    </View>
     </View>
 
     <Text style={{color:colors.text}} className='text-body font-noto'>
