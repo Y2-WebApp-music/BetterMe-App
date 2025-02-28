@@ -146,6 +146,12 @@ const CommunityFeed = () => {
               </View>
               <PenIcon width={24} height={24} color={colors.nonFocus}/>
             </TouchableOpacity>
+            <TouchableOpacity activeOpacity={0.1} onPress={()=>{router.push('/community/user/goal/123')}} className='grow flex-row items-center rounded-full border border-primary p-2 px-4'>
+              <View style={{ transform: [{ translateY: 1 }], }} className='mr-auto'>
+                <Text style={{color:colors.red}} className='font-noto'>Goal</Text>
+              </View>
+              <PenIcon width={24} height={24} color={colors.nonFocus}/>
+            </TouchableOpacity>
             <GalleryIcon width={30} height={30} color={colors.nonFocus}/>
           </View>
         </View>
