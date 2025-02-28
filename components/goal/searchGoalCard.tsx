@@ -7,7 +7,7 @@ import Animated, { useAnimatedProps, useSharedValue, withTiming } from 'react-na
 import Svg, { Circle } from 'react-native-svg';
 
 const { width } = Dimensions.get('window');
-const circle_length = width * 0.18;
+const circle_length = width * 0.48;
 const r = circle_length / (2 * Math.PI);
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
@@ -46,12 +46,8 @@ const SearchGoalCard = ({ goal_id, goal_name, start_date, end_date, total_task, 
   }));
 
   return (
-    <TouchableOpacity 
-      onPress={() => { router.push(`/home/goal/create/${goal_id}`); }} 
-      style={{ marginBottom: 8, backgroundColor: colors.background, borderColor: colors.gray }} 
-      className='h-32 p-4 w-full justify-center rounded-normal border border-gray flex-row'
-    >
-      <View style={{ width: '89%', height: '100%' }} className='flex justify-center items-start'>
+    <TouchableOpacity onPress={() => { router.push(`/home/goal/create/${goal_id}`); }} style={{ marginBottom: 8, backgroundColor: colors.background, borderColor: colors.gray }} className='h-32 p-4 m-4 justify-center items-center rounded-normal border border-gray flex-row'>
+      <View style={{ width: '80%', height: '100%' }} className='flex justify-center'>
         <View style={{ width: '100%', height: '70%' }} className='justify-center'>
           <Text
             style={{ overflow: 'hidden', color: colors.text }}
@@ -66,32 +62,41 @@ const SearchGoalCard = ({ goal_id, goal_name, start_date, end_date, total_task, 
         <Text style={{ color: colors.subText }} className='text-detail font-noto'>{total_task} Task duration : {duration}</Text>
       </View>
 
-      <View style={{ width: '10%', height: '100%' }} className='justify-center items-center'>
-        <Svg width={circle_length} height={circle_length} viewBox="0 0 100 100">
+      <View className='justify-center items-center'>
+        <Svg width={circle_length/2.8} height={circle_length/2.8} style={{ transform: [{ rotate: '270deg' }] }} >
           <Circle
-            cx="50"
-            cy="50"
-            r="45"
-            stroke={colors.gray}
-            strokeWidth="10"
-            fill="none"
+            cx={circle_length/5.6}
+            cy={circle_length/5.6}
+            r={r}
+            fill="#E8E8E8"
+            stroke={'#E8E8E8'}
+            strokeWidth={6}
           />
           <AnimatedCircle
-            cx="50"
-            cy="50"
-            r="45"
+            cx={circle_length/5.6}
+            cy={circle_length/5.6}
+            r={r}
+            fill="#E8E8E8"
             stroke={color}
-            strokeWidth="10"
+            strokeWidth={8}
             strokeLinecap="round"
-            fill="none"
             strokeDasharray={circle_length}
             animatedProps={animatedProps}
           />
-          <Text style={{color:color}} className=' absolute text-heading font-notoSemiBold'>{percent}%</Text>
+          <Circle
+            cx={circle_length/5.6}
+            cy={circle_length/5.6}
+            r={r-5}
+            fill={colors.background}
+            stroke='none'
+          />
         </Svg>
+        <Text style={{color:color}} className='absolute text-heading font-notoSemiBold'>{percent}%</Text>
       </View>
     </TouchableOpacity>
+
   );
 };
 
 export default SearchGoalCard;
+

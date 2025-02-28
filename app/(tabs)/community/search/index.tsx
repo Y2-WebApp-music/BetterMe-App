@@ -9,7 +9,7 @@ import PostWithPhoto from '../../../../components/Post/postWithPhoto';
 import PostOnlyText from '../../../../components/Post/postOnlyText';
 import { GoalCreateCardProp, goalCreateDataDummy } from '../../../../types/goal';
 import SearchGoalCard from '../../../../components/goal/searchGoalCard';
-import Complete from '../../home/goal/complete';
+import SearchInput from '../../../../components/SearchInput';
 
 
 
@@ -25,6 +25,7 @@ const SearchCommunity = () => {
   const [postList, setPostList] = useState<number[]>([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20])
 
   const [goal,setGoal] = useState<GoalCreateCardProp[]>([])
+  const [search, setSearch] = useState('')
   
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = useCallback(() => {
@@ -55,16 +56,9 @@ const SearchCommunity = () => {
           }
         >
           <View className='flex-row items-center justify-center w-full mt-4'>
-              <Text className='text-heading text-primary font-notoMedium'>Search in Community</Text>
+              <Text className='text-subTitle text-primary font-notoMedium'>Search in Community</Text>
           </View>
-            <View className='w-full mt-1 flex-row gap-2 justify-start items-center'>
-              <TouchableOpacity activeOpacity={0.6} className='grow flex-row items-center rounded-full border border-primary p-2 px-4'>
-                <View style={{ transform: [{ translateY: 1 }], }} className='mr-auto'>
-                  <Text style={{color:colors.subText}} className='font-noto'>Search post, tag, goal</Text>
-                </View>
-                <SearchIcon width={24} height={24} color={colors.nonFocus}/>
-              </TouchableOpacity>
-            </View>
+          <SearchInput name={'Search post, tag, goal'} value={search} handleChange={(e)=>{setSearch(e)}}/>
 
           <View style={{height:1, width:'100%', backgroundColor:colors.gray}} className='my-3'/>
 
