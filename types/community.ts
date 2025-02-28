@@ -30,7 +30,7 @@ export type PostContent = CommunityUserPost & {
 };
 // like is length
 
-export type Comment = CommunityUser & {
+export type Comment = CommunityUserPost & {
   content:string
 };
 

@@ -2,6 +2,12 @@ import { View, Text, KeyboardAvoidingView, SafeAreaView, Platform, ScrollView, R
 import React, { useCallback, useState } from 'react'
 import { useLocalSearchParams } from 'expo-router';
 import BackButton from '../../../../components/Back';
+import PostOnlyText from '../../../../components/Post/postOnlyText';
+import DisplayComment from '../../../../components/Post/displayComment';
+import TextInputComment from '../../../../components/Post/textInputComment';
+import { FlashList } from '@shopify/flash-list';
+import { postDummy } from '../../../../types/community';
+
 
 const CommunityPost = () => {
 
@@ -27,7 +33,7 @@ const CommunityPost = () => {
           </View>
         </View>
         <ScrollView
-          className='w-[92%] h-auto'
+          className='w-[96%] h-auto'
           contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', marginTop:6}}
           showsVerticalScrollIndicator={false}
           keyboardDismissMode='on-drag'
@@ -35,7 +41,20 @@ const CommunityPost = () => {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
         >
-          <Text>Post {id}</Text>
+          <PostOnlyText/>
+          <Text className='p-3'>3421 Comment</Text>
+          <TextInputComment/>
+          <FlashList
+            data={postDummy}
+            renderItem={({ item }) =>
+            <DisplayComment 
+              username={item.username}
+              profile_img={item.profile_img}
+              content={item.content}
+            />
+            }
+            estimatedItemSize={200}
+          />
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

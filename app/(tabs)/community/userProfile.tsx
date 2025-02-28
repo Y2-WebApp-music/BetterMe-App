@@ -15,6 +15,7 @@ import PostWithPhoto from '../../../components/Post/postWithPhoto';
 import { postDummy } from '../../../types/community';
 import CommunityGoalCard from '../../../components/goal/communityGoalCard';
 import { useTheme } from '../../../context/themeContext';
+import FollowButton from '../../../components/Post/followButton';
 
 
 
