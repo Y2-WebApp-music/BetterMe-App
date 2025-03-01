@@ -115,7 +115,7 @@ export const postDummy:PostContent[] = [
     date:'2025-02-04T05:54:45.558+00:00',
     profile_img:'https://picsum.photos/270',
     post_id:'wj54knwgeavi89q45ui3gv',
-    content:'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Voluptatem magni facere quasi at temporibus quibusdam provident neque blanditiis quas praesentium ad, veniam, molestias quo, non autem fugiat dolorem nihil error!',
+    content:'hello ipsum dolor, sit amet consectetur adipisicing elit. Voluptatem magni facere quasi at temporibus quibusdam provident neque blanditiis quas praesentium ad, veniam, molestias quo, non autem fugiat dolorem nihil error!',
     tag:[1,4,5,7],
     like:4123,
     comment:1345,

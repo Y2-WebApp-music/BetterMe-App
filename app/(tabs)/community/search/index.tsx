@@ -1,5 +1,5 @@
 import { View, Text, RefreshControl, SafeAreaView, ScrollView, KeyboardAvoidingView, Platform, StyleSheet, TouchableOpacity, Dimensions } from 'react-native'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useState, useMemo } from 'react'
 import BackButton from '../../../../components/Back';
 import { useTheme } from '../../../../context/themeContext';
 import { SearchIcon } from '../../../../constants/icon';
@@ -25,7 +25,24 @@ const SearchCommunity = () => {
   const [postList, setPostList] = useState<number[]>([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20])
 
   const [goal,setGoal] = useState<GoalCreateCardProp[]>([])
+  
   const [search, setSearch] = useState('')
+
+  // filter post
+  const filterPost = useMemo(() => {
+    return postDummy.filter(post => 
+      post.content.toLowerCase().includes(search.toLowerCase()) || 
+      post.username.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [search]);
+
+  // filter goal
+  const filterGoals = useMemo(() => {
+    return goalDataDummy.filter(goal => 
+      goal.goal_name.toLowerCase().includes(search.toLowerCase()) || 
+      goal.create_by.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [search]);
   
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = useCallback(() => {
@@ -55,10 +72,12 @@ const SearchCommunity = () => {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
         >
-          <View className='flex-row items-center justify-center w-full mt-4'>
+          <View className='items-center justify-center w-full mt-4'>
               <Text className='text-subTitle text-primary font-notoMedium'>Search in Community</Text>
+              <View className='w-[92%]'>
+            <SearchInput name={'Search post, tag, goal'} value={search} handleChange={(e)=>{setSearch(e)}}/>
           </View>
-          <SearchInput name={'Search post, tag, goal'} value={search} handleChange={(e)=>{setSearch(e)}}/>
+          </View>
 
           <View style={{height:1, width:'100%', backgroundColor:colors.gray}} className='my-3'/>
 
@@ -105,7 +124,7 @@ const SearchCommunity = () => {
             postList.length != 0 ? (
               <View className='w-full'>
                 <FlashList
-                  data={postDummy}
+                  data={filterPost}
                   renderItem={({ item }) => (
                     item.photo ? (
                       <PostWithPhoto _id={item._id} username={item.username} profile_img={item.profile_img} post_id={item.post_id} date={item.date} content={item.content} tag={item.tag} like={item.like} comment={item.comment} photo={item.photo} />
@@ -125,7 +144,7 @@ const SearchCommunity = () => {
 
           {viewGoals && (
             <FlashList
-            data={goalDataDummy}
+            data={filterGoals}
             renderItem={({ item }) =>
               <SearchGoalCard goal_id={item.goal_id}
             goal_name={item.goal_name}

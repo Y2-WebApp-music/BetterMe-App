@@ -46,55 +46,58 @@ const SearchGoalCard = ({ goal_id, goal_name, start_date, end_date, total_task, 
   }));
 
   return (
-    <TouchableOpacity onPress={() => { router.push(`/home/goal/create/${goal_id}`); }} style={{ marginBottom: 8, backgroundColor: colors.background, borderColor: colors.gray }} className='h-32 p-4 m-4 justify-center items-center rounded-normal border border-gray flex-row'>
-      <View style={{ width: '80%', height: '100%' }} className='flex justify-center'>
-        <View style={{ width: '100%', height: '70%' }} className='justify-center'>
-          <Text
-            style={{ overflow: 'hidden', color: colors.text }}
-            numberOfLines={2}
-            ellipsizeMode="tail"
-            className='font-noto text-heading2 line-clamp-2'
-          >
-            {goal_name}
-          </Text>
+    <View className="flex-1 justify-center items-center">
+      <TouchableOpacity onPress={() => { router.push(`/home/goal/${goal_id}`); }} 
+        style={{ marginBottom: 8, backgroundColor: colors.background, borderColor: colors.gray, alignSelf: 'center', marginHorizontal: 'auto', width: '96%' }} 
+        className='h-32 justify-center items-center rounded-normal border border-gray flex-row'>
+        <View style={{ width: '75%', height: '100%', paddingLeft: 2 }} className='justify-center'> 
+          <View style={{ width: '100%', height: '70%' }} className='justify-center'>
+            <Text
+              style={{ overflow: 'hidden', color: colors.text }}
+              numberOfLines={2}
+              ellipsizeMode="tail"
+              className='font-noto text-heading2 line-clamp-2'
+            >
+              {goal_name}
+            </Text>
+          </View>
+          <Text style={{ color: colors.subText, marginLeft: 2 }} className='text-xs font-noto'>create by : {create_by}</Text>
+          <Text style={{ color: colors.subText, marginLeft: 2 }} className='text-xs font-noto'>{total_task} Task duration : {duration}</Text>
         </View>
-        <Text style={{ color: colors.subText }} className='text-detail font-noto'>create by : {create_by}</Text>
-        <Text style={{ color: colors.subText }} className='text-detail font-noto'>{total_task} Task duration : {duration}</Text>
-      </View>
 
-      <View className='justify-center items-center'>
-        <Svg width={circle_length/2.8} height={circle_length/2.8} style={{ transform: [{ rotate: '270deg' }] }} >
-          <Circle
-            cx={circle_length/5.6}
-            cy={circle_length/5.6}
-            r={r}
-            fill="#E8E8E8"
-            stroke={'#E8E8E8'}
-            strokeWidth={6}
-          />
-          <AnimatedCircle
-            cx={circle_length/5.6}
-            cy={circle_length/5.6}
-            r={r}
-            fill="#E8E8E8"
-            stroke={color}
-            strokeWidth={8}
-            strokeLinecap="round"
-            strokeDasharray={circle_length}
-            animatedProps={animatedProps}
-          />
-          <Circle
-            cx={circle_length/5.6}
-            cy={circle_length/5.6}
-            r={r-5}
-            fill={colors.background}
-            stroke='none'
-          />
-        </Svg>
-        <Text style={{color:color}} className='absolute text-heading font-notoSemiBold'>{percent}%</Text>
-      </View>
-    </TouchableOpacity>
-
+        <View className='justify-center items-center'>
+          <Svg width={circle_length/2.8} height={circle_length/2.8} style={{ transform: [{ rotate: '270deg' }] }} >
+            <Circle
+              cx={circle_length/5.6}
+              cy={circle_length/5.6}
+              r={r}
+              fill="#E8E8E8"
+              stroke={'#E8E8E8'}
+              strokeWidth={6}
+            />
+            <AnimatedCircle
+              cx={circle_length/5.6}
+              cy={circle_length/5.6}
+              r={r}
+              fill="#E8E8E8"
+              stroke={color}
+              strokeWidth={8}
+              strokeLinecap="round"
+              strokeDasharray={circle_length}
+              animatedProps={animatedProps}
+            />
+            <Circle
+              cx={circle_length/5.6}
+              cy={circle_length/5.6}
+              r={r-5}
+              fill={colors.background}
+              stroke='none'
+            />
+          </Svg>
+          <Text style={{color:color}} className='absolute text-heading font-notoSemiBold'>{percent}%</Text>
+        </View>
+      </TouchableOpacity>
+    </View>
   );
 };
 
