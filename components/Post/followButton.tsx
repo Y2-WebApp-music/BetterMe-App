@@ -15,11 +15,11 @@ const FollowButton = () => {
       className={`flex-row gap-2 p-1 px-1 justify-center items-center rounded-full w-auto ${following ? 'bg-gray' : 'bg-primary'}`}
       style={{paddingHorizontal: 10,  alignSelf: 'flex-start', }}
     >
-      <Text className={`text-detail font-notoMedium ${following ? 'text-subText' : 'text-white'}`}>
+      <Text className={`text-body font-notoMedium ${following ? 'text-subText' : 'text-white'}`}>
         {following ? 'following' : 'follow'}
       </Text>
       {!following && (
-        <AddIcon width={20} height={20} color={'white'}/>
+        <AddIcon width={24} height={24} color={'white'}/>
       )}
     </TouchableOpacity>
   )

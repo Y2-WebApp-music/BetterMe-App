@@ -20,7 +20,7 @@ type PostWithPhotoProp = {
   openComment : () => void
 }
 
-const PostWithPhoto = ({ openComment, ...props }: PostContent & PostWithPhotoProp) => {
+const PostWithPhoto = ({ openComment, post_id, ...props }: PostContent & PostWithPhotoProp) => {
 
   const { colors } = useTheme();
   const {user} = useAuth()
@@ -141,7 +141,7 @@ const PostWithPhoto = ({ openComment, ...props }: PostContent & PostWithPhotoPro
       </View>
       </GestureDetector>
     }
-    <TouchableWithoutFeedback onPress={()=>{router.push('/community/post/id')}}>
+    <TouchableWithoutFeedback onPress={()=>{router.push(`/community/post/${post_id}`)}}>
       <Text
         style={{marginVertical:3, color:colors.text}} className='text-body font-noto line-clamp-2'
         numberOfLines={2}

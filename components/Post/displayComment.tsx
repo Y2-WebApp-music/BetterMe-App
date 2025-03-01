@@ -28,7 +28,7 @@ const DisplayComment = ({ username, profile_img, content}:Comment) => {
       </View>
     </View>
     <View>
-      <Text style={{color:colors.text}} className='text-detail font-noto mt-1'>{content}</Text>
+      <Text style={{color:colors.text}} className='text-body font-noto ml-6'>{content}</Text>
     </View>
     </View>
     

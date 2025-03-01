@@ -173,9 +173,6 @@ const CommunityFeed = () => {
         }
         <TagSection/>
 
-        {/* test to post */}
-        <PenIcon width={24} height={24} color={colors.nonFocus} onPress={()=>{router.push('/community/post/id')}}/>
-
         <View className="flex-1 mb-4 mt-1 flex flex-col gap-2 items-center w-full pb-5">
 
             {postList.length != 0 ? (
