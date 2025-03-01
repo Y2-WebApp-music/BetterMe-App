@@ -91,8 +91,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (firebaseUser) {
         fetchUserDetails(firebaseUser)
       } else {
-         // setUser(dummyUser);
-         // AsyncStorage.setItem('@user', JSON.stringify(dummyUser));
+        //  setUser(dummyUser);
+        //  AsyncStorage.setItem('@user', JSON.stringify(dummyUser));
         setUser(null);
         AsyncStorage.removeItem('@user');
       }
