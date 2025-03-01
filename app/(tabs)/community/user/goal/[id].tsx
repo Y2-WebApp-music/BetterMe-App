@@ -14,7 +14,7 @@ import { GoalData, Task } from '../../../../../types/goal';
 import BackButton from '../../../../../components/Back';
 import { Image } from 'react-native';
 import { DeleteIcon, OptionIcon } from '../../../../../constants/icon';
-
+import { AddIcon } from '../../../../../constants/icon';
 const { width } = Dimensions.get('window');
 const circle_length = width * 0.62;
 const r = circle_length / (2 * Math.PI);
@@ -60,11 +60,11 @@ export default function CommunityGoalScreen() {
       },
       {
         task_name:'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
-        status:false
+        status:true
       },
       {
         task_name:'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
-        status:false
+        status:true
       },
 
     ],
@@ -248,10 +248,10 @@ export default function CommunityGoalScreen() {
 
                         {/* Dates Section */}
                         <View>
-                          <Text className="text-subText font-notoLight text-[1rem]">
+                          <Text className="text-subText font-notoLight text-[1rem]"style={{color:colors.subText}}>
                             Create: {format(goalData.start_date, 'd MMMM yyyy')}
                           </Text>
-                          <Text className="text-subText font-notoLight text-[1rem]">
+                          <Text className="text-subText font-notoLight text-[1rem]"style={{color:colors.subText}}>
                             End: {format(goalData.end_date, 'd MMMM yyyy')}
                           </Text>
                         </View>
@@ -263,7 +263,7 @@ export default function CommunityGoalScreen() {
                   <View className='h-[1px] w-full bg-gray rounded-full'/>
                   <View className='flex-row justify-start items-center mt-1'>
                     <Text style={{color: colors.text } } className='grow text-heading3'>Task List</Text>
-                    <Text className='text-subText font-noto'>{goalData.complete_task}/{goalData.total_task} completed</Text>
+                    <Text className='text-subText font-noto'style={{color:colors.subText}}>{goalData.complete_task}/{goalData.total_task} completed</Text>
                   </View>
                 </>
               )}
@@ -298,18 +298,22 @@ export default function CommunityGoalScreen() {
                       )}
                       estimatedItemSize={200}
                     />
-                      {/*"Add to Your Goal" */}
+                  {/*"Add to Your Goal" */}
                   <TouchableOpacity 
                     className="bg-blue-500 flex-row items-center justify-center rounded-full px-4 py-2 mt-6"
-                    style={{ alignSelf: 'center', width: '50%' }}
-                    onPress={()=>{router.push(`/home/goal/create/123`)}}
+                    style={{ alignSelf: 'center', minWidth: '50%' }} 
+                    onPress={() => { router.push(`/home/goal/create/123`) }}
                   >
-                    <Text className="text-white font-bold text-base">Add to Your Goal</Text>
-                  
-                    <View className="w-6 h-6 bg-white rounded-full items-center justify-center ml-2">
-                      <Text className="text-blue-500 text-l font-bold">+</Text>
+                    <Text className="text-white font-notoMedium text-body  text-center">
+                      Add to Your Goal
+                    </Text>
+
+                    <View className="w-6 h-6  rounded-full items-center justify-center ml-3">
+                      <AddIcon width={26} height={26} color={'#fff'} />  
                     </View>
                   </TouchableOpacity>
+
+
 
                   </View>
 
