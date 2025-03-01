@@ -33,7 +33,20 @@ type CommunityGoalScreenProps = {
   profile_img:string;
 
 
+
+type CommunityGoalScreenProps = {
+  end_date: string
+  description: string;
+  start_date: string;
+  task: Task[];
+  complete_task: number;
+  goal_id: string
+  goal_name: string
+  total_task: number
+  username:string
+  profile_img:string
 }
+
 export default function CommunityGoalScreen() {
   const { user } = useAuth()
   const { id } = useLocalSearchParams();
@@ -51,6 +64,7 @@ export default function CommunityGoalScreen() {
         status:false
       },
       {
+
         task_name:'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
         status:true
       },
@@ -74,7 +88,7 @@ export default function CommunityGoalScreen() {
     profile_img:"https://picsum.photos/id/237/200/300"
   })
 
-  const [isLoad, setIsLoad] = useState(true)
+  const [isLoad, setIsLoad] = useState(false)
   const [err, setErr] = useState<string | null>('')
 
   // Fetch Data Here
@@ -82,7 +96,6 @@ export default function CommunityGoalScreen() {
     try {
       const response = await axios.get(`${SERVER_URL}/goal/detail/${id}`);
       const data = response.data;
-
       const transformedData: CommunityGoalScreenProps = {
         goal_id: data.goal_id,
         goal_name: data.goal_name,
@@ -105,9 +118,9 @@ export default function CommunityGoalScreen() {
     }
   };
 
-  useEffect(() => {
-    fetchGoalData();
-  }, []);
+  // useEffect(() => {
+  //   fetchGoalData();
+  // }, []);
 
   // useEffect(()=>{
   //   console.log('========================================================================');
@@ -297,15 +310,7 @@ export default function CommunityGoalScreen() {
                       )}
                       estimatedItemSize={200}
                     />
-                  {/*"Add to Your Goal" */}
-
-
-
-                  </View>
-
-
-
-
+                 </View>
               )}
             </View>
           </ScrollView>

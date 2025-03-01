@@ -1,5 +1,5 @@
 import { View, Text, RefreshControl, SafeAreaView, ScrollView, KeyboardAvoidingView, Platform, Dimensions, StyleSheet, TouchableOpacity } from 'react-native'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import BackButton from '../../../components/Back';
 import { useAuth } from '../../../context/authContext';
 import { Image } from 'expo-image';
@@ -15,9 +15,8 @@ import PostWithPhoto from '../../../components/Post/postWithPhoto';
 import { postDummy } from '../../../types/community';
 import CommunityGoalCard from '../../../components/goal/communityGoalCard';
 import { useTheme } from '../../../context/themeContext';
-
-
-
+import { BottomSheetModal } from '@gorhom/bottom-sheet/src';
+import CommentBottomModal from '../../../components/modal/CommentBottomModal';
 
 
 const screenWidth = Dimensions.get('window').width;
@@ -96,6 +95,11 @@ const UserProfile = () => {
     }, [])
   );
 
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const handleOpenPress = () => {
+    bottomSheetModalRef.current?.present();
+  };
+
   return (
     <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-center items-center font-noto">
       <KeyboardAvoidingView
@@ -159,7 +163,7 @@ const UserProfile = () => {
                     data={postDummy}
                     renderItem={({ item }) => (
                       item.photo? (
-                        <PostWithPhoto _id={item._id} username={item.username} profile_img={item.profile_img} post_id={item.post_id} date={item.date} content={item.content} tag={item.tag} like={item.like} comment={item.comment} photo={item.photo} />
+                        <PostWithPhoto _id={item._id} username={item.username} profile_img={item.profile_img} post_id={item.post_id} date={item.date} content={item.content} tag={item.tag} like={item.like} comment={item.comment} photo={item.photo} openComment={handleOpenPress} />
                       ):(
                         <PostOnlyText/>
                       )
@@ -232,6 +236,7 @@ const UserProfile = () => {
               </View>
             )}
         </ScrollView>
+      <CommentBottomModal ref={bottomSheetModalRef} />
       </KeyboardAvoidingView>
     </SafeAreaView>
   )
