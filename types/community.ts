@@ -32,6 +32,7 @@ export type PostContent = CommunityUserPost & {
 
 export type Comment = CommunityUserPost & {
   content:string
+  comment_date:string
 };
 
 export type CommunityGoal = CommunityUser & {
@@ -202,4 +203,21 @@ export const postDummy:PostContent[] = [
     comment:1345,
     photo:['https://picsum.photos/400','https://picsum.photos/410','https://picsum.photos/420','https://picsum.photos/430','https://picsum.photos/440','https://picsum.photos/450','https://picsum.photos/460','https://picsum.photos/470','https://picsum.photos/480','https://picsum.photos/490','https://picsum.photos/500'],
   },
+]
+
+export const commentDummy:Comment [] = [
+  {
+    _id:'string',
+    username:'NovaNomad',
+    profile_img:'https://picsum.photos/270',
+    content: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Voluptatem magni facere quasi at temporibus quibusdam provident neque blanditiis quas praesentium ad, veniam, molestias quo, non autem fugiat dolorem nihil error!',
+    comment_date:'2025-02-04T05:54:45.558+00:00'
+  },
+  {
+    _id:'string',
+    username:'LunarLynx',
+    profile_img:'https://picsum.photos/215',
+    content: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Voluptatem magni facere quasi at temporibus quibusdam provident neque blanditiis quas praesentium ad, veniam, molestias quo, non autem fugiat dolorem nihil error!',
+    comment_date:'2025-02-04T05:54:45.558+00:00'
+  }
 ]

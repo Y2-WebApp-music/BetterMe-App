@@ -6,7 +6,7 @@ import { useTheme } from '../../context/themeContext'
 
 const screenWidth = Dimensions.get('window').width;
 
-const DisplayComment = ({ username, profile_img, content}:Comment) => {
+const DisplayComment = ({ username, profile_img, content, comment_date}:Comment) => {
   const { colors } = useTheme();
   
   return (
@@ -24,11 +24,19 @@ const DisplayComment = ({ username, profile_img, content}:Comment) => {
 
       <View className='flex-1'>
           <Text style={{color:colors.text}} className='text-heading3 font-noto'>{username}</Text>
-          <Text style={{color:colors.subText}} className='text-detail font-notoLight'>11 May 2024</Text>
+          <Text style={{color:colors.subText}} className='text-detail font-notoLight'>
+            {new Intl.DateTimeFormat('en-GB', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                // hour: '2-digit',
+                // minute: '2-digit'
+            }).format(new Date(comment_date))}
+          </Text>
       </View>
     </View>
     <View>
-      <Text style={{color:colors.text}} className='text-body font-noto ml-6'>{content}</Text>
+      <Text style={{color:colors.text}} className='text-body font-noto ml-2'>{content}</Text>
     </View>
     </View>
     

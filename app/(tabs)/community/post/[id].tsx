@@ -6,21 +6,22 @@ import FollowButton from '../../../../components/Post/followButton';
 import DisplayComment from '../../../../components/Post/displayComment';
 import TextInputComment from '../../../../components/Post/textInputComment';
 import { FlashList } from '@shopify/flash-list';
-import { postDummy } from '../../../../types/community';
+import { commentDummy } from '../../../../types/community';
 import { useTheme } from '../../../../context/themeContext';
 import { Image } from 'expo-image';
-import { LikeIcon,CommentIcon } from '../../../../constants/icon'
+import { LikeIcon } from '../../../../constants/icon'
 import { router } from 'expo-router';
 import { PostContent } from '../../../../types/community';
-import Animated, { useAnimatedStyle, useSharedValue, withDelay, withSpring } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import SlideItem from '../../../../components/Post/slideItem';
 import PageNum from '../../../../components/Post/pageNum';
 import Paginaion from '../../../../components/Post/pagination';
+import { TagCommunity } from '../../../../types/community';
 
 
 const screenWidth = Dimensions.get('window').width;
 
-const CommunityPost = ({   post_id }: PostContent) => {
+const CommunityPost = ({ post_id }: PostContent) => {
 
   const { id } = useLocalSearchParams();
   const { colors } = useTheme();
@@ -38,10 +39,9 @@ const CommunityPost = ({   post_id }: PostContent) => {
     tag:[1,4,5,7],
     like:4123,
     comment:1345,
-    photo:['https://picsum.photos/400','https://picsum.photos/410','https://picsum.photos/420','https://picsum.photos/430','https://picsum.photos/440','https://picsum.photos/450','https://picsum.photos/460','https://picsum.photos/470','https://picsum.photos/480','https://picsum.photos/490'],
+    photo:[],
   })
 
-  const Slides = [ require('../../../../assets/dummyPhoto/BigMeal.jpg'), require('../../../../assets/dummyPhoto/Breakfast.jpg'), require('../../../../assets/dummyPhoto/Salmon.jpg'), require('../../../../assets/dummyPhoto/ShrimpBroc.jpg'),require('../../../../assets/dummyPhoto/ShrimpBroc.jpg')]
   const [index, setIndex] = useState(0);
   const scrollX = useRef(new ReactAnimated.Value(0)).current;
   const handleOnScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -83,6 +83,21 @@ const CommunityPost = ({   post_id }: PostContent) => {
     }, 2000);
   }, []);
 
+  const TagList = ({ tagId }: { tagId: number[] }) => {
+    const { colors } = useTheme();
+    const tags = TagCommunity.filter(tag => tagId.includes(tag.id));
+  
+    return (
+      <View className="flex-row gap-1 my-1">
+        {tags.map((tag) => (
+          <TouchableOpacity key={tag.id} style={{ backgroundColor: colors.gray }} className="rounded-full p-1 px-2">
+            <Text style={{ color: colors.subText }} className="text-detail font-noto">{tag.text}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
       <KeyboardAvoidingView
@@ -103,7 +118,7 @@ const CommunityPost = ({   post_id }: PostContent) => {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
         >
-          {data.photo.length != 0 && 
+          {data.photo && data.photo.length > 0 ? (
             <View>      
               <View style={{ backgroundColor: colors.background }} className='flex-row gap-2 items-center justify-between'>
                 <View className='my-2 items-center flex-row gap-2'>
@@ -122,7 +137,15 @@ const CommunityPost = ({   post_id }: PostContent) => {
                   </TouchableOpacity>
                   <View>
                     <Text style={{ color: colors.text }} className='text-heading3 font-noto'>{data.username}</Text>
-                    <Text style={{ color: colors.subText }} className='text-detail font-notoLight'>{data.date}</Text>
+                    <Text style={{ color: colors.subText }} className='text-detail font-notoLight'>
+                      {new Intl.DateTimeFormat('en-GB', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric',
+                            // hour: '2-digit',
+                            // minute: '2-digit'
+                          }).format(new Date(data.date))}
+                    </Text>
                   </View>
                 </View>
                 <View className='mb-4'>
@@ -131,22 +154,14 @@ const CommunityPost = ({   post_id }: PostContent) => {
               </View>
               <Text style={{ marginVertical:3, color: colors.text }} className='text-body font-noto ml-2'>{data.content}</Text>
               <View className=" flex-row gap-1 my-2 ml-2">
-                <TouchableOpacity style={{backgroundColor:colors.gray}} className="rounded-full p-1 px-2">
-                  <Text style={{color:colors.subText}} className=" text-detail font-noto">exercise</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={{backgroundColor:colors.gray}} className="rounded-full p-1 px-2">
-                  <Text style={{color:colors.subText}} className=" text-detail font-noto ">fitness</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={{backgroundColor:colors.gray}} className="rounded-full p-1 px-2">
-                  <Text style={{color:colors.subText}} className=" text-detail font-noto">+2</Text>
-                </TouchableOpacity>
+              <TagList tagId={data.tag}/>
               </View>
               <View>
                 <Animated.View>
                   <FlatList 
                     data={data.photo}
                     renderItem={({ item }) => (
-                      <View style={{ width: screenWidth * 0.93, height: screenWidth * 0.93, padding: 3, position: 'relative' }}>
+                      <View style={{ width: screenWidth * 0.96, height: screenWidth * 0.96, padding: 3, position: 'relative' }}>
                         <SlideItem item={{ uri: item }} />
                       </View>
                     )}
@@ -178,18 +193,82 @@ const CommunityPost = ({   post_id }: PostContent) => {
               <Text style={{color:colors.text}} className='text-detail font-noto mb-2 ml-4'>{data.comment} comment</Text>
               <TextInputComment/>
               <FlashList
-                data={postDummy}
+                data={commentDummy}
                 renderItem={({ item }) =>
                 <DisplayComment
                   _id={item._id}
                   username={item.username}
                   profile_img={item.profile_img}
                   content={item.content}
+                  comment_date={item.comment_date}
                 />
                 }
                 estimatedItemSize={200}
               />
-            </View>}       
+            </View>
+
+          ) : (  
+            <View>      
+              <View style={{ backgroundColor: colors.background }} className='flex-row gap-2 items-center justify-between'>
+                <View className='my-2 items-center flex-row gap-2'>
+                  <TouchableOpacity 
+                    onPress={() => router.push(`/community/user/${post_id}`)}
+                    activeOpacity={0.6}
+                    style={{ borderColor: colors.gray }}  
+                    className='overflow-hidden rounded-full border border-gray'
+                  >
+                    <Image
+                      style={styles.image}
+                      source={data.profile_img}
+                      contentFit="cover"
+                      transition={1000}
+                    />
+                  </TouchableOpacity>
+                  <View>
+                    <Text style={{ color: colors.text }} className='text-heading3 font-noto'>{data.username}</Text>
+                    <Text style={{ color: colors.subText }} className='text-detail font-notoLight'>
+                      {new Intl.DateTimeFormat('en-GB', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric',
+                            // hour: '2-digit',
+                            // minute: '2-digit'
+                          }).format(new Date(data.date))}</Text>
+                  </View>
+                </View>
+                <View className='mb-4'>
+                  <FollowButton />
+                </View>
+              </View>
+              <Text style={{ marginVertical:3, color: colors.text }} className='text-body font-noto ml-2'>{data.content}</Text>
+              <View className=" flex-row gap-1 my-2 ml-2">
+              <TagList tagId={data.tag}/>
+              </View>
+              <View className=" items-end mb-2">
+                <TouchableOpacity className=" flex-row gap-1 items-center">
+                  <LikeIcon width={26} height={26} color={colors.darkGray}/>
+                  <Text style={{color:colors.subText}} className='text-body font-noto'>{data.like}</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={{paddingHorizontal:14, borderColor:colors.gray}} className='w-full border-b mb-2 '></View>
+              <Text style={{color:colors.text}} className='text-detail font-noto mb-2 ml-4'>{data.comment} comment</Text>
+              <TextInputComment/>
+              <FlashList
+                data={commentDummy}
+                renderItem={({ item }) =>
+                <DisplayComment
+                  _id={item._id}
+                  username={item.username}
+                  profile_img={item.profile_img}
+                  content={item.content}
+                  comment_date={item.comment_date}
+                />
+                }
+                estimatedItemSize={200}
+              />
+            </View>
+          )}
+
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
