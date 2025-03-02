@@ -1,5 +1,5 @@
 import { View, Text, SafeAreaView, KeyboardAvoidingView, Platform, ScrollView, RefreshControl, TouchableOpacity, StyleSheet, Dimensions } from 'react-native'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import BackButton from '../../../../components/Back'
 import { useLocalSearchParams } from 'expo-router';
 import { router } from 'expo-router';
@@ -13,6 +13,8 @@ import PostOnlyText from '../../../../components/Post/postOnlyText';
 import { postDummy } from '../../../../types/community';
 import CommunityGoalCard from '../../../../components/goal/communityGoalCard';
 import { useTheme } from '../../../../context/themeContext';
+import CommentBottomModal from '../../../../components/modal/CommentBottomModal';
+import { BottomSheetModal } from '@gorhom/bottom-sheet/src';
 
 
 const screenWidth = Dimensions.get('window').width;
@@ -59,7 +61,13 @@ const Userprofile = () => {
       setTimeout(() => {
         setRefreshing(false);
       }, 2000);
-    }, []);
+  }, []);
+
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+
+  const handleOpenPress = () => {
+    bottomSheetModalRef.current?.present();
+  };
 
   return (
     <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-center items-center font-noto">
@@ -123,7 +131,7 @@ const Userprofile = () => {
                     data={postDummy}
                     renderItem={({ item }) => (
                       item.photo? (
-                        <PostWithPhoto _id={item._id} username={item.username} profile_img={item.profile_img} post_id={item.post_id} date={item.date} content={item.content} tag={item.tag} like={item.like} comment={item.comment} photo={item.photo} />
+                        <PostWithPhoto _id={item._id} username={item.username} profile_img={item.profile_img} post_id={item.post_id} date={item.date} content={item.content} tag={item.tag} like={item.like} comment={item.comment} photo={item.photo} openComment={handleOpenPress} />
                       ):(
                         <PostOnlyText/>
                       )
@@ -196,6 +204,7 @@ const Userprofile = () => {
               </View>
             )}
         </ScrollView>
+      <CommentBottomModal ref={bottomSheetModalRef} />
       </KeyboardAvoidingView>
     </SafeAreaView>
   )
