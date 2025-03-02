@@ -1,4 +1,4 @@
-import {Animated as ReactAnimated, FlatList, View, Text,TouchableOpacity, StyleSheet, Dimensions, NativeScrollEvent, NativeSyntheticEvent, ViewToken} from 'react-native'
+import {Animated as ReactAnimated, FlatList, View, Text,TouchableOpacity, StyleSheet, Dimensions, NativeScrollEvent, NativeSyntheticEvent, ViewToken, TouchableWithoutFeedback} from 'react-native'
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import { Image } from 'expo-image';
 import { LikeIcon,CommentIcon, OptionIcon } from '../../constants/icon'
@@ -12,6 +12,7 @@ import { useAuth } from '../../context/authContext';
 import { router } from 'expo-router';
 import { useTheme } from '../../context/themeContext';
 import CommentBottomModal from '../modal/CommentBottomModal';
+import FollowButton from './followButton';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -19,7 +20,7 @@ type PostWithPhotoProp = {
   openComment : () => void
 }
 
-const PostWithPhoto = ({ openComment, ...props }: PostContent & PostWithPhotoProp) => {
+const PostWithPhoto = ({ openComment, post_id, ...props }: PostContent & PostWithPhotoProp) => {
 
   const { colors } = useTheme();
   const {user} = useAuth()
@@ -98,15 +99,15 @@ const PostWithPhoto = ({ openComment, ...props }: PostContent & PostWithPhotoPro
           </View>
 
       </View>
-      {props._id !== user?._id ? (
+      {/* {props._id !== user?._id ? (
         <TouchableOpacity className="flex-row rounded-full p-1 px-2">
           <OptionIcon width={24} height={24} color={colors.darkGray}/>
         </TouchableOpacity>
-      ):(
-        <TouchableOpacity className="flex-row rounded-full bg-gray p-1 px-2">
-          <Text className="text-subText font-noto px-4 ">following</Text>
-        </TouchableOpacity>
-      )}
+      ):( */}
+      <View className='mb-4'>
+        <FollowButton/>
+      </View>
+      {/* )} */}
     </View>
 
     {props.photo &&
@@ -140,14 +141,15 @@ const PostWithPhoto = ({ openComment, ...props }: PostContent & PostWithPhotoPro
       </View>
       </GestureDetector>
     }
-
-    <Text
-      style={{marginVertical:3, color:colors.text}} className='text-body font-noto line-clamp-2'
-      numberOfLines={2}
-      ellipsizeMode="tail"
-    >
-      {props.content}
-    </Text>
+    <TouchableWithoutFeedback onPress={()=>{router.push(`/community/post/${post_id}`)}}>
+      <Text
+        style={{marginVertical:3, color:colors.text}} className='text-body font-noto line-clamp-2'
+        numberOfLines={2}
+        ellipsizeMode="tail"
+      >
+        {props.content}
+      </Text>
+    </TouchableWithoutFeedback>
 
     <View style={{paddingBottom:8}} className="mt-2 flex-row gap-2 items-center justify-between">
       <View style={{gap:14}} className=" items-end flex-row">
