@@ -5,6 +5,7 @@ import { useTheme } from '../../../../context/themeContext';
 import { SearchIcon } from '../../../../constants/icon';
 import { FlashList } from '@shopify/flash-list';
 import { postDummy } from '../../../../types/community';
+import { TagCommunity } from '../../../../types/community';
 import PostWithPhoto from '../../../../components/Post/postWithPhoto';
 import PostOnlyText from '../../../../components/Post/postOnlyText';
 import { GoalCreateCardProp, goalCreateDataDummy } from '../../../../types/goal';
@@ -41,6 +42,19 @@ const SearchCommunity = () => {
     return goalDataDummy.filter(goal => 
       goal.goal_name.toLowerCase().includes(search.toLowerCase()) || 
       goal.create_by.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [search]);
+
+  // filter tag
+  const filterTag = useMemo(() => {
+    const matchTag = TagCommunity.filter(tag => 
+      tag.text.toLowerCase().includes(search.toLowerCase())
+    );
+  
+    const matchTagId = matchTag.map(tag => tag.id);
+  
+    return postDummy.filter(post => 
+      post.tag.some(tagId => matchTagId.includes(tagId))
     );
   }, [search]);
   
@@ -158,9 +172,27 @@ const SearchCommunity = () => {
           />
           )}
 
-          {/* {viewTag && (
-            <View></View>
-          )} */}
+          {viewTag && (
+            postList.length != 0 ? (
+              <View className='w-full'>
+                <FlashList
+                  data={filterTag}
+                  renderItem={({ item }) => (
+                    item.photo ? (
+                      <PostWithPhoto _id={item._id} username={item.username} profile_img={item.profile_img} post_id={item.post_id} date={item.date} content={item.content} tag={item.tag} like={item.like} comment={item.comment} photo={item.photo} />
+                    ) : (
+                      <PostOnlyText/>
+                    )
+                  )}
+                  estimatedItemSize={200}
+                />
+              </View>
+            ) : (
+              <View>
+                <Text>No post</Text>
+              </View>
+            )
+          )}
 
         </ScrollView>
       </KeyboardAvoidingView>
