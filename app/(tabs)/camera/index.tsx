@@ -70,10 +70,12 @@ const TakePicture = () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
-      allowsEditing: true,
       aspect: [4, 4],
       quality: 1,
-      selectionLimit:10,
+      selectionLimit:1,
+      allowsMultipleSelection:false,
+      allowsEditing: true,
+      orderedSelection:true,
     });
 
     console.log(result);
