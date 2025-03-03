@@ -16,10 +16,14 @@ const SleepGoal = () => {
   const [sleepTime, setSleepTime] = useState({ hours: 0, minutes: 0 });
 
   useEffect(() => {
-    async function checkStorage() {
-      const existingTime = await AsyncStorage.getItem('sleepData');
-      setToggle(!!existingTime);
-    }
+    const checkStorage = async () => {
+      try {
+        const existingTime = await AsyncStorage.getItem('sleepData');
+        setToggle(!!existingTime);
+      } catch (error) {
+        console.error('Error checking sleepData:', error);
+      }
+    };
     checkStorage();
   }, []);
 
@@ -29,28 +33,32 @@ const SleepGoal = () => {
     console.log('Sleep toggle', toggle);
   }, [toggle]);
 
-  const handleToggle = useCallback(async () => {
-    if (toggle) {
-      const sleepDuration = await toggleSleep();
-      if (sleepDuration) {
-        setSleepTime({
-          hours: Math.floor(sleepDuration / 60),
-          minutes: sleepDuration % 60,
-        });
-      }
-    } else {
-      await toggleSleep();
-      setSleepTime({ hours: 0, minutes: 0 });
-    }
-    
-    setToggle((prev) => !prev);
+  useEffect(() => {
     Animated.timing(animatedValue, {
-      toValue: toggle ? 0 : 1,
+      toValue: toggle ? 1 : 0,
       duration: 400,
       easing: Easing.inOut(Easing.ease),
       useNativeDriver: false,
     }).start();
   }, [toggle]);
+
+  const handleToggle = useCallback(async () => {
+    try {
+      const sleepDuration = await toggleSleep();
+      setToggle((prev) => !prev);
+
+      if (sleepDuration) {
+        setSleepTime({
+          hours: Math.floor(sleepDuration / 60),
+          minutes: sleepDuration % 60,
+        });
+      } else {
+        setSleepTime({ hours: 0, minutes: 0 });
+      }
+    } catch (error) {
+      console.error('Error toggling sleep:', error);
+    }
+  }, []);
 
   const backgroundColor = animatedValue.interpolate({
     inputRange: [0, 1],
@@ -69,7 +77,7 @@ const SleepGoal = () => {
 
   return (
     <View style={{ paddingHorizontal: 20, backgroundColor: colors.white, borderColor: colors.gray }} className='h-28 w-full rounded-normal border p-2 justify-center items-center flex-row gap-2'>
-      <NightIcon width={36} height={36} color={colors.night} />
+      {/* <NightIcon width={36} height={36} color={colors.night} /> */}
 
       <View style={{ paddingLeft: 10 }} className='grow'>
         <View style={{ transform: [{ translateY: 8 }] }}>
@@ -88,13 +96,15 @@ const SleepGoal = () => {
       </View>
 
       <View style={{ transform: [{ translateY: 8 }] }} className='relative flex-col justify-center items-center'>
-        <TouchableWithoutFeedback onPress={handleToggle}>
+        <TouchableWithoutFeedback testID="toggle-button" onPress={handleToggle}>
           <Animated.View style={[styles.container, { backgroundColor }]}>
             <Animated.View style={[styles.round, { transform: [{ translateX }], width: roundWidth }]}>
               {toggle ? (
-                <NightIcon width={20} height={20} color={colors.night} />
+                // <NightIcon width={20} height={20} color={colors.night} />
+                <Text>NightIcon</Text>
               ) : (
-                <DayIcon width={20} height={20} color={colors.yellow} />
+                <Text>DayIcon</Text>
+                // <DayIcon width={20} height={20} color={colors.yellow} />
               )}
             </Animated.View>
           </Animated.View>
@@ -151,7 +161,7 @@ export const toggleSleep = async (): Promise<number | null> => {
     const sleepDuration = differenceInMinutes(endTime, startTime);
 
     if (sleepDuration < 120 || sleepDuration > 780) {
-      console.log('Invalid sleep duration:', Math.floor(sleepDuration / 60), 'hours');
+      console.log('Invalid sleep duration:', Math.floor(sleepDuration), 'minute');
       await AsyncStorage.removeItem('sleepData');
       return null;
     }

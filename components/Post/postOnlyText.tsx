@@ -1,9 +1,11 @@
-import { View, Text,TouchableOpacity, StyleSheet, Dimensions} from 'react-native'
 import React, { useState } from 'react'
 import { Image } from 'expo-image';
 import { LikeIcon,CommentIcon } from '../../constants/icon'
 import { useTheme } from '../../context/themeContext';
 import { PostContent, TagCommunity } from '../../types/community';
+import { View, Text,TouchableOpacity, StyleSheet, Dimensions, TouchableWithoutFeedback} from 'react-native'
+import FollowButton from './followButton';
+import { router } from 'expo-router';
 
 const PostOnlyText = () => {
 
@@ -65,16 +67,17 @@ const PostOnlyText = () => {
         </View>
 
     </View>
-      <TouchableOpacity style={{backgroundColor:colors.gray}} className="flex-row rounded-full p-1 px-2">
-        <Text style={{color:colors.subText}} className="font-noto px-4 ">following</Text>
-      </TouchableOpacity>
+    <View className='mb-4'>
+      <FollowButton/>
     </View>
-
-    <Text style={{color:colors.text}} className='text-body font-noto'>
-      Lorem ipsum, dolor sit amet consectetur adipisicing elit. 
-      Error, numquam, asperiores quasi nemo nisi totam reprehenderit saepe, tenetur ut deleniti facere rerum ex soluta provident minus vel. Eius, 
-      aut inventore!
-    </Text>
+    </View>
+    <TouchableWithoutFeedback onPress={()=>{router.push(`/community/post/1234`)}}>
+        <Text style={{color:colors.text}} className='text-body font-noto' >
+          Lorem ipsum, dolor sit amet consectetur adipisicing elit. 
+          Error, numquam, asperiores quasi nemo nisi totam reprehenderit saepe, tenetur ut deleniti facere rerum ex soluta provident minus vel. Eius, 
+          aut inventore!
+        </Text>
+    </TouchableWithoutFeedback>
 
 
     <View style={{paddingBottom:8}} className="mt-2 flex-row gap-2 items-center justify-between">

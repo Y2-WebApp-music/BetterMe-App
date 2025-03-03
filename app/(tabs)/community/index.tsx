@@ -1,19 +1,18 @@
-import { View, Text, SafeAreaView, ScrollView, RefreshControl, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator, Button } from 'react-native'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { router } from 'expo-router';
-import { Image } from 'expo-image';
-import { useAuth } from '../../../context/authContext';
-import { AddIcon, BellIcon, GalleryIcon, PenIcon, SearchIcon, UserIcon } from '../../../constants/icon';
+import { BottomSheetModal } from '@gorhom/bottom-sheet/src';
 import { FlashList } from '@shopify/flash-list';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring, WithSpringConfig, WithTimingConfig } from 'react-native-reanimated';
+import { Image } from 'expo-image';
+import { router } from 'expo-router';
+import React, { useCallback, useRef, useState } from 'react';
+import { ActivityIndicator, Dimensions, RefreshControl, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import CommentBottomModal from '../../../components/modal/CommentBottomModal';
 import PostOnlyText from '../../../components/Post/postOnlyText';
 import PostWithPhoto from '../../../components/Post/postWithPhoto';
+import { BellIcon, GalleryIcon, PenIcon, SearchIcon } from '../../../constants/icon';
+import { useAuth } from '../../../context/authContext';
+import { useTheme } from '../../../context/themeContext';
 import { postDummy } from '../../../types/community';
-import { colors, useTheme } from '../../../context/themeContext';
-import CommentBottomModal from '../../../components/modal/CommentBottomModal';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { BottomSheetBackdrop, BottomSheetFooter, BottomSheetModal, BottomSheetModalProvider, BottomSheetTextInput, BottomSheetView, useBottomSheetModal } from '@gorhom/bottom-sheet/src';
 
 
 const screenWidth = Dimensions.get('window').width;
@@ -88,10 +87,7 @@ const CommunityFeed = () => {
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
-  const { dismiss } = useBottomSheetModal();
-
   const handleOpenPress = () => {
-    console.log('handleOpenPress ');
     bottomSheetModalRef.current?.present();
   };
 
@@ -176,6 +172,10 @@ const CommunityFeed = () => {
 
         <View className="flex-1 mb-4 mt-1 flex flex-col gap-2 items-center w-full pb-5">
 
+          <TouchableOpacity onPress={()=>{router.push(`/community/user/goal/${123123}`)}}>
+            <Text>Goal community</Text>
+          </TouchableOpacity>
+
             {postList.length != 0 ? (
               <View className='w-full'>
                 <FlashList
@@ -214,7 +214,7 @@ const CommunityFeed = () => {
       </ScrollView>
 
       <View style={{ position:'absolute', top:0, left:0, right:0, height: insets.top, zIndex:100, backgroundColor:colors.background }} />
-        <CommentBottomModal ref={bottomSheetModalRef} />
+      <CommentBottomModal ref={bottomSheetModalRef} />
       </SafeAreaView>
   )
 }
