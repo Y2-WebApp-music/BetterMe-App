@@ -1,11 +1,11 @@
-import { View, Text,TouchableOpacity, StyleSheet, Dimensions, TouchableWithoutFeedback} from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { Image } from 'expo-image';
 import { LikeIcon,CommentIcon } from '../../constants/icon'
 import { useTheme } from '../../context/themeContext';
+import { PostContent, TagCommunity } from '../../types/community';
+import { View, Text,TouchableOpacity, StyleSheet, Dimensions, TouchableWithoutFeedback} from 'react-native'
 import FollowButton from './followButton';
 import { router } from 'expo-router';
-
 
 const PostOnlyText = () => {
 
@@ -20,6 +20,33 @@ const PostOnlyText = () => {
     },
   });
 
+  const [data, setData]= useState<PostContent>({
+      _id:'string',
+      username:'Alex Kim',
+      date:'2025-02-04T05:54:45.558+00:00',
+      profile_img:'https://picsum.photos/270',
+      post_id:'wj54knwgeavi89q45ui3gv',
+      content:'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Voluptatem magni facere quasi at temporibus quibusdam provident neque blanditiis quas praesentium ad, veniam, molestias quo, non autem fugiat dolorem nihil error!',
+      tag:[1,2,3,4],
+      like:4123,
+      comment:1345,
+      photo:[],
+    })
+
+    const TagList = ({ tagId }: { tagId: number[] }) => {
+        const { colors } = useTheme();
+        const tags = TagCommunity.filter(tag => tagId.includes(tag.id));
+      
+        return (
+          <View className="flex-row gap-1 my-1">
+            {tags.map((tag) => (
+              <TouchableOpacity key={tag.id} style={{ backgroundColor: colors.gray }} className="rounded-full p-1 px-2">
+                <Text style={{ color: colors.subText }} className="text-detail font-noto">{tag.text}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        );
+      };
 
   return (
     <View style={{paddingHorizontal:14, borderColor:colors.gray}} className='w-full border-b pb-2 '>
@@ -66,15 +93,7 @@ const PostOnlyText = () => {
       </View>
 
       <View className=" flex-row gap-1">
-          <TouchableOpacity style={{backgroundColor:colors.gray}} className="rounded-full p-1 px-2">
-            <Text style={{color:colors.subText}} className=" text-detail font-noto">exercise</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={{backgroundColor:colors.gray}} className="rounded-full p-1 px-2">
-            <Text style={{color:colors.subText}} className=" text-detail font-noto ">fitness</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={{backgroundColor:colors.gray}} className="rounded-full p-1 px-2">
-            <Text style={{color:colors.subText}} className=" text-detail font-noto">+2</Text>
-          </TouchableOpacity>
+      <TagList tagId={data.tag}/>
       </View>
     </View>
 

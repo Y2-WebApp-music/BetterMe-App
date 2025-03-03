@@ -7,7 +7,7 @@ import Paginaion from './pagination'
 import PageNum from './pageNum';
 import { Gesture, GestureDetector, GestureHandlerRootView, } from 'react-native-gesture-handler';
 import Animated, { useAnimatedStyle, useSharedValue, withDelay, withSpring } from 'react-native-reanimated';
-import { PostContent } from '../../types/community';
+import { PostContent, TagCommunity } from '../../types/community';
 import { useAuth } from '../../context/authContext';
 import { router } from 'expo-router';
 import { useTheme } from '../../context/themeContext';
@@ -79,6 +79,21 @@ const PostWithPhoto = ({ openComment, post_id, ...props }: PostContent & PostWit
     transform: [{ scale: scale.value }],
     opacity: scale.value > 0 ? 1 : 0,
   }));
+
+  const TagList = ({ tagId }: { tagId: number[] }) => {
+    const { colors } = useTheme();
+    const tags = TagCommunity.filter(tag => tagId.includes(tag.id));
+  
+    return (
+      <View className="flex-row gap-1 my-1">
+        {tags.map((tag) => (
+          <TouchableOpacity key={tag.id} style={{ backgroundColor: colors.gray }} className="rounded-full p-1 px-2">
+            <Text style={{ color: colors.subText }} className="text-detail font-noto">{tag.text}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    );
+  };
 
   return (
     <GestureHandlerRootView style={{paddingHorizontal:14, width:'100%', borderBottomWidth:1, borderColor:colors.gray, paddingBottom:4}}>
@@ -164,15 +179,7 @@ const PostWithPhoto = ({ openComment, post_id, ...props }: PostContent & PostWit
       </View>
 
       <View className=" flex-row gap-1">
-          <TouchableOpacity style={{backgroundColor:colors.gray}} className="rounded-full p-1 px-2">
-            <Text style={{color:colors.subText}} className=" text-detail font-noto">exercise</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={{backgroundColor:colors.gray}} className="rounded-full p-1 px-2">
-            <Text style={{color:colors.subText}} className=" text-detail font-noto ">fitness</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={{backgroundColor:colors.gray}} className="rounded-full p-1 px-2">
-            <Text style={{color:colors.subText}} className=" text-detail font-noto">+2</Text>
-          </TouchableOpacity>
+      <TagList tagId={props.tag}/>
       </View>
     </View>
 
