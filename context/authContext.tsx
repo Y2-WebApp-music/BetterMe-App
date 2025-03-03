@@ -33,7 +33,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       const userJSON = await AsyncStorage.getItem('@user');
       const localUser = userJSON ? JSON.parse(userJSON) : null;
-      console.log(localUser);
+      // console.log(localUser);
       if (localUser) {
         setUser(localUser);
       }
@@ -77,7 +77,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             activity,
             calorie_need,
           };
-          console.log(' :=========== userData ===========: \n',extendedUser);
+          // console.log(' :=========== userData ===========: \n',extendedUser);
           setUser(extendedUser);
 
           await AsyncStorage.setItem('@user', JSON.stringify(extendedUser));

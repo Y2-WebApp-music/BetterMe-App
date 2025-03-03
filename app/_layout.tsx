@@ -19,6 +19,8 @@ import { AuthProvider } from '../context/authContext';
 import 'react-native-reanimated'
 import 'react-native-gesture-handler'
 import { ThemeProvider } from '../context/themeContext';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet/src';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -47,6 +49,8 @@ export default function RootLayout() {
   }
 
   return (
+    <GestureHandlerRootView>
+          <BottomSheetModalProvider>
     <ThemeProvider>
       <AuthProvider>
         <ProtectedLogin>
@@ -60,5 +64,7 @@ export default function RootLayout() {
         </ProtectedLogin>
       </AuthProvider>
     </ThemeProvider>
+          </BottomSheetModalProvider>
+          </GestureHandlerRootView>
   );
 }
