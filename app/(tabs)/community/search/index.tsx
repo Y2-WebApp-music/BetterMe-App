@@ -1,17 +1,15 @@
-import { View, Text, RefreshControl, SafeAreaView, ScrollView, KeyboardAvoidingView, Platform, StyleSheet, TouchableOpacity, Dimensions } from 'react-native'
+import { View, Text, RefreshControl, SafeAreaView, ScrollView, KeyboardAvoidingView, Platform } from 'react-native'
 import React, { useCallback, useState, useMemo } from 'react'
 import BackButton from '../../../../components/Back';
 import { useTheme } from '../../../../context/themeContext';
-import { SearchIcon } from '../../../../constants/icon';
 import { FlashList } from '@shopify/flash-list';
 import { postDummy } from '../../../../types/community';
 import { TagCommunity } from '../../../../types/community';
 import PostWithPhoto from '../../../../components/Post/postWithPhoto';
 import PostOnlyText from '../../../../components/Post/postOnlyText';
-import { GoalCreateCardProp, goalCreateDataDummy } from '../../../../types/goal';
 import SearchGoalCard from '../../../../components/goal/searchGoalCard';
 import SearchInput from '../../../../components/SearchInput';
-
+import SwitchToggleButton from '../../../../components/switchToggleButton';
 
 
 
@@ -25,7 +23,6 @@ const SearchCommunity = () => {
 
   const [postList, setPostList] = useState<number[]>([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20])
 
-  const [goal,setGoal] = useState<GoalCreateCardProp[]>([])
   
   const [search, setSearch] = useState('')
 
@@ -72,7 +69,7 @@ const SearchCommunity = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1, width:"100%",alignItems:'center' }}
       >
-        <View className='w-full'>
+        <View className='w-[92%]'>
           <View className='max-w-[14vw]'>
             <BackButton goto={'/menu'}/>
           </View>
@@ -96,40 +93,37 @@ const SearchCommunity = () => {
           <View style={{height:1, width:'100%', backgroundColor:colors.gray}} className='my-3'/>
 
           <View className='flex-row w-[92%] justify-start items-center gap-4 ml-4'>
-            <TouchableOpacity 
-              onPress={() => {
-                setViewPost(true);
-                setViewGoals(false);
-                setViewTag(false);
-              }} 
-              className={`p-1 px-4 ${viewPost ? 'bg-primary' : 'bg-transparent'} rounded-normal`}
-            >
-              <Text style={{color: viewPost ? '#fff' : colors.subText}} className='text-heading2 font-notoMedium'>post</Text>
-            </TouchableOpacity>
-            <View style={{backgroundColor:colors.gray}} className='h-full w-[1px] rounded-full'/>
+          <SwitchToggleButton
+            label="post" 
+            isActive={viewPost} 
+            onPress={() => {
+              setViewPost(true);
+              setViewGoals(false);
+              setViewTag(false);
+            }} 
+          />
 
-            <TouchableOpacity 
-              onPress={() => {
-                setViewPost(false);
-                setViewGoals(true);
-                setViewTag(false);
-              }} 
-              className={`p-1 px-4 ${viewGoals ? 'bg-primary' : 'bg-transparent'} rounded-normal`}
-            >
-              <Text style={{color: viewGoals ? '#fff' : colors.subText}} className='text-heading2 font-notoMedium'>goals</Text>
-            </TouchableOpacity>
-            <View style={{backgroundColor:colors.gray}} className='h-full w-[1px] rounded-full'/>
+          <View style={{ backgroundColor: colors.gray }} className='h-full w-[1px] rounded-full'/>
+          <SwitchToggleButton
+            label="goals" 
+            isActive={viewGoals} 
+            onPress={() => {
+              setViewPost(false);
+              setViewGoals(true);
+              setViewTag(false);
+            }} 
+          />
 
-            <TouchableOpacity 
-              onPress={() => {
-                setViewPost(false);
-                setViewGoals(false);
-                setViewTag(true);
-              }} 
-              className={`p-1 px-4 ${viewTag ? 'bg-primary' : 'bg-transparent'} rounded-normal`}
-            >
-              <Text style={{color: viewTag ? '#fff' : colors.subText}} className='text-heading2 font-notoMedium'>tag</Text>
-            </TouchableOpacity>
+          <View style={{ backgroundColor: colors.gray }} className='h-full w-[1px] rounded-full'/>
+          <SwitchToggleButton
+            label="tag" 
+            isActive={viewTag} 
+            onPress={() => {
+              setViewPost(false);
+              setViewGoals(false);
+              setViewTag(true);
+            }} 
+          />
           </View>
 
           <View style={{height:1, width:'100%',backgroundColor:colors.gray}} className='my-3'/>

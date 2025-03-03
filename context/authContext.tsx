@@ -90,7 +90,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const unsub = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
         fetchUserDetails(firebaseUser)
-      } else {
+      } else {git
         //  setUser(dummyUser);
         //  AsyncStorage.setItem('@user', JSON.stringify(dummyUser));
         setUser(null);

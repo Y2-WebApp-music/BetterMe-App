@@ -51,7 +51,7 @@ const SearchGoalCard = ({ goal_id, goal_name, start_date, end_date, total_task, 
         style={{ marginBottom: 8, backgroundColor: colors.background, borderColor: colors.gray, alignSelf: 'center', marginHorizontal: 'auto', width: '96%' }} 
         className='h-32 justify-center items-center rounded-normal border border-gray flex-row'>
         <View style={{ width: '75%', height: '100%', paddingLeft: 2 }} className='justify-center'> 
-          <View style={{ width: '100%', height: '70%' }} className='justify-center'>
+          <View style={{width:'100%', height:'60%', display:'flex', justifyContent:'center'}}>
             <Text
               style={{ overflow: 'hidden', color: colors.text }}
               numberOfLines={2}
@@ -61,8 +61,10 @@ const SearchGoalCard = ({ goal_id, goal_name, start_date, end_date, total_task, 
               {goal_name}
             </Text>
           </View>
-          <Text style={{ color: colors.subText, marginLeft: 2 }} className='text-xs font-noto'>create by : {create_by}</Text>
-          <Text style={{ color: colors.subText, marginLeft: 2 }} className='text-xs font-noto'>{total_task} Task duration : {duration}</Text>
+          <View>
+            <Text style={{ color: colors.subText, marginLeft: 2 }} className='text-detail font-noto'>create by : {create_by}</Text>
+            <Text style={{ color: colors.subText, marginLeft: 2 }} className='text-detail font-noto'>{total_task} Task duration : {duration}</Text>
+          </View>
         </View>
 
         <View className='justify-center items-center'>
@@ -78,7 +80,7 @@ const SearchGoalCard = ({ goal_id, goal_name, start_date, end_date, total_task, 
             <AnimatedCircle
               cx={circle_length/5.6}
               cy={circle_length/5.6}
-              r={r}
+              r={r-1}
               fill="#E8E8E8"
               stroke={color}
               strokeWidth={8}
