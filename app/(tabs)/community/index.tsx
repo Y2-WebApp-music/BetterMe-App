@@ -1,8 +1,8 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet/src';
 import { FlashList } from '@shopify/flash-list';
 import { Image } from 'expo-image';
-import { router } from 'expo-router';
-import React, { useCallback, useRef, useState } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Dimensions, RefreshControl, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -12,7 +12,9 @@ import PostWithPhoto from '../../../components/Post/postWithPhoto';
 import { BellIcon, GalleryIcon, PenIcon, SearchIcon } from '../../../constants/icon';
 import { useAuth } from '../../../context/authContext';
 import { useTheme } from '../../../context/themeContext';
-import { postDummy } from '../../../types/community';
+import { PostContent, postDummy } from '../../../types/community';
+import axios from 'axios';
+import { SERVER_URL } from '@env';
 
 
 const screenWidth = Dimensions.get('window').width;
@@ -24,18 +26,12 @@ const SCROLL_DOWN_THRESHOLD = 60;
 const CommunityFeed = () => {
 
   const { colors } = useTheme();
-  const { user } = useAuth()
+  const { user, userFollow } = useAuth()
 
   const [refreshing, setRefreshing] = useState(false);
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    console.log('refreshing ');
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000);
-  }, []);
 
-  const [postList, setPostList] = useState<number[]>([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20])
+  // const [postList, setPostList] = useState<number[]>([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20])
+  const [postList, setPostList] = useState<PostContent[] | null>(null)
 
   const insets = useSafeAreaInsets();
   const scrollYRef = useRef(0)
@@ -86,10 +82,56 @@ const CommunityFeed = () => {
   };
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-
   const handleOpenPress = () => {
     bottomSheetModalRef.current?.present();
   };
+
+  const getFeed = async () => {
+    try {
+      const response = await axios.get(`${SERVER_URL}/community/post/feed/${user?._id}`);
+      const data = response.data
+
+      console.log('response Feed sample[0] \n',data[0]);
+      if ( data.message === "User not found") {return console.error('User not found')}
+
+      if (data) {
+        const formattedData: PostContent[] = data.map((post: any) => ({
+          post_id: post.post_id,
+          date: post.date,
+          content: post.content,
+          tag: post.tag,
+          like: post.like,
+          comment: post.comment,
+          photo: post.image,
+          _id: post.create_by._id,
+          username: post.create_by.username,
+          profile_img: post.create_by.profile_img,
+        }));
+  
+        setPostList(formattedData);
+      } else {
+        return
+      }
+
+    } catch (error: any){
+      console.error('Get Post Error: ',error)
+    }
+  }
+
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    console.log('refreshing ');
+    setTimeout(() => {
+      getFeed().finally(()=>setRefreshing(false));
+    }, 500);
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      getFeed()
+    }, [])
+  );
 
   return (
     <SafeAreaView style={{backgroundColor:colors.background}} className=" relative w-full h-full justify-center items-center font-noto">
@@ -171,15 +213,10 @@ const CommunityFeed = () => {
         <TagSection/>
 
         <View className="flex-1 mb-4 mt-1 flex flex-col gap-2 items-center w-full pb-5">
-
-          <TouchableOpacity onPress={()=>{router.push(`/community/user/goal/${123123}`)}}>
-            <Text>Goal community</Text>
-          </TouchableOpacity>
-
-            {postList.length != 0 ? (
+          {postList?(
               <View className='w-full'>
                 <FlashList
-                  data={postDummy}
+                  data={postList}
                   renderItem={({ item }) => (
                     item.photo? (
                       <PostWithPhoto
@@ -196,18 +233,29 @@ const CommunityFeed = () => {
                         openComment={handleOpenPress}
                       />
                     ):(
-                      <PostOnlyText/>
+                      <PostOnlyText
+                        _id={item._id}
+                        username={item.username}
+                        profile_img={item.profile_img}
+                        post_id={item.post_id}
+                        date={item.date}
+                        content={item.content}
+                        tag={item.tag}
+                        like={item.like}
+                        comment={item.comment}
+                        openComment={handleOpenPress}
+                      />
                     )
                   )
                   }
                   estimatedItemSize={200}
                 />
               </View>
-            ):(
-              <View>
-                <Text style={{color:colors.subText}}>No post</Text>
-              </View>
-            )
+              ):(
+                <View className='flex-1 justify-center items-center'>
+                  <Text style={{color:colors.subText}} className='text-heading2'>No post</Text>
+                </View>
+              )
             }
 
         </View>
