@@ -31,20 +31,6 @@ type CommunityGoalScreenProps = {
   complete_task:number;
   username:string;
   profile_img:string;
-
-
-
-type CommunityGoalScreenProps = {
-  end_date: string
-  description: string;
-  start_date: string;
-  task: Task[];
-  complete_task: number;
-  goal_id: string
-  goal_name: string
-  total_task: number
-  username:string
-  profile_img:string
 }
 
 export default function CommunityGoalScreen() {
