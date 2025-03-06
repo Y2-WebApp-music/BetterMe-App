@@ -5,12 +5,14 @@ import { router } from 'expo-router';
 import { GoogleAuthProvider, IdTokenResult, onAuthStateChanged, signInWithCredential, signOut, User, UserInfo, UserMetadata } from 'firebase/auth';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { auth } from '../components/auth/firebaseConfig';
-import { UserData } from '../types/user';
+import { UserData, UserFollow } from '../types/user';
 import LoadingBubble from '../components/auth/Loading';
 
 type AuthContextType = {
   user: UserData | null;
   setUser: React.Dispatch<React.SetStateAction<UserData | null>>;
+  userFollow: UserFollow | null;
+  setUserFollow: React.Dispatch<React.SetStateAction<UserFollow | null>>;
   loginWithGoogle: (id_token: string) => Promise<void>;
   signOut: () => Promise<void>;
 };
@@ -27,6 +29,7 @@ export const useAuth = () => {
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserData | null>(null);
+  const [userFollow, setUserFollow] = useState<UserFollow | null>(null);
 
   // Check local user and Firebase auth state
   const checkLocalUser = async () => {
@@ -36,6 +39,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // console.log(localUser);
       if (localUser) {
         setUser(localUser);
+        followUser(localUser._id)
       }
     } catch (e) {
       console.error('Error fetching user from AsyncStorage', e);
@@ -61,6 +65,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           console.warn('User not found Loading.....');
           return <LoadingBubble />;
         }
+
         
         else {
           console.warn('.....Have User in Data base.....');
@@ -80,6 +85,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           // console.log(' :=========== userData ===========: \n',extendedUser);
           setUser(extendedUser);
 
+          followUser(_id)
           await AsyncStorage.setItem('@user', JSON.stringify(extendedUser));
         }
       } catch (error) {
@@ -121,9 +127,28 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  const followUser = async (_id:string) => {
+    try {
+      const response = await axios.get(`${SERVER_URL}/user/follow/${_id}`);
+      const res = response.data
+
+      if ( res.message === "User not found") { return console.log('User not found in follow');}
+
+      console.log('follow res ',res);
+      setUserFollow({
+        follower: res.follower,
+        following: res.following,
+      })
+
+      await AsyncStorage.setItem('@follow', JSON.stringify(res));
+    } catch (error) {
+      console.error('followUser get failed', error);
+    }
+  }
+
 
   return (
-    <AuthContext.Provider value={{ user, setUser, loginWithGoogle, signOut: handleSignOut }}>
+    <AuthContext.Provider value={{ user, setUser, userFollow, setUserFollow, loginWithGoogle, signOut: handleSignOut }}>
       {children}
     </AuthContext.Provider>
   );
