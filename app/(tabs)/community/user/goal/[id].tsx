@@ -178,9 +178,9 @@ export default function CommunityGoalScreen() {
                         cx={circle_length/5.6}
                         cy={circle_length/5.6}
                         r={r}
-                        fill="#E8E8E8"
+                        fill={colors.gray}
                         stroke={colors.gray}
-                        strokeWidth={6}
+                        strokeWidth={8}
                       />
                       <AnimatedCircle
                         cx={circle_length/5.6}

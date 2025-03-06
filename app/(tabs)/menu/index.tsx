@@ -14,8 +14,7 @@ import { MealSummaryCard } from '../../../types/food';
 import axios from 'axios';
 import { SERVER_URL } from '@env';
 import { toDateId } from '@marceloterreiro/flash-calendar';
-import format from 'date-fns/format';
-import { subDays } from 'date-fns';
+import { format, subDays } from 'date-fns';
 import { useTheme } from '../../../context/themeContext';
 
 const screenWidth = Dimensions.get('window').width;

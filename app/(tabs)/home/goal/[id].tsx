@@ -258,15 +258,15 @@ export default function GoalScreen() {
                         cx={circle_length/5.6}
                         cy={circle_length/5.6}
                         r={r}
-                        fill="#E8E8E8"
-                        stroke={'#E8E8E8'}
-                        strokeWidth={6}
+                        fill={colors.gray}
+                        stroke={colors.gray}
+                        strokeWidth={8}
                       />
                       <AnimatedCircle
                         cx={circle_length/5.6}
                         cy={circle_length/5.6}
                         r={r}
-                        fill="#E8E8E8"
+                        fill={colors.gray}
                         stroke={color}
                         strokeWidth={8}
                         strokeLinecap="round"
