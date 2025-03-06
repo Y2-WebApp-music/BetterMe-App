@@ -1,5 +1,6 @@
-import {Image, StyleSheet, View, Dimensions} from 'react-native';
+import { StyleSheet, View, Dimensions} from 'react-native';
 import React from 'react';
+import { Image } from 'expo-image';
 
 type SlideItemProps = {
     item: any
@@ -8,12 +9,13 @@ type SlideItemProps = {
 const SlideItem = ({item} : SlideItemProps) =>{
     
     return (
-            <View style = {styles.container} >
-                <Image source={item}
-                resizeMode="cover"
+        <View style = {styles.container} >
+            <Image source={item}
+                contentFit="cover"
                 style={styles.image}
-                />
-            </View>
+                transition={1000}
+            />
+        </View>
     )
 }
 

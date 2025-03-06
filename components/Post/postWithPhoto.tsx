@@ -3,7 +3,6 @@ import React, {useCallback, useEffect, useRef, useState} from 'react'
 import { Image } from 'expo-image';
 import { LikeIcon,CommentIcon, OptionIcon } from '../../constants/icon'
 import SlideItem from './slideItem'
-import Paginaion from './pagination'
 import PageNum from './pageNum';
 import { Gesture, GestureDetector, GestureHandlerRootView, } from 'react-native-gesture-handler';
 import Animated, { useAnimatedStyle, useSharedValue, withDelay, withSpring } from 'react-native-reanimated';
@@ -13,6 +12,10 @@ import { router } from 'expo-router';
 import { useTheme } from '../../context/themeContext';
 import CommentBottomModal from '../modal/CommentBottomModal';
 import FollowButton from './followButton';
+import { FlashList } from '@shopify/flash-list';
+import { formatNumber, TagList } from './postConstants';
+import { format } from 'date-fns';
+import Pagination from './pagination';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -23,7 +26,7 @@ type PostWithPhotoProp = {
 const PostWithPhoto = ({ openComment, post_id, ...props }: PostContent & PostWithPhotoProp) => {
 
   const { colors } = useTheme();
-  const {user} = useAuth()
+  const { user } = useAuth()
   
 
   const [index, setIndex] = useState(0);
@@ -55,11 +58,7 @@ const PostWithPhoto = ({ openComment, post_id, ...props }: PostContent & PostWit
   const viewabilityConfig = useRef({
     itemVisiblePercentThreshold: 50,
   }).current;
-
-
-  const Slides = [ require('../../assets/dummyPhoto/BigMeal.jpg'), require('../../assets/dummyPhoto/Breakfast.jpg'), require('../../assets/dummyPhoto/Salmon.jpg'), require('../../assets/dummyPhoto/ShrimpBroc.jpg'),require('../../assets/dummyPhoto/ShrimpBroc.jpg')]
   
-
   const scale = useSharedValue(0);
 
   const doubleTap = Gesture.Tap()
@@ -73,27 +72,12 @@ const PostWithPhoto = ({ openComment, post_id, ...props }: PostContent & PostWit
           scale.value = withDelay(100, withSpring(0));
         }
       });
-    });
+  });
 
   const likeAnimated = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
     opacity: scale.value > 0 ? 1 : 0,
   }));
-
-  const TagList = ({ tagId }: { tagId: number[] }) => {
-    const { colors } = useTheme();
-    const tags = TagCommunity.filter(tag => tagId.includes(tag.id));
-  
-    return (
-      <View className="flex-row gap-1 my-1">
-        {tags.map((tag) => (
-          <TouchableOpacity key={tag.id} style={{ backgroundColor: colors.gray }} className="rounded-full p-1 px-2">
-            <Text style={{ color: colors.subText }} className="text-detail font-noto">{tag.text}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-    );
-  };
 
   return (
     <GestureHandlerRootView style={{paddingHorizontal:14, width:'100%', borderBottomWidth:1, borderColor:colors.gray, paddingBottom:4}}>
@@ -101,59 +85,79 @@ const PostWithPhoto = ({ openComment, post_id, ...props }: PostContent & PostWit
     <View style={{backgroundColor:colors.background}} className=' flex-row gap-2 items-center justify-between'>
 
       <View className='my-2 items-center flex-row gap-2'>
-          <TouchableOpacity onPress={()=>{router.push(`/community/user/${props._id}`)}} activeOpacity={0.6} style={{borderColor:colors.gray}}  className='overflow-hidden rounded-full border border-gray'>
-            <Image
+        <TouchableOpacity onPress={()=>{router.push(`/community/user/${props._id}`)}} activeOpacity={0.6} style={{borderColor:colors.gray}}  className='overflow-hidden rounded-full border border-gray'>
+          <Image
             style={styles.image}
             source={props.profile_img}
             contentFit="cover"
-            transition={1000}/>
-          </TouchableOpacity>
-          <View>
+            transition={1000}
+          />
+        </TouchableOpacity>
+        <View>
           <Text style={{color:colors.text}} className='text-heading3 font-noto'>{props.username}</Text>
-          <Text style={{color:colors.subText}} className='text-detail font-notoLight'>11 may 2024</Text>
-          </View>
+          <Text style={{color:colors.subText}} className='text-detail font-notoLight'>{format(props.date,'dd MMM yyy HH:mm')}</Text>
+        </View>
 
       </View>
-      {/* {props._id !== user?._id ? (
+      {props._id === user?._id ? (
         <TouchableOpacity className="flex-row rounded-full p-1 px-2">
           <OptionIcon width={24} height={24} color={colors.darkGray}/>
         </TouchableOpacity>
-      ):( */}
-      <View className='mb-4'>
-        <FollowButton/>
-      </View>
-      {/* )} */}
+      ):(
+        <View>
+          <FollowButton userPostID={props._id}/>
+        </View>
+      )}
     </View>
 
     {props.photo &&
       <GestureDetector gesture={Gesture.Exclusive(doubleTap)}>
-      <View>
-      
         <Animated.View >
-          <FlatList data={Slides}
-            renderItem={({item}) =>
+            {props.photo.length > 1? (
+              <>
+                <FlatList data={props.photo}
+                  renderItem={({item}) =>
+                    <View style={{width:screenWidth*0.93, height:screenWidth*0.93, padding:3, position:'relative' }}>
+                      <SlideItem item={item} />
+                    </View>
+                  }
+                  horizontal
+                  pagingEnabled
+                  snapToAlignment = "center"
+                  showsHorizontalScrollIndicator={false}
+                  onScroll={handleOnScroll}
+                  onViewableItemsChanged={handleOnViewableItemChanged}
+                  viewabilityConfig={viewabilityConfig}
+                />
+                <PageNum currentIndex={index} total={props.photo.length}/>
+                <Pagination data={props.photo} scrollX={scrollX}/>
+              </>
+            ):(
               <View style={{width:screenWidth*0.93, height:screenWidth*0.93, padding:3, position:'relative' }}>
-                <SlideItem item={item} />
+                <View
+                  style = {{ width : '100%',
+                    height : '100%',
+                    alignItems: 'center',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <Image
+                    source={props.photo}
+                    contentFit="cover"
+                    style={{flex: 1, width:'100%', borderRadius: 15}}
+                    transition={1000}
+                  />
+                </View>
               </View>
+            )
             }
-            horizontal
-            pagingEnabled
-            snapToAlignment = "center"
-            showsHorizontalScrollIndicator={false}
-            onScroll={handleOnScroll}
-            onViewableItemsChanged={handleOnViewableItemChanged}
-            viewabilityConfig={viewabilityConfig}
-            />
-          <PageNum currentIndex={index} total={Slides.length}/>
-          <Paginaion data={Slides} scrollX={scrollX}/>
-          <View style={{position:'absolute', width:'100%', height:'100%', alignItems:'center',justifyContent:'center'}}>
-            <Animated.Image
-              style={[styles.like, likeAnimated]}
-              source={require('../../assets/icons/Like.png')}
+            <View style={{position:'absolute', width:'100%', height:'100%', alignItems:'center',justifyContent:'center'}}>
+              <Animated.Image
+                style={[styles.like, likeAnimated]}
+                source={require('../../assets/icons/Like.png')}
               />
-          </View>
+            </View>
         </Animated.View>
-      </View>
       </GestureDetector>
     }
     <TouchableWithoutFeedback onPress={()=>{router.push(`/community/post/${post_id}`)}}>
@@ -170,25 +174,22 @@ const PostWithPhoto = ({ openComment, post_id, ...props }: PostContent & PostWit
       <View style={{gap:14}} className=" items-end flex-row">
         <TouchableOpacity className=" flex-row gap-1 items-center">
           <LikeIcon width={26} height={26} color={colors.darkGray}/>
-          <Text style={{color:colors.subText}} className='text-body font-noto'>123k</Text>
+          <Text style={{color:colors.subText}} className='text-body font-noto'>
+            {formatNumber(props.like)}
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={openComment} className=" flex-row gap-1 items-center">
           <CommentIcon width={26} height={26}color={colors.darkGray}/>
-          <Text style={{color:colors.subText}} className='text-body font-noto'>567k</Text>
+          <Text style={{color:colors.subText}} className='text-body font-noto'>
+            {formatNumber(props.comment)}
+          </Text>
         </TouchableOpacity>
       </View>
 
-      <View className=" flex-row gap-1">
       <TagList tagId={props.tag}/>
-      </View>
     </View>
-
   </GestureHandlerRootView>
-
-  
   )
-
-
 }
 
 export default PostWithPhoto

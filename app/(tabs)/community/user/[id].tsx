@@ -131,20 +131,43 @@ const Userprofile = () => {
                     data={postDummy}
                     renderItem={({ item }) => (
                       item.photo? (
-                        <PostWithPhoto _id={item._id} username={item.username} profile_img={item.profile_img} post_id={item.post_id} date={item.date} content={item.content} tag={item.tag} like={item.like} comment={item.comment} photo={item.photo} openComment={handleOpenPress} />
+                        <PostWithPhoto
+                          _id={item._id}
+                          username={item.username}
+                          profile_img={item.profile_img}
+                          post_id={item.post_id}
+                          date={item.date}
+                          content={item.content}
+                          tag={item.tag}
+                          like={item.like}
+                          comment={item.comment}
+                          photo={item.photo}
+                          openComment={handleOpenPress}
+                        />
                       ):(
-                        <PostOnlyText/>
+                        <PostOnlyText
+                          _id={item._id}
+                          username={item.username}
+                          profile_img={item.profile_img}
+                          post_id={item.post_id}
+                          date={item.date}
+                          content={item.content}
+                          tag={item.tag}
+                          like={item.like}
+                          comment={item.comment}
+                          openComment={handleOpenPress}
+                        />
                       )
                     )
                     }
                     estimatedItemSize={200}
                   />
                 </View>
-              ):(
-                <View>
-                  <Text>No post</Text>
-                </View>
-              )
+                ):(
+                  <View>
+                    <Text style={{color:colors.subText}}>No post</Text>
+                  </View>
+                )
             ):(
               <View className='w-[92%] justify-center items-center gap-2 mt-2 pb-16'>
                 <View className='flex-row items-center justify-center'>
