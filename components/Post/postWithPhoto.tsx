@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { Dimensions, FlatList, NativeScrollEvent, NativeSyntheticEvent, Animated as ReactAnimated, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View, ViewToken } from 'react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView, } from 'react-native-gesture-handler';
-import Animated, { useAnimatedStyle, useSharedValue, withDelay, withSpring } from 'react-native-reanimated';
+import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withDelay, withSpring } from 'react-native-reanimated';
 import { CommentIcon, OptionIcon } from '../../constants/icon';
 import { useAuth } from '../../context/authContext';
 import { useTheme } from '../../context/themeContext';
@@ -60,18 +60,32 @@ const PostWithPhoto = ({ openComment, post_id, ...props }: PostContent & PostWit
   
   const scale = useSharedValue(0);
 
+  
+  const navigateToPost = (post_id: string) => {
+    router.push(`/community/post/${post_id}`);
+  };
+  
+  const oneTap = Gesture.Tap()
+    .maxDuration(200)
+    .numberOfTaps(1)
+    .onEnd(() => {
+      runOnJS(navigateToPost)(post_id);
+    });
+  
   const doubleTap = Gesture.Tap()
     .maxDuration(150)
     .numberOfTaps(2)
     .onStart(() => {
       console.log('Double tap!');
-      
       scale.value = withSpring(1.2, undefined, (isFinished) => {
         if (isFinished) {
           scale.value = withDelay(100, withSpring(0));
         }
       });
-  });
+    });
+  
+  // Ensure that the double tap is checked **first**
+  const tapGesture = Gesture.Exclusive(doubleTap, oneTap);
 
   const likeAnimated = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
@@ -110,7 +124,7 @@ const PostWithPhoto = ({ openComment, post_id, ...props }: PostContent & PostWit
     </View>
 
     {props.photo &&
-      <GestureDetector gesture={Gesture.Exclusive(doubleTap)}>
+      <GestureDetector gesture={tapGesture}>
         <Animated.View >
             {props.photo.length > 1? (
               <>
