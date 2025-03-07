@@ -1,7 +1,7 @@
 import { View, Text, SafeAreaView, KeyboardAvoidingView, Platform, ScrollView, RefreshControl, TouchableOpacity, StyleSheet, Dimensions } from 'react-native'
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import BackButton from '../../../../components/Back'
-import { useLocalSearchParams } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { router } from 'expo-router';
 import { Image } from 'expo-image';
 import { useAuth } from '../../../../context/authContext';
@@ -10,61 +10,140 @@ import HomeGoalCard from '../../../../components/goal/homeGoalCard';
 import { homeGoalCardProp } from '../../../../types/goal'
 import PostWithPhoto from '../../../../components/Post/postWithPhoto';
 import PostOnlyText from '../../../../components/Post/postOnlyText';
-import { postDummy } from '../../../../types/community';
+import { PostContent, CommunityUserPost } from '../../../../types/community';
 import CommunityGoalCard from '../../../../components/goal/communityGoalCard';
 import { useTheme } from '../../../../context/themeContext';
 import CommentBottomModal from '../../../../components/modal/CommentBottomModal';
 import { BottomSheetModal } from '@gorhom/bottom-sheet/src';
+import axios from 'axios';
+import { SERVER_URL } from '@env';
+import FollowButton from '../../../../components/Post/followButton';
 
 
 const screenWidth = Dimensions.get('window').width;
 
 const Userprofile = () => {
 
-  const { colors } = useTheme();
   const { id } = useLocalSearchParams();
-  const [postList, setPostList] = useState<number[]>([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20])
-
   const { user } = useAuth();
-
+  const { colors } = useTheme();
+  
+  const [postList, setPostList] = useState<PostContent[] | null>(null)
   const [goalList,setGoalList] = useState<homeGoalCardProp[]>([])
-    
-    const completeGoal = goalList?[
-      ...goalList
-    // select only complete goal
-      .filter((goal) => goal.total_task === goal.complete_task) 
-    // re-order from old to newest
-      .sort((a, b) => {
-        const dateA = new Date(a.end_date).setHours(0, 0, 0, 0);
-        const dateB = new Date(b.end_date).setHours(0, 0, 0, 0);
-        return dateA - dateB;
-      }),
-    ] : []
-  
-    const inprogressGoal = goalList?[
-      ...goalList
-    // select only inprogress goal
-      .filter((goal) => goal.total_task !== goal.complete_task) 
-    // re-order from old to newest
-      .sort((a, b) => {
-        const dateA = new Date(a.end_date).setHours(0, 0, 0, 0);
-        const dateB = new Date(b.end_date).setHours(0, 0, 0, 0);
-        return dateA - dateB;
-      }),
-    ] : []
-  
   const [viewPost, setViewPost] = useState(true);
 
+  const [userData, setUserData] = useState< CommunityUserPost | null>(null)
+
+
+  useEffect(()=>{
+    setUserData({
+      _id: id.toString(),
+      username: 'no data',
+      profile_img: '',
+    })
+  },[id])
+
+
+  const getPostData = async () => {
+    try {
+      const response = await axios.get(`${SERVER_URL}/community/user-posts/${id}`);
+      const data = response.data
+
+      console.log('response Feed sample[0] \n',data[0]);
+      if ( data.message === "User not found") {return console.error('User not found')}
+
+      if (data) {
+        const formattedData: PostContent[] = data.map((post: any) => ({
+          post_id: post.post_id,
+          date: post.date,
+          content: post.content,
+          tag: post.tag,
+          like: post.like,
+          comment: post.comment,
+          photo: post.image,
+          _id: id,
+          username: 'no data',
+          profile_img: '',
+        }));
+  
+        setPostList(formattedData);
+      } else {
+        return
+      }
+
+    } catch (error: any){
+      console.error('Get Post Error: ',error)
+    }
+  }
+    
+  const getGoalData = async () => {
+    try {
+      const response = await axios.get(`${SERVER_URL}/community/goal/card/${id}`);
+      const data = response.data // homeGoalCardProp[]
+
+      // console.log('getAllGoal response \n',response.data);
+
+      if (data.message === "Goal not found") {
+        return
+      } else {
+        setGoalList([
+          ...data.map((goal: any) => ({
+            goal_id:goal.goal_id,
+            goal_name:goal.goal_name,
+            end_date:goal.end_date,
+            total_task:goal.total_task,
+            complete_task:goal.complete_task,
+          })),
+        ])
+      }
+
+    } catch (error: any){
+      console.error(error)
+    }
+  }
+  
+  const completeGoal = goalList?[
+    ...goalList
+  // select only complete goal
+    .filter((goal) => goal.total_task === goal.complete_task) 
+  // re-order from old to newest
+    .sort((a, b) => {
+      const dateA = new Date(a.end_date).setHours(0, 0, 0, 0);
+      const dateB = new Date(b.end_date).setHours(0, 0, 0, 0);
+      return dateA - dateB;
+    }),
+  ] : []
+
+  const inprogressGoal = goalList?[
+    ...goalList
+  // select only inprogress goal
+    .filter((goal) => goal.total_task !== goal.complete_task)
+    .filter((goal) => new Date(goal.end_date) > new Date())
+  // re-order from old to newest
+    .sort((a, b) => {
+      const dateA = new Date(a.end_date).setHours(0, 0, 0, 0);
+      const dateB = new Date(b.end_date).setHours(0, 0, 0, 0);
+      return dateA - dateB;
+    }),
+  ] : []
+
+  useFocusEffect(
+    useCallback(() => {
+      getPostData()
+      getGoalData()
+    }, [])
+  );
+
   const [refreshing, setRefreshing] = useState(false);
-    const onRefresh = useCallback(() => {
-      setRefreshing(true);
-      setTimeout(() => {
-        setRefreshing(false);
-      }, 2000);
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      getPostData()
+      getGoalData().finally(()=>setRefreshing(false))
+    }, 500);
   }, []);
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-
   const handleOpenPress = () => {
     bottomSheetModalRef.current?.present();
   };
@@ -95,6 +174,7 @@ const Userprofile = () => {
                 <Text style={{color:colors.subText}} className=' font-not pb-1'>maybe.gmail.com</Text>
                 <Text style={{color:colors.subText}} className=' font-noto pb-1'>333k post 3333 goal</Text>
                 <View>
+                  <FollowButton userPostID={id.toString()}/>
                   <TouchableOpacity onPress={()=>{router.push(`/community/index`)}} style={{backgroundColor:colors.gray}} className=' flex-row gap-2 p-2 px-4 justify-center items-center rounded-full'>
                     <Text style={{color:colors.text}} className=' text-body font-notoMedium'>following</Text>
                   </TouchableOpacity>
@@ -124,11 +204,11 @@ const Userprofile = () => {
 
             <View style={{height:1, width:'100%',backgroundColor:colors.gray}} className=' my-3'/>
 
-            {viewPost? (
+            {viewPost && postList? (
               postList.length != 0 ? (
                 <View className='w-full'>
                   <FlashList
-                    data={postDummy}
+                    data={postList}
                     renderItem={({ item }) => (
                       item.photo? (
                         <PostWithPhoto
@@ -164,20 +244,20 @@ const Userprofile = () => {
                   />
                 </View>
                 ):(
-                  <View>
-                    <Text style={{color:colors.subText}}>No post</Text>
+                  <View className='flex-1 justify-center items-center'>
+                    <Text style={{color:colors.subText}} className='text-heading2'>No post</Text>
                   </View>
                 )
             ):(
               <View className='w-[92%] justify-center items-center gap-2 mt-2 pb-16'>
                 <View className='flex-row items-center justify-center'>
-                  <Text style={{color:colors.yellow}} className='text-heading'>33</Text>
+                  <Text style={{color:colors.yellow}} className='text-heading'>{inprogressGoal.length}</Text>
                   <View style={{ transform: [{ translateY: 3 }]}}>
-                    <Text style={{color:colors.text}} className='text-body font-noto  pl-3'>In progress</Text>
+                    <Text style={{color:colors.text}} className='text-body font-noto pl-3'>In progress</Text>
                   </View>
-                  <Text style={{color:colors.green}} className='text-heading pl-4'>123</Text>
+                  <Text style={{color:colors.green}} className='text-heading pl-4'>{completeGoal.length}</Text>
                   <View style={{ transform: [{ translateY: 3 }]}}>
-                    <Text style={{color:colors.text}} className='text-body font-noto  pl-3'>Complete</Text>
+                    <Text style={{color:colors.text}} className='text-body font-noto pl-3'>Complete</Text>
                   </View>
                 </View>
                 <View className='w-full'>

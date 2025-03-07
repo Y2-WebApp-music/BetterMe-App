@@ -12,7 +12,7 @@ import axios from 'axios';
 import { SERVER_URL } from '@env';
 import PostOnlyText from '../../../components/Post/postOnlyText';
 import PostWithPhoto from '../../../components/Post/postWithPhoto';
-import { postDummy } from '../../../types/community';
+import { PostContent, postDummy } from '../../../types/community';
 import CommunityGoalCard from '../../../components/goal/communityGoalCard';
 import { useTheme } from '../../../context/themeContext';
 import FollowButton from '../../../components/Post/followButton';
@@ -26,30 +26,62 @@ const UserProfile = () => {
 
   const { colors } = useTheme();
   const { user } = useAuth();
-
-  const [viewPost, setViewPost] = useState(true);
-  const [postList, setPostList] = useState<number[]>([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20])
-
+  
+  const [postList, setPostList] = useState<PostContent[] | null>(null)
   const [goalList,setGoalList] = useState<homeGoalCardProp[]>([])
+  const [viewPost, setViewPost] = useState(true);
   const [noGoal, setNoGoal] = useState(false)
 
-  const getAllGoal = async () => {
+
+  const getPostData = async () => {
     try {
-      const response = await axios.get(`${SERVER_URL}/goal/user/${user?._id}`);
+      const response = await axios.get(`${SERVER_URL}/community/user-posts/${user?._id}`);
+      const data = response.data
+
+      console.log('response Feed sample[0] \n',data[0]);
+      if ( data.message === "User not found") {return console.error('User not found')}
+
+      if (data) {
+        const formattedData: PostContent[] = data.map((post: any) => ({
+          post_id: post.post_id,
+          date: post.date,
+          content: post.content,
+          tag: post.tag,
+          like: post.like,
+          comment: post.comment,
+          photo: post.image,
+          _id: user?._id || '',
+          username: user?.displayName || '',
+          profile_img: user?.photoURL || '',
+        }));
+  
+        setPostList(formattedData);
+      } else {
+        return
+      }
+
+    } catch (error: any){
+      console.error('Get Post Error: ',error)
+    }
+  }
+
+  const getGoalData = async () => {
+    try {
+      const response = await axios.get(`${SERVER_URL}/community/goal/card/${user?._id}`);
       const data = response.data // homeGoalCardProp[]
 
       // console.log('getAllGoal response \n',response.data);
 
-      if (data.message === "No goal") {
+      if (data.message === "Goal not found") {
         setNoGoal(true)
       } else {
         setGoalList([
           ...data.map((goal: any) => ({
             goal_id:goal.goal_id,
             goal_name:goal.goal_name,
+            end_date:goal.end_date,
             total_task:goal.total_task,
             complete_task:goal.complete_task,
-            end_date:goal.end_date,
           })),
         ])
       }
@@ -84,17 +116,21 @@ const UserProfile = () => {
     }),
   ] : []
 
-  const [refreshing, setRefreshing] = useState(false);
-  const onRefresh = useCallback(() => {
-    setRefreshing(true)
-    getAllGoal().finally(() => setRefreshing(false));
-  }, []);
-
   useFocusEffect(
     useCallback(() => {
-      getAllGoal()
+      getPostData()
+      getGoalData()
     }, [])
   );
+
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      getPostData()
+      getGoalData().finally(()=>setRefreshing(false))
+    }, 500);
+  }, []);
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const handleOpenPress = () => {
@@ -157,11 +193,11 @@ const UserProfile = () => {
 
             <View style={{height:1, width:'100%',backgroundColor:colors.gray}} className='my-3'/>
 
-            {viewPost? (
+            {viewPost && postList? (
               postList.length != 0 ? (
                 <View className='w-full'>
                   <FlashList
-                    data={postDummy}
+                    data={postList}
                     renderItem={({ item }) => (
                       item.photo? (
                         <PostWithPhoto
@@ -197,8 +233,8 @@ const UserProfile = () => {
                   />
                 </View>
                 ):(
-                  <View>
-                    <Text style={{color:colors.subText}}>No post</Text>
+                  <View className='flex-1 justify-center items-center'>
+                    <Text style={{color:colors.subText}} className='text-heading2'>No post</Text>
                   </View>
                 )
             ):(
@@ -241,10 +277,10 @@ const UserProfile = () => {
                       <FlashList
                         data={completeGoal}
                         renderItem={({ item }) =>
-                          <CommunityGoalCard 
-                            goal_id={item.goal_id} 
+                          <CommunityGoalCard
+                            goal_id={item.goal_id}
                             goal_name={item.goal_name}
-                            total_task={item.total_task} 
+                            total_task={item.total_task}
                             complete_task={item.complete_task}
                           />
                         }
