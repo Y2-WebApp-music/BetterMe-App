@@ -11,7 +11,7 @@ type CommunityUser = {
   liked:string[]
 };
 
-type CommunityUserPost = {
+export type CommunityUserPost = {
   _id:string,
   username:string,
   profile_img:string,

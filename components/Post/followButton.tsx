@@ -48,7 +48,6 @@ const FollowButton = ({userPostID}:{userPostID:string}) => {
 
       if ( res.message === "User not found") { return console.log('User not found in follow');}
 
-      console.log('follow res ',res);
       setUserFollow({
         follower: res.follower,
         following: res.following,
