@@ -50,7 +50,7 @@ const PostOnlyText = ({ openComment, post_id, ...props }: PostContent & PostWith
       <View style={{backgroundColor:colors.background}} className=' flex-row gap-2 items-center justify-between '>
 
         <View className='my-2 items-center flex-row gap-2'>
-          <TouchableOpacity onPress={()=>{router.push(`/community/user/${props._id}`)}} activeOpacity={0.6} style={{borderColor:colors.gray}}  className='overflow-hidden rounded-full border border-gray'>
+          <TouchableOpacity onPress={()=>{router.push(`${props._id === user?._id? `/community/userProfile`: `/community/user/${props._id}`}`)}} activeOpacity={0.6} style={{borderColor:colors.gray}}  className='overflow-hidden rounded-full border'>
             <Image
             style={styles.image}
             source={require('../../assets/maleAvatar.png')}

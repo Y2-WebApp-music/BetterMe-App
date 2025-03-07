@@ -1,21 +1,20 @@
-import {Animated as ReactAnimated, FlatList, View, Text,TouchableOpacity, StyleSheet, Dimensions, NativeScrollEvent, NativeSyntheticEvent, ViewToken, TouchableWithoutFeedback} from 'react-native'
-import React, {useCallback, useEffect, useRef, useState} from 'react'
+import { format } from 'date-fns';
 import { Image } from 'expo-image';
-import { LikeIcon,CommentIcon, OptionIcon } from '../../constants/icon'
-import SlideItem from './slideItem'
-import PageNum from './pageNum';
+import { router } from 'expo-router';
+import React, { useEffect, useRef, useState } from 'react';
+import { Dimensions, FlatList, NativeScrollEvent, NativeSyntheticEvent, Animated as ReactAnimated, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View, ViewToken } from 'react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView, } from 'react-native-gesture-handler';
 import Animated, { useAnimatedStyle, useSharedValue, withDelay, withSpring } from 'react-native-reanimated';
-import { PostContent, TagCommunity } from '../../types/community';
+import { CommentIcon, OptionIcon } from '../../constants/icon';
 import { useAuth } from '../../context/authContext';
-import { router } from 'expo-router';
 import { useTheme } from '../../context/themeContext';
-import CommentBottomModal from '../modal/CommentBottomModal';
+import { PostContent } from '../../types/community';
 import FollowButton from './followButton';
-import { FlashList } from '@shopify/flash-list';
-import { formatNumber, TagList } from './postConstants';
-import { format } from 'date-fns';
+import LikeButton from './likeButton';
+import PageNum from './pageNum';
 import Pagination from './pagination';
+import { formatNumber, TagList } from './postConstants';
+import SlideItem from './slideItem';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -85,12 +84,12 @@ const PostWithPhoto = ({ openComment, post_id, ...props }: PostContent & PostWit
     <View style={{backgroundColor:colors.background}} className=' flex-row gap-2 items-center justify-between'>
 
       <View className='my-2 items-center flex-row gap-2'>
-        <TouchableOpacity onPress={()=>{router.push(`/community/user/${props._id}`)}} activeOpacity={0.6} style={{borderColor:colors.gray}}  className='overflow-hidden rounded-full border border-gray'>
+        <TouchableOpacity onPress={()=>{router.push(`${props._id === user?._id? `/community/userProfile`: `/community/user/${props._id}`}`)}} activeOpacity={0.6} style={{borderColor:colors.gray}}  className='overflow-hidden rounded-full border'>
           <Image
             style={styles.image}
             source={props.profile_img}
             contentFit="cover"
-            transition={1000}
+            transition={200}
           />
         </TouchableOpacity>
         <View>
@@ -172,12 +171,8 @@ const PostWithPhoto = ({ openComment, post_id, ...props }: PostContent & PostWit
 
     <View style={{paddingBottom:8}} className="mt-2 flex-row gap-2 items-center justify-between">
       <View style={{gap:14}} className=" items-end flex-row">
-        <TouchableOpacity className=" flex-row gap-1 items-center">
-          <LikeIcon width={26} height={26} color={colors.darkGray}/>
-          <Text style={{color:colors.subText}} className='text-body font-noto'>
-            {formatNumber(props.like)}
-          </Text>
-        </TouchableOpacity>
+        <LikeButton like={props.like} post_id={post_id}/>
+
         <TouchableOpacity onPress={openComment} className=" flex-row gap-1 items-center">
           <CommentIcon width={26} height={26}color={colors.darkGray}/>
           <Text style={{color:colors.subText}} className='text-body font-noto'>
