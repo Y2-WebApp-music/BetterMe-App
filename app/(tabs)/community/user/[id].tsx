@@ -1,5 +1,5 @@
 import { View, Text, SafeAreaView, KeyboardAvoidingView, Platform, ScrollView, RefreshControl, TouchableOpacity, StyleSheet, Dimensions } from 'react-native'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import BackButton from '../../../../components/Back'
 import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { router } from 'expo-router';
@@ -18,33 +18,67 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet/src';
 import axios from 'axios';
 import { SERVER_URL } from '@env';
 import FollowButton from '../../../../components/Post/followButton';
+import { formatNumber } from '../../../../components/Post/postConstants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AddIcon } from '../../../../constants/icon';
 
 
 const screenWidth = Dimensions.get('window').width;
 
+type UserDataProps = CommunityUserPost & {
+  email:string
+  goal:number
+  post:number
+}
 const Userprofile = () => {
 
   const { id } = useLocalSearchParams();
-  const { user } = useAuth();
+  const { user, userFollow, setUserFollow } = useAuth();
   const { colors } = useTheme();
   
+  const [userData, setUserData] = useState< UserDataProps | null>(null)
   const [postList, setPostList] = useState<PostContent[] | null>(null)
   const [goalList,setGoalList] = useState<homeGoalCardProp[]>([])
   const [viewPost, setViewPost] = useState(true);
 
-  const [userData, setUserData] = useState< CommunityUserPost | null>(null)
 
-
-  useEffect(()=>{
-    setUserData({
-      _id: id.toString(),
-      username: 'no data',
-      profile_img: '',
-    })
-  },[id])
+  const getUserData = async (): Promise<UserDataProps | null> => {
+    try {
+      const response = await axios.get(`${SERVER_URL}/user/profile/${id}`);
+      const data = response.data;
+  
+      if (data.message === "User not found") {
+        console.error("User not found");
+        return null;
+      }
+  
+      const userData: UserDataProps = {
+        _id: data._id,
+        username: data.username,
+        profile_img: data.profile_img,
+        email: data.email,
+        goal: data.goal,
+        post: data.post
+      };
+  
+      setUserData(userData);
+      return userData;
+    } catch (error: any) {
+      console.error("Get User Error:", error);
+      return null;
+    }
+  };
 
 
   const getPostData = async () => {
+
+    let userInfo = userData;
+    
+    if (!userInfo) {
+      userInfo = await getUserData();
+      if (!userInfo) return;
+    }
+
     try {
       const response = await axios.get(`${SERVER_URL}/community/user-posts/${id}`);
       const data = response.data
@@ -61,9 +95,9 @@ const Userprofile = () => {
           like: post.like,
           comment: post.comment,
           photo: post.image,
-          _id: id,
-          username: 'no data',
-          profile_img: '',
+          _id: userInfo._id,
+          username: userInfo.username,
+          profile_img: userInfo.profile_img,
         }));
   
         setPostList(formattedData);
@@ -135,16 +169,71 @@ const Userprofile = () => {
   );
 
   const [refreshing, setRefreshing] = useState(false);
-  const onRefresh = useCallback(() => {
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    setTimeout(() => {
-      getPostData()
-      getGoalData().finally(()=>setRefreshing(false))
-    }, 500);
+    try {
+      await Promise.all([getUserData(), getPostData(), getGoalData()]);
+    } finally {
+      setRefreshing(false);
+    }
   }, []);
 
+  const [isFollowing, setIsFollowing] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const followUpdate = async () => {
+    if (!user || !userData || loading) return;
+
+    setLoading(true);
+    
+    try {
+      const response = await axios.put(`${SERVER_URL}/community/user/follow?user_id=${userData?._id}&follower_id=${user._id}`);
+      const data = response.data;
+      console.log('data.message ', data.message);
+
+      setIsFollowing(!isFollowing);
+    } catch (error: any) {
+      console.error('Follow Error: ', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getFollowData = async (_id:string) => {
+    try {
+      await AsyncStorage.removeItem('@follow');
+
+      const response = await axios.get(`${SERVER_URL}/user/follow/${_id}`);
+      const res = response.data
+
+      if ( res.message === "User not found") { return console.log('User not found in follow');}
+
+      setUserFollow({
+        follower: res.follower,
+        following: res.following,
+      })
+
+      await AsyncStorage.setItem('@follow', JSON.stringify(res));
+    } catch (error) {
+      console.error('followUser get failed', error);
+    }
+  }
+
+  useLayoutEffect(() => {
+    if (userFollow && userData?._id) {
+      setIsFollowing(userFollow.following.includes(userData?._id));
+    }
+  }, [userFollow, userData?._id]);
+
+  const handleFollow = async () => {
+    await followUpdate().finally(()=>{user && getFollowData(user._id)})
+  };
+
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-  const handleOpenPress = () => {
+  const [selectedPostId, setSelectedPostId] = useState<string>('');
+
+  const handleOpenPress = (post_id: string) => {
+    setSelectedPostId(post_id);
     bottomSheetModalRef.current?.present();
   };
 
@@ -156,7 +245,7 @@ const Userprofile = () => {
       >
         <View className='w-[92%]'>
           <View className='max-w-[14vw]'>
-            <BackButton goto={'/menu'}/>
+            <BackButton goto={'/'}/>
           </View>
         </View>
         <ScrollView
@@ -170,13 +259,28 @@ const Userprofile = () => {
         >
             <View className='mb-4 w-[92%] flex flex-row-reverse gap-2 items-center'>
               <View className='grow'>
-                <Text style={{color:colors.text}} className='text-heading2 font-notoMedium'>Someone</Text>
-                <Text style={{color:colors.subText}} className=' font-not pb-1'>maybe.gmail.com</Text>
-                <Text style={{color:colors.subText}} className=' font-noto pb-1'>333k post 3333 goal</Text>
-                <View>
-                  <FollowButton userPostID={id.toString()}/>
-                  <TouchableOpacity onPress={()=>{router.push(`/community/index`)}} style={{backgroundColor:colors.gray}} className=' flex-row gap-2 p-2 px-4 justify-center items-center rounded-full'>
-                    <Text style={{color:colors.text}} className=' text-body font-notoMedium'>following</Text>
+                <Text style={{color:colors.text}} className='text-heading2 font-notoMedium'>{userData?.username}</Text>
+                <Text style={{color:colors.subText}} className=' font-not pb-1'>{userData?.email}</Text>
+                <Text style={{color:colors.subText}} className=' font-noto pb-1'>{formatNumber(userData? userData.post : 0)} post {formatNumber(userData? userData.goal : 0)} goal</Text>
+                <View >
+                  <TouchableOpacity
+                    onPress={handleFollow}
+                    style={{
+                      paddingHorizontal: 10,
+                      alignSelf: 'flex-start',
+                      backgroundColor: isFollowing ? colors.gray : colors.primary,
+                      paddingLeft: isFollowing ? 12 : 14,
+                      width:'100%'
+                    }}
+                    disabled={loading}
+                    className=' flex-row gap-2 p-2 px-4 justify-center items-center rounded-full'
+                  >
+                    <Text style={{ color: isFollowing ? colors.subText : '#fff' }} className={`text-body font-notoMedium`}>
+                      {loading ? 'Loading...' : isFollowing ? 'Following' : 'Follow'}
+                    </Text>
+                    {!isFollowing && !loading && (
+                      <AddIcon width={24} height={24} color={'white'} />
+                    )}
                   </TouchableOpacity>
                 </View>
               </View>
@@ -307,7 +411,7 @@ const Userprofile = () => {
               </View>
             )}
         </ScrollView>
-      <CommentBottomModal ref={bottomSheetModalRef} />
+      <CommentBottomModal ref={bottomSheetModalRef} post_id={selectedPostId}/>
       </KeyboardAvoidingView>
     </SafeAreaView>
   )
