@@ -151,27 +151,35 @@ export const toggleSleep = async (): Promise<number | null> => {
   await resetIfNeeded();
 
   const existingTime = await AsyncStorage.getItem('sleepData');
+  console.log('Existing sleepData:', existingTime);
 
   if (!existingTime) {
     await AsyncStorage.setItem('sleepData', new Date().toISOString());
+    console.log('Started sleep tracking.');
     return null;
-  } else {
-    const startTime = new Date(existingTime);
-    const endTime = new Date();
-    const sleepDuration = differenceInMinutes(endTime, startTime);
+  }
 
-    if (sleepDuration < 120 || sleepDuration > 780) {
-      console.log('Invalid sleep duration:', Math.floor(sleepDuration), 'minute');
-      await AsyncStorage.removeItem('sleepData');
-      return null;
-    }
+  const startTime = new Date(existingTime);
+  const endTime = new Date();
+  const sleepDuration = differenceInMinutes(endTime, startTime);
+  console.log('Start Time:', startTime);
+  console.log('End Time:', endTime);
+  console.log('Calculated Sleep Duration:', sleepDuration);
 
-    const validSleepTime = sleepDuration - 30;
-    if (validSleepTime < 90) {
-      console.log('Valid sleep time too short after excluding first 30 minutes.');
-      await AsyncStorage.removeItem('sleepData');
-      return null;
-    }
+  if (sleepDuration < 120 || sleepDuration > 780) {
+    console.log('Invalid sleep duration:', sleepDuration);
+    await AsyncStorage.removeItem('sleepData');
+    return null;
+  }
+
+  const validSleepTime = sleepDuration - 30;
+  if (validSleepTime < 90) {
+    console.log('Valid sleep time too short after excluding first 30 minutes.');
+    await AsyncStorage.removeItem('sleepData');
+    return null;
+  }
+
+  console.log('Final Valid Sleep Time:', validSleepTime);
 
     const newRecord: sleepCard = {
       total_time: validSleepTime,
@@ -195,7 +203,7 @@ export const toggleSleep = async (): Promise<number | null> => {
 
     await AsyncStorage.removeItem('sleepData');
     return validSleepTime;
-  }
+  
 };
 
 export default SleepGoal;

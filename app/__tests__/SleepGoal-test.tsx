@@ -75,3 +75,38 @@ describe('toggleSleep function', () => {
     );
   });
 });
+
+describe('toggleSleep function - Time Calculation and Server Request', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('calculates sleep duration correctly and sends to server', async () => {
+    // Mock start sleep time at 22:00
+    const sleepStartTime = new Date(2025, 2, 9, 22, 0, 0);
+    jest.spyOn(global, 'Date').mockImplementation(() => sleepStartTime);
+    await AsyncStorage.setItem('sleepData', sleepStartTime.toISOString());
+
+    // Mock wake-up time at 07:30
+    const wakeUpTime = new Date(2025, 2, 10, 7, 30, 0);
+    jest.spyOn(global, 'Date').mockImplementation(() => wakeUpTime);
+
+    // Debug: ตรวจสอบค่าใน resetIfNeeded
+    console.log('Date in resetIfNeeded:', new Date().toISOString());
+
+    // Call toggleSleep function
+    const sleepDuration = await toggleSleep();
+
+    expect(sleepDuration).toBe(540);
+
+    expect(axios.post).toHaveBeenCalledWith(
+      `${SERVER_URL}/sleep/createSleep`,
+      expect.objectContaining({
+        total_time: 540,
+        date: expect.any(String),
+        start_time: '22:00',
+        end_time: '07:30',
+      })
+    );
+  });
+});
