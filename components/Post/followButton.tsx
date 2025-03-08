@@ -1,11 +1,12 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useState } from 'react'
 import { AddIcon } from '../../constants/icon';
 import { useTheme } from '../../context/themeContext';
 import { useAuth } from '../../context/authContext';
 import axios from 'axios';
 import { SERVER_URL } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Haptics from 'expo-haptics';
 
 const FollowButton = ({userPostID}:{userPostID:string}) => {
 
@@ -15,7 +16,12 @@ const FollowButton = ({userPostID}:{userPostID:string}) => {
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  useEffect(() => {
+  const triggerMediumHaptics = async () => {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+    console.log('Haptics triggered');
+  };
+
+  useLayoutEffect(() => {
     if (userFollow && userPostID) {
       setIsFollowing(userFollow.following.includes(userPostID));
     }
@@ -60,6 +66,7 @@ const FollowButton = ({userPostID}:{userPostID:string}) => {
   }
 
   const handleFollow = async () => {
+    triggerMediumHaptics()
     await followUpdate().finally(()=>{user && getFollowData(user._id)})
   };
   
@@ -77,7 +84,7 @@ const FollowButton = ({userPostID}:{userPostID:string}) => {
       disabled={loading}
     >
       <Text style={{ color: isFollowing ? colors.subText : '#fff' }} className={`text-body font-notoMedium`}>
-        {loading ? 'Loading...' : isFollowing ? 'Following' : 'Follow'}
+        {loading ? 'Loading' : isFollowing ? 'Following' : 'Follow'}
       </Text>
       {!isFollowing && !loading && (
         <AddIcon width={24} height={24} color={'white'} />
