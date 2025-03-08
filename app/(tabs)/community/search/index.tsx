@@ -76,8 +76,8 @@ const SearchCommunity = () => {
         style={{ flex: 1, width:"100%",alignItems:'center' }}
       >
         <View className='w-[92%]'>
-          <View className='max-w-[14vw]'>
-            <BackButton goto={'/menu'}/>
+          <View className='w-[92%] py-2'>
+            <BackButton goto={'/'}/>
           </View>
         </View>
         <ScrollView
