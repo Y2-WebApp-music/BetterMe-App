@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from "../../context/themeContext";
 import { TagCommunity } from "../../types/community";
+import { router } from 'expo-router';
 
 
 export const formatNumber = (num: number) => {
@@ -45,6 +46,7 @@ export const TagList = ({ tagId }: { tagId: number[] }) => {
           </TouchableOpacity>
         )}
         horizontal
+        scrollEnabled={false}
         showsHorizontalScrollIndicator={false}
         ListFooterComponent={
           remainingCount > 0 ? (
@@ -62,3 +64,33 @@ export const TagList = ({ tagId }: { tagId: number[] }) => {
     </View>
   );
 };
+
+export const AllTag = () => {
+  const { colors } = useTheme();
+
+  return (
+    <View className="my-1">
+      <FlatList
+        data={TagCommunity}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={{ backgroundColor: colors.primary, marginHorizontal: 2 }}
+            className="rounded-full p-1 px-2"
+            onPress={()=>{router.push('/community/search')}}
+          >
+            <Text
+              style={{color:'#fff'}}
+              className="text-detail font-noto"
+              numberOfLines={1}
+            >
+              {item.text}
+            </Text>
+          </TouchableOpacity>
+        )}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+      />
+    </View>
+  );
+}

@@ -15,6 +15,7 @@ import { useTheme } from '../../../context/themeContext';
 import { PostContent, postDummy } from '../../../types/community';
 import axios from 'axios';
 import { SERVER_URL } from '@env';
+import { AllTag } from '../../../components/Post/postConstants';
 
 
 const screenWidth = Dimensions.get('window').width;
@@ -29,6 +30,7 @@ const CommunityFeed = () => {
   const { user, userFollow } = useAuth()
 
   const [refreshing, setRefreshing] = useState(false);
+  const [isLoad, setIsLoad] = useState(false);
 
   // const [postList, setPostList] = useState<number[]>([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20])
   const [postList, setPostList] = useState<PostContent[] | null>(null)
@@ -81,17 +83,11 @@ const CommunityFeed = () => {
     scrollYRef.current = scrollY;
   };
 
-  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-  const handleOpenPress = () => {
-    bottomSheetModalRef.current?.present();
-  };
-
   const getFeed = async () => {
     try {
       const response = await axios.get(`${SERVER_URL}/community/post/feed/${user?._id}`);
       const data = response.data
 
-      console.log('response Feed sample[0] \n',data[0]);
       if ( data.message === "User not found") {return console.error('User not found')}
 
       if (data) {
@@ -121,17 +117,25 @@ const CommunityFeed = () => {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    console.log('refreshing ');
     setTimeout(() => {
       getFeed().finally(()=>setRefreshing(false));
-    }, 500);
+    }, 200);
   }, []);
 
   useFocusEffect(
     useCallback(() => {
-      getFeed()
+      setIsLoad(true)
+      getFeed().finally(()=>setIsLoad(false))
     }, [])
   );
+
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const [selectedPostId, setSelectedPostId] = useState<string>('');
+
+  const handleOpenPress = (post_id: string) => {
+    setSelectedPostId(post_id);
+    bottomSheetModalRef.current?.present();
+  };
 
   return (
     <SafeAreaView style={{backgroundColor:colors.background}} className=" relative w-full h-full justify-center items-center font-noto">
@@ -213,7 +217,8 @@ const CommunityFeed = () => {
         <TagSection/>
 
         <View className="flex-1 mb-4 mt-1 flex flex-col gap-2 items-center w-full pb-5">
-          {postList?(
+          {!isLoad?(
+            postList?(
               <View className='w-full'>
                 <FlashList
                   data={postList}
@@ -251,18 +256,40 @@ const CommunityFeed = () => {
                   estimatedItemSize={200}
                 />
               </View>
-              ):(
-                <View className='flex-1 justify-center items-center'>
-                  <Text style={{color:colors.subText}} className='text-heading2'>No post</Text>
+            ):(
+              <View className='flex-1 justify-center items-center'>
+                <Text style={{color:colors.subText}} className='text-heading2'>No post</Text>
+              </View>
+            )
+          ):(
+            <View className='flex-1 w-[92%]'>
+              <View className='flex-row mt-3'>
+                <View className='w-[60%] flex-row gap-2 items-center'>
+                  <View style={{backgroundColor:colors.gray}} className='h-14 w-14 rounded-full'/>
+                  <View style={{backgroundColor:colors.gray}} className='h-12 w-[50%] rounded-normal'/>
                 </View>
-              )
-            }
-
+                <View className='w-[40%] items-end justify-center'>
+                  <View style={{backgroundColor:colors.gray}} className=' rounded-full w-[70%] h-10'/>
+                </View>
+              </View>
+              <View>
+                <View style={{width:screenWidth*0.92, height:screenWidth*0.86, backgroundColor:colors.gray }} className='mt-2 rounded-normal'/>
+                <View style={{width:screenWidth*0.92, height:screenWidth*0.20, backgroundColor:colors.gray }} className='mt-2 rounded-normal'/>
+              </View>
+              <View className='flex-row justify-between'>
+                <View style={{width:'30%', height:screenWidth*0.1, backgroundColor:colors.gray }} className='mt-2 rounded-normal'/>
+                <View style={{width:'50%', height:screenWidth*0.1, backgroundColor:colors.gray }} className='mt-2 rounded-normal'/>
+              </View>
+            </View>
+          )}
+            
         </View>
+
+
       </ScrollView>
 
       <View style={{ position:'absolute', top:0, left:0, right:0, height: insets.top, zIndex:100, backgroundColor:colors.background }} />
-      <CommentBottomModal ref={bottomSheetModalRef} />
+      <CommentBottomModal ref={bottomSheetModalRef} post_id={selectedPostId} />
       </SafeAreaView>
   )
 }
@@ -327,13 +354,8 @@ const TagSection:React.FC = () => {
       <View className="w-[92%]">
         <Text style={{color:colors.subText}} className="text-detail text-subText">interest this tag?</Text>
       </View>
-      <View className="w-[92%] items-start mt-2 flex-row gap-2">
-        <TouchableOpacity className="flex-row rounded-full bg-primary p-1 px-4">
-          <Text className="text-white font-notoMedium text-detail">clean food</Text>
-        </TouchableOpacity>
-        <TouchableOpacity className="flex-row rounded-full bg-primary p-1 px-4">
-          <Text className="text-white font-notoMedium text-detail">weight training</Text>
-        </TouchableOpacity>
+      <View className="w-full items-start mt-2 flex-row gap-2 pl-2">
+        <AllTag/>
       </View>
     </Animated.View>
   );
