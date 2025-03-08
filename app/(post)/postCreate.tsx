@@ -1,8 +1,10 @@
 import { View, Text, SafeAreaView, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
 import React from 'react'
-import BackButton from '../components/Back'
+import BackButton from '../../components/Back'
 
 const PostCreate = () => {
+
+  
   return (
     <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
       <KeyboardAvoidingView
@@ -21,7 +23,7 @@ const PostCreate = () => {
           keyboardDismissMode='on-drag'
         >
           <Text>Create Post</Text>
-          <Text>Form Root</Text>
+          <Text>Test Test...</Text>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
