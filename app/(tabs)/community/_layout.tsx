@@ -9,7 +9,7 @@ const CommunityLayout = () => {
       <Stack.Screen name="userProfile" options={{ headerShown: false }} />
       <Stack.Screen name="post/create" options={{ headerShown: false }} />
       <Stack.Screen name="post/edit/[id]" options={{ headerShown: false }} />
-      <Stack.Screen name="post/[id]" options={{ headerShown: false }} />
+      {/* <Stack.Screen name="post/[id]" options={{ headerShown: false }} /> */}
       <Stack.Screen name="search/index" options={{ headerShown: false }} />
       <Stack.Screen name="user/[id]" options={{ headerShown: false }} />
       <Stack.Screen name="user/goal/[id]" options={{ headerShown: false }} />

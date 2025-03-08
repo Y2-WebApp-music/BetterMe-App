@@ -4,11 +4,9 @@ type CommunityUser = {
   _id:string,
   username:string,
   profile_img:string,
+  email:string,
   post:number,
   goal:number,
-  follower:string[],
-  following:string[],
-  liked:string[]
 };
 
 export type CommunityUserPost = {

@@ -13,6 +13,8 @@ type AuthContextType = {
   setUser: React.Dispatch<React.SetStateAction<UserData | null>>;
   userFollow: UserFollow | null;
   setUserFollow: React.Dispatch<React.SetStateAction<UserFollow | null>>;
+  likedPost: string[] | null;
+  setLikedPost: React.Dispatch<React.SetStateAction<string[] | null>>;
   loginWithGoogle: (id_token: string) => Promise<void>;
   signOut: () => Promise<void>;
 };
@@ -30,6 +32,7 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserData | null>(null);
   const [userFollow, setUserFollow] = useState<UserFollow | null>(null);
+  const [likedPost, setLikedPost] = useState<string[] | null>(null);
 
   // Check local user and Firebase auth state
   const checkLocalUser = async () => {
@@ -39,7 +42,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // console.log(localUser);
       if (localUser) {
         setUser(localUser);
-        followUser(localUser._id)
+        getFollowUser(localUser._id)
+        getLikedPost(localUser._id)
       }
     } catch (e) {
       console.error('Error fetching user from AsyncStorage', e);
@@ -85,7 +89,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           // console.log(' :=========== userData ===========: \n',extendedUser);
           setUser(extendedUser);
 
-          followUser(_id)
+          getFollowUser(_id)
+          getLikedPost(_id)
           await AsyncStorage.setItem('@user', JSON.stringify(extendedUser));
         }
       } catch (error) {
@@ -127,7 +132,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const followUser = async (_id:string) => {
+  const getFollowUser = async (_id:string) => {
     try {
       const response = await axios.get(`${SERVER_URL}/user/follow/${_id}`);
       const res = response.data
@@ -146,9 +151,25 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }
 
+  const getLikedPost = async (_id:string) => {
+    try {
+      const response = await axios.get(`${SERVER_URL}/community/like-post/${_id}`);
+      const res = response.data
+
+      if ( res.message === "User not found") { return console.log('User not found');}
+
+      console.log('like res ',res);
+      setLikedPost(res)
+
+      await AsyncStorage.setItem('@liked', JSON.stringify(res));
+    } catch (error) {
+      console.error('followUser get failed', error);
+    }
+  }
+
 
   return (
-    <AuthContext.Provider value={{ user, setUser, userFollow, setUserFollow, loginWithGoogle, signOut: handleSignOut }}>
+    <AuthContext.Provider value={{ user, setUser, userFollow, setUserFollow, likedPost, setLikedPost, loginWithGoogle, signOut: handleSignOut }}>
       {children}
     </AuthContext.Provider>
   );
