@@ -13,7 +13,7 @@ import { format } from 'date-fns';
 
 
 type PostWithPhotoProp = {
-  openComment : () => void
+  openComment : (post_id:string) => void
 }
 
 const PostOnlyText = ({ openComment, post_id, ...props }: PostContent & PostWithPhotoProp) => {
@@ -74,7 +74,7 @@ const PostOnlyText = ({ openComment, post_id, ...props }: PostContent & PostWith
         )}
     </View>
 
-    <TouchableWithoutFeedback onPress={()=>{router.push(`/community/post/1234`)}}>
+    <TouchableWithoutFeedback onPress={()=>{router.push(`(post)/${post_id}`);}}>
       <Text style={{color:colors.text}} className='text-body font-noto' >
         {props.content}
       </Text>
@@ -89,7 +89,7 @@ const PostOnlyText = ({ openComment, post_id, ...props }: PostContent & PostWith
             {formatNumber(props.like)}
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={openComment} className=" flex-row gap-1 items-center">
+        <TouchableOpacity onPress={()=>{openComment(post_id)}} className=" flex-row gap-1 items-center">
           <CommentIcon width={26} height={26}color={colors.darkGray}/>
           <Text style={{color:colors.subText}} className='text-body font-noto'>
             {formatNumber(props.comment)}

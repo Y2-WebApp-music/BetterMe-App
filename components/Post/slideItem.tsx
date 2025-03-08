@@ -1,10 +1,13 @@
-import { StyleSheet, View, Dimensions} from 'react-native';
-import React from 'react';
 import { Image } from 'expo-image';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 
 type SlideItemProps = {
     item: any
 }
+
+const blurhash = 'UAQ0UC4-0K00TOEdxWjE0WS[xr-q02tlo|S1';
+
 
 const SlideItem = ({item} : SlideItemProps) =>{
     
@@ -13,7 +16,8 @@ const SlideItem = ({item} : SlideItemProps) =>{
             <Image source={item}
                 contentFit="cover"
                 style={styles.image}
-                transition={1000}
+                placeholder={{ blurhash }}
+                transition={400}
             />
         </View>
     )

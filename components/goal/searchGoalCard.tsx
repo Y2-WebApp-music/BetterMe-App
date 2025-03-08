@@ -47,7 +47,7 @@ const SearchGoalCard = ({ goal_id, goal_name, start_date, end_date, total_task, 
 
   return (
     <View className="flex-1 justify-center items-center">
-      <TouchableOpacity onPress={() => { router.push(`/home/goal/${goal_id}`); }} 
+      <TouchableOpacity onPress={() => { router.push(`/community/user/goal/${goal_id}`); }} 
         style={{ marginBottom: 8, backgroundColor: colors.background, borderColor: colors.gray, alignSelf: 'center', marginHorizontal: 'auto', width: '96%' }} 
         className='h-32 justify-center items-center rounded-normal border border-gray flex-row'>
         <View style={{ width: '72%', height: '100%', paddingLeft: 2 }} className='justify-center'> 
