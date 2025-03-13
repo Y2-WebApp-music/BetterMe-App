@@ -8,6 +8,8 @@ import { CloseIcon } from "../../constants/icon";
 import { useAuth } from "../../context/authContext";
 import { TagCommunity } from "../../types/community";
 
+
+const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 
 const MemoizedRenderItem = memo(({ item, onPress }: { item: { id: number, text: string }, onPress: () => void }) => (
@@ -27,23 +29,21 @@ const AddTagBottomModal = forwardRef<BottomSheetModal, AddTagBottomModalProps>(
   const { user } = useAuth()
   const data = useMemo(() => TagCommunity, []);
   const [searchQuery, setSearchQuery] = useState(""); 
-  const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
 
 
-
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ["60%", "100%"], []);
 
   const filteredTags = useMemo(() => {
     return data.filter((tag) => tag.text.toLowerCase().includes(searchQuery.toLowerCase()));
   }, [searchQuery, data]);
   const onSelectTag = (tag: { id: number; text: string }) => {
-    setSelectedTagIds((prevSelected) => {
-      const isAlreadySelected = prevSelected.includes(tag.id);
-      if (isAlreadySelected) {
-        return prevSelected.filter((id) => id !== tag.id); // เอาออกจากรายการ
-      } else {
-        return [...prevSelected, tag.id]; // เพิ่มเข้าไปในรายการ
+    setSelectedTags((prevSelected) => {
+      const isAlreadySelected = prevSelected.some((t) => t.id === tag.id);
+      if (!isAlreadySelected) {
+        return [...prevSelected, tag];
       }
+      return prevSelected;
     });
   };
 
