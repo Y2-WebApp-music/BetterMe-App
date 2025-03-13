@@ -26,7 +26,6 @@ interface AddTagBottomModalProps {
 const AddTagBottomModal = forwardRef<BottomSheetModal, AddTagBottomModalProps>(
   ({ selectedTags, setSelectedTags }, ref) => {
   const { colors } = useTheme();
-  const { user } = useAuth()
   const data = useMemo(() => TagCommunity, []);
   const [searchQuery, setSearchQuery] = useState(""); 
 
@@ -78,47 +77,45 @@ const AddTagBottomModal = forwardRef<BottomSheetModal, AddTagBottomModalProps>(
         keyboardBlurBehavior="restore"
         enableDynamicSizing={false}
       >
-        <BottomSheetView className="items-center bg-white">
+        <BottomSheetView style={{backgroundColor:colors.white}} className="items-center">
           <View className='mb-2'>
             <Text style={{color:colors.text}} className='text-heading2'>Search tag</Text>
           </View>
 
-        <View className=" bg-white border border-gray rounded-normal p-1 px-[10px] flex-row ">
-          <BottomSheetTextInput style={[styles.input, {width:'90%', color:colors.text}]} className='grow' placeholder='Search some tag...' value={searchQuery} 
+        <View style={{backgroundColor:colors.white, borderColor:colors.gray}} className="border rounded-normal p-1 px-[10px] flex-row ">
+          <BottomSheetTextInput style={[styles.input, {width:'90%', color:colors.text, padding:4, backgroundColor:colors.white}]} className='grow' placeholder='Search some tag...' value={searchQuery} 
         onChangeText={setSearchQuery} />
         </View>
           
-            <View className="flex-row flex-wrap gap-2 p-2">
+            <View className="flex-row flex-wrap gap-2 p-2 w-full">
             {selectedTags.map((tag) => (
-                <View className="flex-row bg-primary gap-2 p-1 px-2 justify-start items-center rounded-normal " key={tag.id}>
-                <Text className="text-white font-notoMedium">{tag.text}</Text>
-                <TouchableOpacity onPress={() => removeTag(tag.id)}>
+                <View className="flex-row bg-primary gap-2 p-2 px-2 justify-start items-center rounded-normal " key={tag.id}>
+                  <Text className="text-white font-notoMedium">{tag.text}</Text>
+                  <TouchableOpacity onPress={() => removeTag(tag.id)}>
                     <CloseIcon width={20} height={20} color="white" />
-                </TouchableOpacity>
+                  </TouchableOpacity>
                 </View>
             ))}
             </View>
         </BottomSheetView>
         
         <BottomSheetFlashList
-        data={filteredTags}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => {
-          const isSelected = selectedTags.some((t) => t.id === item.id);
-          return (
-            <TouchableOpacity 
-              onPress={() => onSelectTag(item)}
-              style={[
-                styles.itemContainer, 
-              ]}
-            >
-              <Text className={`text-body ${isSelected ? "text-white" : "text-subText"}`}>{item.text}</Text>
-            </TouchableOpacity>
-          );
-        }}
-        estimatedItemSize={50}
-        contentContainerStyle={{ paddingBottom: 100 }}
-      />
+          data={filteredTags}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => {
+            const isSelected = selectedTags.some((t) => t.id === item.id);
+            return (
+              <TouchableOpacity
+                onPress={() => onSelectTag(item)}
+                style={[styles.itemContainer,{borderColor:isSelected? colors.primary : colors.gray} ]}
+              >
+                <Text style={{color:isSelected ? colors.text : colors.subText}} className={`text-body`}>{item.text}</Text>
+              </TouchableOpacity>
+            );
+          }}
+          estimatedItemSize={50}
+          contentContainerStyle={{ paddingBottom: 100 }}
+        />
       </BottomSheetModal>
 
   );
@@ -138,7 +135,6 @@ const styles = StyleSheet.create({
     marginVertical: 4,
     borderRadius:15,
     borderWidth: 1,
-    borderColor: '#e8e8e8',
     display:'flex',
     justifyContent:'center',
   },
