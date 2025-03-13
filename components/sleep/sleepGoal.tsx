@@ -77,7 +77,7 @@ const SleepGoal = () => {
 
   return (
     <View style={{ paddingHorizontal: 20, backgroundColor: colors.white, borderColor: colors.gray }} className='h-28 w-full rounded-normal border p-2 justify-center items-center flex-row gap-2'>
-      {/* <NightIcon width={36} height={36} color={colors.night} /> */}
+      <NightIcon width={36} height={36} color={colors.night} />
 
       <View style={{ paddingLeft: 10 }} className='grow'>
         <View style={{ transform: [{ translateY: 8 }] }}>
@@ -100,11 +100,11 @@ const SleepGoal = () => {
           <Animated.View style={[styles.container, { backgroundColor }]}>
             <Animated.View style={[styles.round, { transform: [{ translateX }], width: roundWidth }]}>
               {toggle ? (
-                // <NightIcon width={20} height={20} color={colors.night} />
-                <Text>NightIcon</Text>
+                <NightIcon width={20} height={20} color={colors.night} />
+                // <Text>NightIcon</Text>
               ) : (
-                <Text>DayIcon</Text>
-                // <DayIcon width={20} height={20} color={colors.yellow} />
+                // <Text>DayIcon</Text>
+                <DayIcon width={20} height={20} color={colors.yellow} />
               )}
             </Animated.View>
           </Animated.View>
@@ -183,9 +183,9 @@ export const toggleSleep = async (): Promise<number | null> => {
 
     const newRecord: sleepCard = {
       total_time: validSleepTime,
-      date: format(new Date(), 'yyyy-MM-dd'),
-      start_time: format(startTime, 'HH:mm'),
-      end_time: format(endTime, 'HH:mm'),
+      date: startTime.toISOString(),
+      start_time: startTime.toISOString(),
+      end_time: endTime.toISOString(),
     };
 
     const existingRecords = await AsyncStorage.getItem('sleepRecords');
