@@ -135,7 +135,9 @@ const SearchCommunity = () => {
                   data={filterPost}
                   renderItem={({ item }) => (
                     item.photo ? (
-                      <PostWithPhoto _id={item._id} username={item.username} profile_img={item.profile_img} post_id={item.post_id} date={item.date} content={item.content} tag={item.tag} like={item.like} comment={item.comment} photo={item.photo} />
+                      <PostWithPhoto _id={item._id} username={item.username} profile_img={item.profile_img} post_id={item.post_id} date={item.date} content={item.content} tag={item.tag} like={item.like} comment={item.comment} photo={item.photo} openComment={function (): void {
+                        throw new Error('Function not implemented.');
+                      } } />
                     ) : (
                       <PostOnlyText/>
                     )
@@ -173,7 +175,9 @@ const SearchCommunity = () => {
                   data={filterTag}
                   renderItem={({ item }) => (
                     item.photo ? (
-                      <PostWithPhoto _id={item._id} username={item.username} profile_img={item.profile_img} post_id={item.post_id} date={item.date} content={item.content} tag={item.tag} like={item.like} comment={item.comment} photo={item.photo} />
+                      <PostWithPhoto _id={item._id} username={item.username} profile_img={item.profile_img} post_id={item.post_id} date={item.date} content={item.content} tag={item.tag} like={item.like} comment={item.comment} photo={item.photo} openComment={function (): void {
+                        throw new Error('Function not implemented.');
+                      } } />
                     ) : (
                       <PostOnlyText/>
                     )

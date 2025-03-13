@@ -136,7 +136,7 @@ const CommunityFeed = () => {
                 transition={1000}
               />
             </TouchableOpacity>
-            <TouchableOpacity activeOpacity={0.6} onPress={()=>{router.push('/community/post/create')}} className='grow flex-row items-center rounded-full border border-primary p-2 px-4'>
+            <TouchableOpacity activeOpacity={0.6} onPress={()=>{router.push('/postCreate')}} className='grow flex-row items-center rounded-full border border-primary p-2 px-4'>
               <View style={{ transform: [{ translateY: 1 }], }} className='mr-auto'>
                 <Text style={{color:colors.subText}} className='font-noto'>What are you doing?</Text>
               </View>
@@ -219,7 +219,7 @@ const CommunityFeed = () => {
   )
 }
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   image: {
     justifyContent: 'center',
     width:screenWidth * 0.11,
