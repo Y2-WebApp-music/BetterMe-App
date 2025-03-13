@@ -294,7 +294,7 @@ const CommunityFeed = () => {
   )
 }
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   image: {
     justifyContent: 'center',
     width:screenWidth * 0.11,

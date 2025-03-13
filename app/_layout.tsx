@@ -60,6 +60,7 @@ export default function RootLayout() {
             <Stack.Screen name="(post)" options={{ headerShown: false }} />
             <Stack.Screen name="welcome" options={{ headerShown: false }} />
             <Stack.Screen name="index" options={{ headerShown: false }} />
+            <Stack.Screen name="postCreate" options={{ headerShown: false }} />
             <Stack.Screen name="oauthredirect" options={{ headerShown: false }} />
           </Stack>
         </ProtectedLogin>
