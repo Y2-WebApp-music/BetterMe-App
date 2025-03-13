@@ -258,15 +258,15 @@ export default function GoalScreen() {
                         cx={circle_length/5.6}
                         cy={circle_length/5.6}
                         r={r}
-                        fill="#E8E8E8"
-                        stroke={'#E8E8E8'}
-                        strokeWidth={6}
+                        fill={colors.gray}
+                        stroke={colors.gray}
+                        strokeWidth={8}
                       />
                       <AnimatedCircle
                         cx={circle_length/5.6}
                         cy={circle_length/5.6}
                         r={r}
-                        fill="#E8E8E8"
+                        fill={colors.gray}
                         stroke={color}
                         strokeWidth={8}
                         strokeLinecap="round"
@@ -340,7 +340,7 @@ export default function GoalScreen() {
                           fillColor="#0DC47C"
                           // unFillColor={colors.white}
                           unFillColor={theme === "system" ? systemTheme == "dark"?colors.text:'#FFFFFF' : theme == "dark"?colors.text:'#FFFFFF'}
-                          textComponent={<TextCheckBox taskName={item.task_name} isChecked={item.status} colors={"#fff"}/>}
+                          textComponent={<TextCheckBox taskName={item.task_name} isChecked={item.status} colors={colors.text}/>}
                           textContainerStyle={{ marginLeft: 20 }}
                           iconStyle={{ borderColor: colors.gray, borderRadius: 6 }}
                           innerIconStyle={{ borderWidth: 2, borderRadius: 6, borderColor: '#E8E8E8' }}

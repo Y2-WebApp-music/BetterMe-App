@@ -7,7 +7,7 @@ import Animated, { useAnimatedProps, useSharedValue, withTiming } from 'react-na
 import Svg, { Circle } from 'react-native-svg';
 
 const { width } = Dimensions.get('window');
-const circle_length = width * 0.48;
+const circle_length = width * 0.6;
 const r = circle_length / (2 * Math.PI);
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
@@ -47,10 +47,10 @@ const SearchGoalCard = ({ goal_id, goal_name, start_date, end_date, total_task, 
 
   return (
     <View className="flex-1 justify-center items-center">
-      <TouchableOpacity onPress={() => { router.push(`/home/goal/${goal_id}`); }} 
+      <TouchableOpacity onPress={() => { router.push(`/community/user/goal/${goal_id}`); }} 
         style={{ marginBottom: 8, backgroundColor: colors.background, borderColor: colors.gray, alignSelf: 'center', marginHorizontal: 'auto', width: '96%' }} 
         className='h-32 justify-center items-center rounded-normal border border-gray flex-row'>
-        <View style={{ width: '75%', height: '100%', paddingLeft: 2 }} className='justify-center'> 
+        <View style={{ width: '72%', height: '100%', paddingLeft: 2 }} className='justify-center'> 
           <View style={{width:'100%', height:'60%', display:'flex', justifyContent:'center'}}>
             <Text
               style={{ overflow: 'hidden', color: colors.text }}
@@ -73,15 +73,15 @@ const SearchGoalCard = ({ goal_id, goal_name, start_date, end_date, total_task, 
               cx={circle_length/5.6}
               cy={circle_length/5.6}
               r={r}
-              fill="#E8E8E8"
-              stroke={'#E8E8E8'}
+              fill={colors.gray}
+              stroke={colors.gray}
               strokeWidth={6}
             />
             <AnimatedCircle
               cx={circle_length/5.6}
               cy={circle_length/5.6}
               r={r-1}
-              fill="#E8E8E8"
+              fill={colors.gray}
               stroke={color}
               strokeWidth={8}
               strokeLinecap="round"

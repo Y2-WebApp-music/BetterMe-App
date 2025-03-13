@@ -1,5 +1,5 @@
 import { View, Text, RefreshControl, SafeAreaView, ScrollView, KeyboardAvoidingView, Platform } from 'react-native'
-import React, { useCallback, useState, useMemo } from 'react'
+import React, { useCallback, useState, useMemo, useRef } from 'react'
 import BackButton from '../../../../components/Back';
 import { useTheme } from '../../../../context/themeContext';
 import { FlashList } from '@shopify/flash-list';
@@ -10,6 +10,7 @@ import PostOnlyText from '../../../../components/Post/postOnlyText';
 import SearchGoalCard from '../../../../components/goal/searchGoalCard';
 import SearchInput from '../../../../components/SearchInput';
 import SwitchToggleButton from '../../../../components/switchToggleButton';
+import { BottomSheetModal } from '@gorhom/bottom-sheet/src';
 
 
 
@@ -63,15 +64,20 @@ const SearchCommunity = () => {
     }, 2000);
   }, []);
 
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const handleOpenPress = () => {
+    bottomSheetModalRef.current?.present();
+  };
+
   return (
-    <SafeAreaView className="w-full h-full justify-center items-center bg-Background font-noto">
+    <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-center items-center font-noto">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1, width:"100%",alignItems:'center' }}
       >
         <View className='w-[92%]'>
-          <View className='max-w-[14vw]'>
-            <BackButton goto={'/menu'}/>
+          <View className='w-[92%] py-2'>
+            <BackButton goto={'/'}/>
           </View>
         </View>
         <ScrollView
@@ -116,13 +122,13 @@ const SearchCommunity = () => {
 
           <View style={{ backgroundColor: colors.gray }} className='h-full w-[1px] rounded-full'/>
           <SwitchToggleButton
-            label="tag" 
-            isActive={viewTag} 
+            label="tag"
+            isActive={viewTag}
             onPress={() => {
               setViewPost(false);
               setViewGoals(false);
               setViewTag(true);
-            }} 
+            }}
           />
           </View>
 
@@ -132,24 +138,46 @@ const SearchCommunity = () => {
             postList.length != 0 ? (
               <View className='w-full'>
                 <FlashList
-                  data={filterPost}
+                  data={postDummy}
                   renderItem={({ item }) => (
-                    item.photo ? (
-                      <PostWithPhoto _id={item._id} username={item.username} profile_img={item.profile_img} post_id={item.post_id} date={item.date} content={item.content} tag={item.tag} like={item.like} comment={item.comment} photo={item.photo} openComment={function (): void {
-                        throw new Error('Function not implemented.');
-                      } } />
-                    ) : (
-                      <PostOnlyText/>
+                    item.photo? (
+                      <PostWithPhoto
+                        _id={item._id}
+                        username={item.username}
+                        profile_img={item.profile_img}
+                        post_id={item.post_id}
+                        date={item.date}
+                        content={item.content}
+                        tag={item.tag}
+                        like={item.like}
+                        comment={item.comment}
+                        photo={item.photo}
+                        openComment={handleOpenPress}
+                      />
+                    ):(
+                      <PostOnlyText
+                        _id={item._id}
+                        username={item.username}
+                        profile_img={item.profile_img}
+                        post_id={item.post_id}
+                        date={item.date}
+                        content={item.content}
+                        tag={item.tag}
+                        like={item.like}
+                        comment={item.comment}
+                        openComment={handleOpenPress}
+                      />
                     )
-                  )}
+                  )
+                  }
                   estimatedItemSize={200}
                 />
               </View>
-            ) : (
-              <View>
-                <Text>No post</Text>
-              </View>
-            )
+              ):(
+                <View>
+                  <Text style={{color:colors.subText}}>No post</Text>
+                </View>
+              )
           )}
 
           {viewGoals && (
@@ -172,24 +200,46 @@ const SearchCommunity = () => {
             postList.length != 0 ? (
               <View className='w-full'>
                 <FlashList
-                  data={filterTag}
+                  data={postDummy}
                   renderItem={({ item }) => (
-                    item.photo ? (
-                      <PostWithPhoto _id={item._id} username={item.username} profile_img={item.profile_img} post_id={item.post_id} date={item.date} content={item.content} tag={item.tag} like={item.like} comment={item.comment} photo={item.photo} openComment={function (): void {
-                        throw new Error('Function not implemented.');
-                      } } />
-                    ) : (
-                      <PostOnlyText/>
+                    item.photo? (
+                      <PostWithPhoto
+                        _id={item._id}
+                        username={item.username}
+                        profile_img={item.profile_img}
+                        post_id={item.post_id}
+                        date={item.date}
+                        content={item.content}
+                        tag={item.tag}
+                        like={item.like}
+                        comment={item.comment}
+                        photo={item.photo}
+                        openComment={handleOpenPress}
+                      />
+                    ):(
+                      <PostOnlyText
+                        _id={item._id}
+                        username={item.username}
+                        profile_img={item.profile_img}
+                        post_id={item.post_id}
+                        date={item.date}
+                        content={item.content}
+                        tag={item.tag}
+                        like={item.like}
+                        comment={item.comment}
+                        openComment={handleOpenPress}
+                      />
                     )
-                  )}
+                  )
+                  }
                   estimatedItemSize={200}
                 />
               </View>
-            ) : (
-              <View>
-                <Text>No post</Text>
-              </View>
-            )
+              ):(
+                <View>
+                  <Text style={{color:colors.subText}}>No post</Text>
+                </View>
+              )
           )}
 
         </ScrollView>

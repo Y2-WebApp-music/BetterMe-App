@@ -11,12 +11,13 @@ export type UserData = User & {
   calorie_need: number,
 }
 
-export type UserGoalPublicProp = {
-  goal_id: string[]
+export type UserFollow = {
+  follower: string[],
+  following: string[],
 }
 
-export type UserFollowProp = {
-  firebase_uid: string[]
+export type UserGoalPublicProp = {
+  goal_id: string[]
 }
 
 export const gender = [

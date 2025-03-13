@@ -165,10 +165,6 @@ const AccountSetting = () => {
   }, [editing, changed, navigation]);
 
   const [downloadURL, setDownloadURL] = useState<string | null>(null);
-  const updatePhotoUrl = async () => {
-    await handleImageUpload()
-    await updateUser()
-  }
 
   const uploadToFirebase = async () => {
     const metadata = {
@@ -257,9 +253,15 @@ const AccountSetting = () => {
     return downloadURL;
   };
 
-  const updateUser = async() => {
+  const [updatePhoto, setUpdatePhoto] = useState(false)
+  const updateUser = async(newPhotoUrl: string | null) => {
     try {
       if (user) {
+
+        console.log('updatePhoto? ',updatePhoto);
+        const url = newPhotoUrl || user.photoURL;
+
+        console.log('updateUser : downloadURL ',url);
 
         await updateProfile(auth.currentUser || user, {
           displayName:form.username,
@@ -267,7 +269,7 @@ const AccountSetting = () => {
         
         const response = await axios.put(`${SERVER_URL}/user/update/${user?._id}`, {
           username: form.username,
-          profile_img: downloadURL,
+          profile_img: url,
           birth_date: form.birth,
           gender: form.gender,
           weight: form.weight,
@@ -276,6 +278,8 @@ const AccountSetting = () => {
         });
 
         setEditing(false)
+        setImageModal(false)
+        setUpdatePhoto(false)
 
         await AsyncStorage.removeItem('@user');
 
@@ -284,6 +288,7 @@ const AccountSetting = () => {
         const extendedUser: UserData = {
           ...user,
           displayName:form.username,
+          photoURL: url || user.photoURL,
           _id,
           birth_date,
           gender,
@@ -299,6 +304,18 @@ const AccountSetting = () => {
       console.error('Fail to update :',error)
     }
   }
+
+  const updatePhotoUrl = async () => {
+    try {
+      setUpdatePhoto(true);
+      const newPhotoUrl = await handleImageUpload() || user?.photoURL;
+      if (newPhotoUrl) {
+        await updateUser(newPhotoUrl);
+      }
+    } catch (error) {
+      console.error('Fail to upload photo:', error);
+    }
+  };
 
   return (
       <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-center items-center font-noto">
@@ -327,7 +344,7 @@ const AccountSetting = () => {
                   </View>
                   <View>
                     {editing ? (
-                      <TouchableOpacity activeOpacity={0.6} onPress={updateUser} className=' bg-primary flex-row gap-2 p-2 px-6 justify-center items-center rounded-full'>
+                      <TouchableOpacity activeOpacity={0.6} onPress={() => {user && updateUser(user.photoURL || null)}} className=' bg-primary flex-row gap-2 p-2 px-6 justify-center items-center rounded-full'>
                         <Text className='text-heading2 text-white font-notoMedium'>Save</Text>
                       </TouchableOpacity>
                     ):(

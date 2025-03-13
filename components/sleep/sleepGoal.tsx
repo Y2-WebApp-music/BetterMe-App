@@ -77,7 +77,7 @@ const SleepGoal = () => {
 
   return (
     <View style={{ paddingHorizontal: 20, backgroundColor: colors.white, borderColor: colors.gray }} className='h-28 w-full rounded-normal border p-2 justify-center items-center flex-row gap-2'>
-      {/* <NightIcon width={36} height={36} color={colors.night} /> */}
+      <NightIcon width={36} height={36} color={colors.night} />
 
       <View style={{ paddingLeft: 10 }} className='grow'>
         <View style={{ transform: [{ translateY: 8 }] }}>
@@ -100,11 +100,11 @@ const SleepGoal = () => {
           <Animated.View style={[styles.container, { backgroundColor }]}>
             <Animated.View style={[styles.round, { transform: [{ translateX }], width: roundWidth }]}>
               {toggle ? (
-                // <NightIcon width={20} height={20} color={colors.night} />
-                <Text>NightIcon</Text>
+                <NightIcon width={20} height={20} color={colors.night} />
+                // <Text>NightIcon</Text>
               ) : (
-                <Text>DayIcon</Text>
-                // <DayIcon width={20} height={20} color={colors.yellow} />
+                // <Text>DayIcon</Text>
+                <DayIcon width={20} height={20} color={colors.yellow} />
               )}
             </Animated.View>
           </Animated.View>
@@ -151,33 +151,41 @@ export const toggleSleep = async (): Promise<number | null> => {
   await resetIfNeeded();
 
   const existingTime = await AsyncStorage.getItem('sleepData');
+  console.log('Existing sleepData:', existingTime);
 
   if (!existingTime) {
     await AsyncStorage.setItem('sleepData', new Date().toISOString());
+    console.log('Started sleep tracking.');
     return null;
-  } else {
-    const startTime = new Date(existingTime);
-    const endTime = new Date();
-    const sleepDuration = differenceInMinutes(endTime, startTime);
+  }
 
-    if (sleepDuration < 120 || sleepDuration > 780) {
-      console.log('Invalid sleep duration:', Math.floor(sleepDuration), 'minute');
-      await AsyncStorage.removeItem('sleepData');
-      return null;
-    }
+  const startTime = new Date(existingTime);
+  const endTime = new Date();
+  const sleepDuration = differenceInMinutes(endTime, startTime);
+  console.log('Start Time:', startTime);
+  console.log('End Time:', endTime);
+  console.log('Calculated Sleep Duration:', sleepDuration);
 
-    const validSleepTime = sleepDuration - 30;
-    if (validSleepTime < 90) {
-      console.log('Valid sleep time too short after excluding first 30 minutes.');
-      await AsyncStorage.removeItem('sleepData');
-      return null;
-    }
+  if (sleepDuration < 120 || sleepDuration > 780) {
+    console.log('Invalid sleep duration:', sleepDuration);
+    await AsyncStorage.removeItem('sleepData');
+    return null;
+  }
+
+  const validSleepTime = sleepDuration - 30;
+  if (validSleepTime < 90) {
+    console.log('Valid sleep time too short after excluding first 30 minutes.');
+    await AsyncStorage.removeItem('sleepData');
+    return null;
+  }
+
+  console.log('Final Valid Sleep Time:', validSleepTime);
 
     const newRecord: sleepCard = {
       total_time: validSleepTime,
-      date: format(new Date(), 'yyyy-MM-dd'),
-      start_time: format(startTime, 'HH:mm'),
-      end_time: format(endTime, 'HH:mm'),
+      date: startTime.toISOString(),
+      start_time: startTime.toISOString(),
+      end_time: endTime.toISOString(),
     };
 
     const existingRecords = await AsyncStorage.getItem('sleepRecords');
@@ -195,7 +203,7 @@ export const toggleSleep = async (): Promise<number | null> => {
 
     await AsyncStorage.removeItem('sleepData');
     return validSleepTime;
-  }
+  
 };
 
 export default SleepGoal;

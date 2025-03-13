@@ -1,8 +1,8 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet/src';
 import { FlashList } from '@shopify/flash-list';
 import { Image } from 'expo-image';
-import { router } from 'expo-router';
-import React, { useCallback, useRef, useState } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Dimensions, RefreshControl, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -12,7 +12,10 @@ import PostWithPhoto from '../../../components/Post/postWithPhoto';
 import { BellIcon, GalleryIcon, PenIcon, SearchIcon } from '../../../constants/icon';
 import { useAuth } from '../../../context/authContext';
 import { useTheme } from '../../../context/themeContext';
-import { postDummy } from '../../../types/community';
+import { PostContent, postDummy } from '../../../types/community';
+import axios from 'axios';
+import { SERVER_URL } from '@env';
+import { AllTag } from '../../../components/Post/postConstants';
 
 
 const screenWidth = Dimensions.get('window').width;
@@ -24,18 +27,13 @@ const SCROLL_DOWN_THRESHOLD = 60;
 const CommunityFeed = () => {
 
   const { colors } = useTheme();
-  const { user } = useAuth()
+  const { user, userFollow } = useAuth()
 
   const [refreshing, setRefreshing] = useState(false);
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    console.log('refreshing ');
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000);
-  }, []);
+  const [isLoad, setIsLoad] = useState(false);
 
-  const [postList, setPostList] = useState<number[]>([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20])
+  // const [postList, setPostList] = useState<number[]>([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20])
+  const [postList, setPostList] = useState<PostContent[] | null>(null)
 
   const insets = useSafeAreaInsets();
   const scrollYRef = useRef(0)
@@ -85,9 +83,57 @@ const CommunityFeed = () => {
     scrollYRef.current = scrollY;
   };
 
-  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const getFeed = async () => {
+    try {
+      const response = await axios.get(`${SERVER_URL}/community/post/feed/${user?._id}`);
+      const data = response.data
 
-  const handleOpenPress = () => {
+      if ( data.message === "User not found") {return console.error('User not found')}
+
+      if (data) {
+        const formattedData: PostContent[] = data.map((post: any) => ({
+          post_id: post.post_id,
+          date: post.date,
+          content: post.content,
+          tag: post.tag,
+          like: post.like,
+          comment: post.comment,
+          photo: post.image,
+          _id: post.create_by._id,
+          username: post.create_by.username,
+          profile_img: post.create_by.profile_img,
+        }));
+  
+        setPostList(formattedData);
+      } else {
+        return
+      }
+
+    } catch (error: any){
+      console.error('Get Post Error: ',error)
+    }
+  }
+
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      getFeed().finally(()=>setRefreshing(false));
+    }, 200);
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      setIsLoad(true)
+      getFeed().finally(()=>setIsLoad(false))
+    }, [])
+  );
+
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const [selectedPostId, setSelectedPostId] = useState<string>('');
+
+  const handleOpenPress = (post_id: string) => {
+    setSelectedPostId(post_id);
     bottomSheetModalRef.current?.present();
   };
 
@@ -171,15 +217,11 @@ const CommunityFeed = () => {
         <TagSection/>
 
         <View className="flex-1 mb-4 mt-1 flex flex-col gap-2 items-center w-full pb-5">
-
-          <TouchableOpacity onPress={()=>{router.push(`/community/user/goal/${123123}`)}}>
-            <Text>Goal community</Text>
-          </TouchableOpacity>
-
-            {postList.length != 0 ? (
+          {!isLoad?(
+            postList?(
               <View className='w-full'>
                 <FlashList
-                  data={postDummy}
+                  data={postList}
                   renderItem={({ item }) => (
                     item.photo? (
                       <PostWithPhoto
@@ -196,7 +238,18 @@ const CommunityFeed = () => {
                         openComment={handleOpenPress}
                       />
                     ):(
-                      <PostOnlyText/>
+                      <PostOnlyText
+                        _id={item._id}
+                        username={item.username}
+                        profile_img={item.profile_img}
+                        post_id={item.post_id}
+                        date={item.date}
+                        content={item.content}
+                        tag={item.tag}
+                        like={item.like}
+                        comment={item.comment}
+                        openComment={handleOpenPress}
+                      />
                     )
                   )
                   }
@@ -204,17 +257,39 @@ const CommunityFeed = () => {
                 />
               </View>
             ):(
-              <View>
-                <Text style={{color:colors.subText}}>No post</Text>
+              <View className='flex-1 justify-center items-center'>
+                <Text style={{color:colors.subText}} className='text-heading2'>No post</Text>
               </View>
             )
-            }
-
+          ):(
+            <View className='flex-1 w-[92%]'>
+              <View className='flex-row mt-3'>
+                <View className='w-[60%] flex-row gap-2 items-center'>
+                  <View style={{backgroundColor:colors.gray}} className='h-14 w-14 rounded-full'/>
+                  <View style={{backgroundColor:colors.gray}} className='h-12 w-[50%] rounded-normal'/>
+                </View>
+                <View className='w-[40%] items-end justify-center'>
+                  <View style={{backgroundColor:colors.gray}} className=' rounded-full w-[70%] h-10'/>
+                </View>
+              </View>
+              <View>
+                <View style={{width:screenWidth*0.92, height:screenWidth*0.86, backgroundColor:colors.gray }} className='mt-2 rounded-normal'/>
+                <View style={{width:screenWidth*0.92, height:screenWidth*0.20, backgroundColor:colors.gray }} className='mt-2 rounded-normal'/>
+              </View>
+              <View className='flex-row justify-between'>
+                <View style={{width:'30%', height:screenWidth*0.1, backgroundColor:colors.gray }} className='mt-2 rounded-normal'/>
+                <View style={{width:'50%', height:screenWidth*0.1, backgroundColor:colors.gray }} className='mt-2 rounded-normal'/>
+              </View>
+            </View>
+          )}
+            
         </View>
+
+
       </ScrollView>
 
       <View style={{ position:'absolute', top:0, left:0, right:0, height: insets.top, zIndex:100, backgroundColor:colors.background }} />
-      <CommentBottomModal ref={bottomSheetModalRef} />
+      <CommentBottomModal ref={bottomSheetModalRef} post_id={selectedPostId} />
       </SafeAreaView>
   )
 }
@@ -279,13 +354,8 @@ const TagSection:React.FC = () => {
       <View className="w-[92%]">
         <Text style={{color:colors.subText}} className="text-detail text-subText">interest this tag?</Text>
       </View>
-      <View className="w-[92%] items-start mt-2 flex-row gap-2">
-        <TouchableOpacity className="flex-row rounded-full bg-primary p-1 px-4">
-          <Text className="text-white font-notoMedium text-detail">clean food</Text>
-        </TouchableOpacity>
-        <TouchableOpacity className="flex-row rounded-full bg-primary p-1 px-4">
-          <Text className="text-white font-notoMedium text-detail">weight training</Text>
-        </TouchableOpacity>
+      <View className="w-full items-start mt-2 flex-row gap-2 pl-2">
+        <AllTag/>
       </View>
     </Animated.View>
   );

@@ -8,7 +8,7 @@ type PaginationProps = {
     scrollX: Animated.Value;
   }
 
-const pagination = ({data, scrollX} : PaginationProps) => {
+const Pagination = ({data, scrollX} : PaginationProps) => {
   return (
     <View style={styles.container}>
         {data.map((_, idx) =>{
@@ -29,7 +29,7 @@ const pagination = ({data, scrollX} : PaginationProps) => {
   )
 }
 
-export default pagination
+export default Pagination
 
 const styles = StyleSheet.create({
     container:{

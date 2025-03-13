@@ -2,7 +2,7 @@ import { SERVER_URL } from '@env';
 import axios from 'axios';
 import { format } from 'date-fns';
 import { useTheme } from '../../../../../context/themeContext';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Dimensions, RefreshControl, SafeAreaView, ScrollView, Switch, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
@@ -31,20 +31,6 @@ type CommunityGoalScreenProps = {
   complete_task:number;
   username:string;
   profile_img:string;
-
-
-
-type CommunityGoalScreenProps = {
-  end_date: string
-  description: string;
-  start_date: string;
-  task: Task[];
-  complete_task: number;
-  goal_id: string
-  goal_name: string
-  total_task: number
-  username:string
-  profile_img:string
 }
 
 export default function CommunityGoalScreen() {
@@ -54,38 +40,15 @@ export default function CommunityGoalScreen() {
 
   const [goalData, setGoalData] = useState<CommunityGoalScreenProps>({
     goal_id:'1',
-    goal_name:'Lorem Ipsum is simply',
-    description:'Lorem Ipsum has been the industry standard dummy text ever since the 1500s',
+    goal_name:'',
+    description:'',
     start_date:new Date().toDateString(),
     end_date:new Date(new Date().setDate(new Date().getDate() + 10)).toDateString(),
-    task : [
-      {
-        task_name:'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
-        status:false
-      },
-      {
-
-        task_name:'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
-        status:true
-      },
-      {
-        task_name:'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
-        status:true
-      },
-      {
-        task_name:'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
-        status:true
-      },
-      {
-        task_name:'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
-        status:true
-      },
-
-    ],
+    task : [],
     total_task:5,
     complete_task:4,
-    username: "loxia",
-    profile_img:"https://picsum.photos/id/237/200/300"
+    username: '',
+    profile_img:'',
   })
 
   const [isLoad, setIsLoad] = useState(false)
@@ -94,7 +57,7 @@ export default function CommunityGoalScreen() {
   // Fetch Data Here
   const fetchGoalData = async () => {
     try {
-      const response = await axios.get(`${SERVER_URL}/goal/detail/${id}`);
+      const response = await axios.get(`${SERVER_URL}/community/goal/detail/${id}`);
       const data = response.data;
       const transformedData: CommunityGoalScreenProps = {
         goal_id: data.goal_id,
@@ -105,8 +68,8 @@ export default function CommunityGoalScreen() {
         task: data.task,
         total_task: data.task.length,
         complete_task: data.task.filter((task: Task) => task.status).length,
-        username: "loxia",
-        profile_img:"https://picsum.photos/id/237/200/300",
+        username: data.username,
+        profile_img:data.profile_img,
       };
 
       setGoalData(transformedData);
@@ -117,17 +80,6 @@ export default function CommunityGoalScreen() {
       setIsLoad(false);
     }
   };
-
-  // useEffect(() => {
-  //   fetchGoalData();
-  // }, []);
-
-  // useEffect(()=>{
-  //   console.log('========================================================================');
-  //   goalData.task.map(data => {
-  //     console.log(data);
-  //   })
-  // },[goalData])
 
   const percent = useMemo(() => Math.round((goalData.complete_task / goalData.total_task) * 100), [ goalData ]);
   const color = percent === 100 ? '#0dc47c' : '#FBA742';
@@ -140,16 +92,16 @@ export default function CommunityGoalScreen() {
     strokeDashoffset: circle_length * (1 - progress.value),
   }));
 
-
-  const [warning, setWarning] = useState(false)
-  const [index, setIndex] = useState<number>(0)
-
+  useFocusEffect(
+    useCallback(() => {
+      fetchGoalData()
+    }, [])
+  );
 
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     fetchGoalData().finally(() => setRefreshing(false));
-    // console.log('Fetch New data');
   }, []);
 
 
@@ -192,9 +144,9 @@ export default function CommunityGoalScreen() {
                         cx={circle_length/5.6}
                         cy={circle_length/5.6}
                         r={r}
-                        fill="#E8E8E8"
+                        fill={colors.gray}
                         stroke={colors.gray}
-                        strokeWidth={6}
+                        strokeWidth={8}
                       />
                       <AnimatedCircle
                         cx={circle_length/5.6}

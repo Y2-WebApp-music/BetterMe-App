@@ -22,7 +22,8 @@
       },
       "package": "com.guynut.betterme",
       "permissions": ["INTERNET"],
-      "usesCleartextTraffic": true
+      "usesCleartextTraffic": true,
+      "softwareKeyboardLayoutMode": "pan"
     },
     "web": {
       "favicon": "./assets/Logo_BetterMe.png"

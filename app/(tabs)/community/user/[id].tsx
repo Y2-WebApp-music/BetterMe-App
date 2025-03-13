@@ -1,7 +1,7 @@
 import { View, Text, SafeAreaView, KeyboardAvoidingView, Platform, ScrollView, RefreshControl, TouchableOpacity, StyleSheet, Dimensions } from 'react-native'
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import BackButton from '../../../../components/Back'
-import { useLocalSearchParams } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { router } from 'expo-router';
 import { Image } from 'expo-image';
 import { useAuth } from '../../../../context/authContext';
@@ -10,62 +10,230 @@ import HomeGoalCard from '../../../../components/goal/homeGoalCard';
 import { homeGoalCardProp } from '../../../../types/goal'
 import PostWithPhoto from '../../../../components/Post/postWithPhoto';
 import PostOnlyText from '../../../../components/Post/postOnlyText';
-import { postDummy } from '../../../../types/community';
+import { PostContent, CommunityUserPost } from '../../../../types/community';
 import CommunityGoalCard from '../../../../components/goal/communityGoalCard';
 import { useTheme } from '../../../../context/themeContext';
 import CommentBottomModal from '../../../../components/modal/CommentBottomModal';
 import { BottomSheetModal } from '@gorhom/bottom-sheet/src';
+import axios from 'axios';
+import { SERVER_URL } from '@env';
+import FollowButton from '../../../../components/Post/followButton';
+import { formatNumber } from '../../../../components/Post/postConstants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AddIcon } from '../../../../constants/icon';
 
 
 const screenWidth = Dimensions.get('window').width;
 
+type UserDataProps = CommunityUserPost & {
+  email:string
+  goal:number
+  post:number
+}
 const Userprofile = () => {
 
-  const { colors } = useTheme();
   const { id } = useLocalSearchParams();
-  const [postList, setPostList] = useState<number[]>([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20])
-
-  const { user } = useAuth();
-
+  const { user, userFollow, setUserFollow } = useAuth();
+  const { colors } = useTheme();
+  
+  const [userData, setUserData] = useState< UserDataProps | null>(null)
+  const [postList, setPostList] = useState<PostContent[] | null>(null)
   const [goalList,setGoalList] = useState<homeGoalCardProp[]>([])
-    
-    const completeGoal = goalList?[
-      ...goalList
-    // select only complete goal
-      .filter((goal) => goal.total_task === goal.complete_task) 
-    // re-order from old to newest
-      .sort((a, b) => {
-        const dateA = new Date(a.end_date).setHours(0, 0, 0, 0);
-        const dateB = new Date(b.end_date).setHours(0, 0, 0, 0);
-        return dateA - dateB;
-      }),
-    ] : []
-  
-    const inprogressGoal = goalList?[
-      ...goalList
-    // select only inprogress goal
-      .filter((goal) => goal.total_task !== goal.complete_task) 
-    // re-order from old to newest
-      .sort((a, b) => {
-        const dateA = new Date(a.end_date).setHours(0, 0, 0, 0);
-        const dateB = new Date(b.end_date).setHours(0, 0, 0, 0);
-        return dateA - dateB;
-      }),
-    ] : []
-  
   const [viewPost, setViewPost] = useState(true);
 
+
+  const getUserData = async (): Promise<UserDataProps | null> => {
+    try {
+      const response = await axios.get(`${SERVER_URL}/user/profile/${id}`);
+      const data = response.data;
+  
+      if (data.message === "User not found") {
+        console.error("User not found");
+        return null;
+      }
+  
+      const userData: UserDataProps = {
+        _id: data._id,
+        username: data.username,
+        profile_img: data.profile_img,
+        email: data.email,
+        goal: data.goal,
+        post: data.post
+      };
+  
+      setUserData(userData);
+      return userData;
+    } catch (error: any) {
+      console.error("Get User Error:", error);
+      return null;
+    }
+  };
+
+
+  const getPostData = async () => {
+
+    let userInfo = userData;
+    
+    if (!userInfo) {
+      userInfo = await getUserData();
+      if (!userInfo) return;
+    }
+
+    try {
+      const response = await axios.get(`${SERVER_URL}/community/user-posts/${id}`);
+      const data = response.data
+
+      console.log('response Feed sample[0] \n',data[0]);
+      if ( data.message === "User not found") {return console.error('User not found')}
+
+      if (data) {
+        const formattedData: PostContent[] = data.map((post: any) => ({
+          post_id: post.post_id,
+          date: post.date,
+          content: post.content,
+          tag: post.tag,
+          like: post.like,
+          comment: post.comment,
+          photo: post.image,
+          _id: userInfo._id,
+          username: userInfo.username,
+          profile_img: userInfo.profile_img,
+        }));
+  
+        setPostList(formattedData);
+      } else {
+        return
+      }
+
+    } catch (error: any){
+      console.error('Get Post Error: ',error)
+    }
+  }
+    
+  const getGoalData = async () => {
+    try {
+      const response = await axios.get(`${SERVER_URL}/community/goal/card/${id}`);
+      const data = response.data // homeGoalCardProp[]
+
+      // console.log('getAllGoal response \n',response.data);
+
+      if (data.message === "Goal not found") {
+        return
+      } else {
+        setGoalList([
+          ...data.map((goal: any) => ({
+            goal_id:goal.goal_id,
+            goal_name:goal.goal_name,
+            end_date:goal.end_date,
+            total_task:goal.total_task,
+            complete_task:goal.complete_task,
+          })),
+        ])
+      }
+
+    } catch (error: any){
+      console.error(error)
+    }
+  }
+  
+  const completeGoal = goalList?[
+    ...goalList
+  // select only complete goal
+    .filter((goal) => goal.total_task === goal.complete_task) 
+  // re-order from old to newest
+    .sort((a, b) => {
+      const dateA = new Date(a.end_date).setHours(0, 0, 0, 0);
+      const dateB = new Date(b.end_date).setHours(0, 0, 0, 0);
+      return dateA - dateB;
+    }),
+  ] : []
+
+  const inprogressGoal = goalList?[
+    ...goalList
+  // select only inprogress goal
+    .filter((goal) => goal.total_task !== goal.complete_task)
+    .filter((goal) => new Date(goal.end_date) > new Date())
+  // re-order from old to newest
+    .sort((a, b) => {
+      const dateA = new Date(a.end_date).setHours(0, 0, 0, 0);
+      const dateB = new Date(b.end_date).setHours(0, 0, 0, 0);
+      return dateA - dateB;
+    }),
+  ] : []
+
+  useFocusEffect(
+    useCallback(() => {
+      getPostData()
+      getGoalData()
+    }, [])
+  );
+
   const [refreshing, setRefreshing] = useState(false);
-    const onRefresh = useCallback(() => {
-      setRefreshing(true);
-      setTimeout(() => {
-        setRefreshing(false);
-      }, 2000);
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await Promise.all([getUserData(), getPostData(), getGoalData()]);
+    } finally {
+      setRefreshing(false);
+    }
   }, []);
 
-  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const [isFollowing, setIsFollowing] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const handleOpenPress = () => {
+  const followUpdate = async () => {
+    if (!user || !userData || loading) return;
+
+    setLoading(true);
+    
+    try {
+      const response = await axios.put(`${SERVER_URL}/community/user/follow?user_id=${userData?._id}&follower_id=${user._id}`);
+      const data = response.data;
+      console.log('data.message ', data.message);
+
+      setIsFollowing(!isFollowing);
+    } catch (error: any) {
+      console.error('Follow Error: ', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getFollowData = async (_id:string) => {
+    try {
+      await AsyncStorage.removeItem('@follow');
+
+      const response = await axios.get(`${SERVER_URL}/user/follow/${_id}`);
+      const res = response.data
+
+      if ( res.message === "User not found") { return console.log('User not found in follow');}
+
+      setUserFollow({
+        follower: res.follower,
+        following: res.following,
+      })
+
+      await AsyncStorage.setItem('@follow', JSON.stringify(res));
+    } catch (error) {
+      console.error('followUser get failed', error);
+    }
+  }
+
+  useLayoutEffect(() => {
+    if (userFollow && userData?._id) {
+      setIsFollowing(userFollow.following.includes(userData?._id));
+    }
+  }, [userFollow, userData?._id]);
+
+  const handleFollow = async () => {
+    await followUpdate().finally(()=>{user && getFollowData(user._id)})
+  };
+
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const [selectedPostId, setSelectedPostId] = useState<string>('');
+
+  const handleOpenPress = (post_id: string) => {
+    setSelectedPostId(post_id);
     bottomSheetModalRef.current?.present();
   };
 
@@ -77,7 +245,7 @@ const Userprofile = () => {
       >
         <View className='w-[92%]'>
           <View className='max-w-[14vw]'>
-            <BackButton goto={'/menu'}/>
+            <BackButton goto={'/'}/>
           </View>
         </View>
         <ScrollView
@@ -91,12 +259,28 @@ const Userprofile = () => {
         >
             <View className='mb-4 w-[92%] flex flex-row-reverse gap-2 items-center'>
               <View className='grow'>
-                <Text style={{color:colors.text}} className='text-heading2 font-notoMedium'>Someone</Text>
-                <Text style={{color:colors.subText}} className=' font-not pb-1'>maybe.gmail.com</Text>
-                <Text style={{color:colors.subText}} className=' font-noto pb-1'>333k post 3333 goal</Text>
-                <View>
-                  <TouchableOpacity onPress={()=>{router.push(`/community/index`)}} style={{backgroundColor:colors.gray}} className=' flex-row gap-2 p-2 px-4 justify-center items-center rounded-full'>
-                    <Text style={{color:colors.text}} className=' text-body font-notoMedium'>following</Text>
+                <Text style={{color:colors.text}} className='text-heading2 font-notoMedium'>{userData?.username}</Text>
+                <Text style={{color:colors.subText}} className=' font-not pb-1'>{userData?.email}</Text>
+                <Text style={{color:colors.subText}} className=' font-noto pb-1'>{formatNumber(userData? userData.post : 0)} post {formatNumber(userData? userData.goal : 0)} goal</Text>
+                <View >
+                  <TouchableOpacity
+                    onPress={handleFollow}
+                    style={{
+                      paddingHorizontal: 10,
+                      alignSelf: 'flex-start',
+                      backgroundColor: isFollowing ? colors.gray : colors.primary,
+                      paddingLeft: isFollowing ? 12 : 14,
+                      width:'100%'
+                    }}
+                    disabled={loading}
+                    className=' flex-row gap-2 p-2 px-4 justify-center items-center rounded-full'
+                  >
+                    <Text style={{ color: isFollowing ? colors.subText : '#fff' }} className={`text-body font-notoMedium`}>
+                      {loading ? 'Loading...' : isFollowing ? 'Following' : 'Follow'}
+                    </Text>
+                    {!isFollowing && !loading && (
+                      <AddIcon width={24} height={24} color={'white'} />
+                    )}
                   </TouchableOpacity>
                 </View>
               </View>
@@ -124,37 +308,60 @@ const Userprofile = () => {
 
             <View style={{height:1, width:'100%',backgroundColor:colors.gray}} className=' my-3'/>
 
-            {viewPost? (
+            {viewPost && postList? (
               postList.length != 0 ? (
                 <View className='w-full'>
                   <FlashList
-                    data={postDummy}
+                    data={postList}
                     renderItem={({ item }) => (
                       item.photo? (
-                        <PostWithPhoto _id={item._id} username={item.username} profile_img={item.profile_img} post_id={item.post_id} date={item.date} content={item.content} tag={item.tag} like={item.like} comment={item.comment} photo={item.photo} openComment={handleOpenPress} />
+                        <PostWithPhoto
+                          _id={item._id}
+                          username={item.username}
+                          profile_img={item.profile_img}
+                          post_id={item.post_id}
+                          date={item.date}
+                          content={item.content}
+                          tag={item.tag}
+                          like={item.like}
+                          comment={item.comment}
+                          photo={item.photo}
+                          openComment={handleOpenPress}
+                        />
                       ):(
-                        <PostOnlyText/>
+                        <PostOnlyText
+                          _id={item._id}
+                          username={item.username}
+                          profile_img={item.profile_img}
+                          post_id={item.post_id}
+                          date={item.date}
+                          content={item.content}
+                          tag={item.tag}
+                          like={item.like}
+                          comment={item.comment}
+                          openComment={handleOpenPress}
+                        />
                       )
                     )
                     }
                     estimatedItemSize={200}
                   />
                 </View>
-              ):(
-                <View>
-                  <Text>No post</Text>
-                </View>
-              )
+                ):(
+                  <View className='flex-1 justify-center items-center'>
+                    <Text style={{color:colors.subText}} className='text-heading2'>No post</Text>
+                  </View>
+                )
             ):(
               <View className='w-[92%] justify-center items-center gap-2 mt-2 pb-16'>
                 <View className='flex-row items-center justify-center'>
-                  <Text style={{color:colors.yellow}} className='text-heading'>33</Text>
+                  <Text style={{color:colors.yellow}} className='text-heading'>{inprogressGoal.length}</Text>
                   <View style={{ transform: [{ translateY: 3 }]}}>
-                    <Text style={{color:colors.text}} className='text-body font-noto  pl-3'>In progress</Text>
+                    <Text style={{color:colors.text}} className='text-body font-noto pl-3'>In progress</Text>
                   </View>
-                  <Text style={{color:colors.green}} className='text-heading pl-4'>123</Text>
+                  <Text style={{color:colors.green}} className='text-heading pl-4'>{completeGoal.length}</Text>
                   <View style={{ transform: [{ translateY: 3 }]}}>
-                    <Text style={{color:colors.text}} className='text-body font-noto  pl-3'>Complete</Text>
+                    <Text style={{color:colors.text}} className='text-body font-noto pl-3'>Complete</Text>
                   </View>
                 </View>
                 <View className='w-full'>
@@ -204,7 +411,7 @@ const Userprofile = () => {
               </View>
             )}
         </ScrollView>
-      <CommentBottomModal ref={bottomSheetModalRef} />
+      <CommentBottomModal ref={bottomSheetModalRef} post_id={selectedPostId}/>
       </KeyboardAvoidingView>
     </SafeAreaView>
   )

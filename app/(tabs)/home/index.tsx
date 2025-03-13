@@ -38,7 +38,7 @@ const Home = () => {
       const response = await axios.get(`${SERVER_URL}/goal/today/${user?._id}`);
       const data = response.data // homeGoalCardProp[]
 
-      console.log('response \n',response.data);
+      console.log('response goal fetch\n');
 
       if (data.message === "No goals for today") {
         setIsNoGoal(true)
