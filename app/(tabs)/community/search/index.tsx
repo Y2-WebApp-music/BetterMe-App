@@ -234,6 +234,47 @@ const SearchCommunity = () => {
     }, [serverResponse])
   );
 
+  const scrollY = useSharedValue(0)
+
+  const onScroll = useAnimatedScrollHandler((event) => {
+    scrollY.value = event.contentOffset.y
+  })
+
+  const headerStyle = useAnimatedStyle(() => {
+    return {
+      opacity: withTiming(scrollY.value > 100 ? 0 : 1, { duration: 300 }),
+      transform: [
+        {
+          scale: withTiming(scrollY.value > 100 ? 0 : 1, { duration: 300 })
+        },
+        {
+          translateY: withTiming(scrollY.value > 100 ? -100 : 0, { duration: 300 })
+        }
+      ],
+    };
+  });
+
+  const headerContainerStyle = useAnimatedStyle(() => {
+    return {
+      height: withTiming(scrollY.value > 100 ? 107 : 165, { duration: 300 }),
+      transform: [
+        {
+          translateY: withTiming(scrollY.value > 100 ? 0 : 0, { duration: 300 })
+        }
+      ],
+    }
+  })
+
+  const inputStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          translateY: withTiming(scrollY.value > 100 ? -50 : 0, { duration: 300 })
+        }
+      ],
+    }
+  })
+
   return (
     <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-center items-center font-noto">
       <KeyboardAvoidingView
@@ -245,18 +286,51 @@ const SearchCommunity = () => {
             <BackButton goto={'/'}/>
           </View>
         </View>
-        <View className='w-full h-auto'>
-          <View className='items-center justify-center w-full mt-4'>
-            <Text style={[{ fontSize: 26, color: colors.primary, fontWeight: '400' }]}>
-              Search in Community
-            </Text>
-            <View style={{height:50}} className='w-full'>
-              <SearchInput search={search} setSearch={setSearch} submit={handleSubmit} setFocus={setIsSearching} setClear={setServerResponse}/>
-            </View>
+        <Animated.View className='w-full' style={[headerContainerStyle]}>
+          <View className='items-center justify-center w-full mt-2'>
+            <Animated.View style={[{ height: 50 }, headerStyle]}>
+              <Text style={[{ fontSize: 26, color: colors.primary, fontWeight: '400' }]}>
+                Search in Community
+              </Text>
+            </Animated.View>
+
+            <Animated.View style={[inputStyle,{height:50}]} className='w-full'>
+              <View style={{height:50}}>
+                <SearchInput search={search} setSearch={setSearch} submit={handleSubmit} setFocus={setIsSearching} setClear={setServerResponse}/>
+              </View>
+              <View style={{height:36, marginTop:6}} className='flex-row w-[92%] justify-start items-center gap-4 ml-4'>
+                <SwitchToggleButton
+                  label="post"
+                  isActive={searchType === 'post'}
+                  onPress={() => {
+                    setSearchType('post')
+                  }}
+                />
+
+                <View style={{ backgroundColor: colors.gray }} className='h-full w-[1px] rounded-full'/>
+                <SwitchToggleButton
+                  label="goals"
+                  isActive={searchType === 'goal'}
+                  onPress={() => {
+                    setSearchType('goal')
+                  }}
+                />
+
+                <View style={{ backgroundColor: colors.gray }} className='h-full w-[1px] rounded-full'/>
+                <SwitchToggleButton
+                  label="tag"
+                  isActive={searchType === 'tag'}
+                  onPress={() => {
+                    setSearchType('tag')
+                  }}
+                />
+              </View>
+              <View style={{height:1, width:'100%',backgroundColor:colors.gray}} className='my-2'/>
+            </Animated.View>
           </View>
-          <View style={{height:1, width:'100%', backgroundColor:colors.gray, marginTop:6}}/>
-        </View>
-        <ScrollView
+        </Animated.View>
+
+        <Animated.ScrollView
           className='w-full h-auto'
           contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', marginTop:6}}
           showsVerticalScrollIndicator={false}
@@ -264,37 +338,9 @@ const SearchCommunity = () => {
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
-          scrollEventThrottle={16}
+          scrollEventThrottle={32}
+          onScroll={onScroll}
         >
-          <View className='flex-row w-[92%] justify-start items-center gap-4 ml-4'>
-          <SwitchToggleButton
-            label="post"
-            isActive={searchType === 'post'}
-            onPress={() => {
-              setSearchType('post')
-            }}
-          />
-
-          <View style={{ backgroundColor: colors.gray }} className='h-full w-[1px] rounded-full'/>
-          <SwitchToggleButton
-            label="goals"
-            isActive={searchType === 'goal'}
-            onPress={() => {
-              setSearchType('goal')
-            }}
-          />
-
-          <View style={{ backgroundColor: colors.gray }} className='h-full w-[1px] rounded-full'/>
-          <SwitchToggleButton
-            label="tag"
-            isActive={searchType === 'tag'}
-            onPress={() => {
-              setSearchType('tag')
-            }}
-          />
-          </View>
-
-          <View style={{height:1, width:'100%',backgroundColor:colors.gray}} className='my-2'/>
 
           {searchType === 'post' && (
             postList && postList.length != 0 ?(
@@ -417,7 +463,7 @@ const SearchCommunity = () => {
               )
             )
           )}
-        </ScrollView>
+        </Animated.ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   )
