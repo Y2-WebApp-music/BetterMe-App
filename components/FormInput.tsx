@@ -49,6 +49,7 @@ const FormInput:React.FC<TextInputProp> = ({name, value, handleChange, keyboardT
           placeholder={name}
           placeholderTextColor={colors.darkGray}
           onChangeText={handleChange}
+          keyboardType={keyboardType === 'email-address' ? 'email-address': 'default'}
           secureTextEntry={keyboardType === 'password' && !showPassword}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}

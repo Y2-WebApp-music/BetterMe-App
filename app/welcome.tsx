@@ -69,7 +69,7 @@ export default function Welcome() {
                 name='email'
                 value={form.email}
                 handleChange={(e:string)=>{setForm({ ...form,email: e}); setErr('')}}
-                keyboardType="default"
+                keyboardType="email-address"
               />
               <FormInput
                 name='password'
