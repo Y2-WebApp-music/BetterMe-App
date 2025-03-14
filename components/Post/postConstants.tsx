@@ -94,3 +94,41 @@ export const AllTag = () => {
     </View>
   );
 }
+
+interface SelectTagListProps {
+  tagFilter: number[];
+}
+
+export const SelectTagList: React.FC<SelectTagListProps> = ({ tagFilter }) => {
+  const { colors } = useTheme();
+
+  const tagList = useMemo(() => TagCommunity, []);
+  const selectedTag = tagList.filter(tag => tagFilter.includes(tag.id));
+
+
+  return (
+    <View className="my-1">
+      <FlatList
+        data={selectedTag}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={{ backgroundColor: colors.primary, marginHorizontal: 2 }}
+            className="rounded-full p-1 px-2"
+            onPress={()=>{router.push(`(post)/tagSearch/${item.id}`)}}
+          >
+            <Text
+              style={{color:'#fff'}}
+              className="text-detail font-noto"
+              numberOfLines={1}
+            >
+              {item.text}
+            </Text>
+          </TouchableOpacity>
+        )}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+      />
+    </View>
+  );
+}

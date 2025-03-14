@@ -2,7 +2,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet/src';
 import { FlashList } from '@shopify/flash-list';
 import { Image } from 'expo-image';
 import { router, useFocusEffect } from 'expo-router';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Dimensions, RefreshControl, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -15,7 +15,7 @@ import { useTheme } from '../../../context/themeContext';
 import { PostContent, postDummy } from '../../../types/community';
 import axios from 'axios';
 import { SERVER_URL } from '@env';
-import { AllTag } from '../../../components/Post/postConstants';
+import { AllTag, SelectTagList } from '../../../components/Post/postConstants';
 
 
 const screenWidth = Dimensions.get('window').width;
@@ -83,6 +83,19 @@ const CommunityFeed = () => {
     scrollYRef.current = scrollY;
   };
 
+  const [interestTag, setInterestTag] = useState<number[] | null >(null)
+  const tagInPost = (postList:PostContent[]) => {
+    const tagSet: Set<number> = new Set();
+  
+    postList?.forEach((item: PostContent) => {
+      item.tag.forEach((num: number) => {
+        tagSet.add(num)
+      });
+    });
+  
+    return Array.from(tagSet)
+  };
+
   const getFeed = async () => {
     try {
       const response = await axios.get(`${SERVER_URL}/community/post/feed/${user?._id}`);
@@ -105,6 +118,9 @@ const CommunityFeed = () => {
         }));
   
         setPostList(formattedData);
+
+        const tagList = tagInPost(formattedData)
+        setInterestTag(tagList)
       } else {
         return
       }
@@ -113,7 +129,6 @@ const CommunityFeed = () => {
       console.error('Get Post Error: ',error)
     }
   }
-
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -125,7 +140,9 @@ const CommunityFeed = () => {
   useFocusEffect(
     useCallback(() => {
       setIsLoad(true)
-      getFeed().finally(()=>setIsLoad(false))
+      getFeed().finally(()=>{
+        setIsLoad(false)
+      })
     }, [])
   );
 
@@ -214,7 +231,9 @@ const CommunityFeed = () => {
             </View>
           </View>
         }
-        <TagSection/>
+        {interestTag &&
+          <TagSection tagList={interestTag}/>
+        }
 
         <View className="flex-1 mb-4 mt-1 flex flex-col gap-2 items-center w-full pb-5">
           {!isLoad?(
@@ -327,8 +346,11 @@ export const styles = StyleSheet.create({
   },
 });
 
+interface TagSectionProps {
+  tagList: number[];
+}
 
-const TagSection:React.FC = () => {
+const TagSection: React.FC<TagSectionProps> = ({ tagList }) => {
   const { colors } = useTheme();
   const top = useSharedValue(0);
 
@@ -355,7 +377,7 @@ const TagSection:React.FC = () => {
         <Text style={{color:colors.subText}} className="text-detail text-subText">interest this tag?</Text>
       </View>
       <View className="w-full items-start mt-2 flex-row gap-2 pl-2">
-        <AllTag/>
+        <SelectTagList tagFilter={tagList}/>
       </View>
     </Animated.View>
   );
