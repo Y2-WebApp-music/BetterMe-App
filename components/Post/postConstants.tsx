@@ -107,19 +107,20 @@ export const SelectTagList: React.FC<SelectTagListProps> = ({ tagFilter }) => {
 
 
   return (
-    <View className="my-1">
+    <View className="">
       <FlatList
         data={selectedTag}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <TouchableOpacity
-            style={{ backgroundColor: colors.primary, marginHorizontal: 2 }}
-            className="rounded-full p-1 px-2"
+            activeOpacity={0.8}
+            style={{ backgroundColor: colors.primary, marginHorizontal: 2 , paddingHorizontal:10}}
+            className="rounded-full p-1"
             onPress={()=>{router.push(`(post)/tagSearch/${item.id}`)}}
           >
             <Text
               style={{color:'#fff'}}
-              className="text-detail font-noto"
+              className="text-detail font-notoMedium"
               numberOfLines={1}
             >
               {item.text}

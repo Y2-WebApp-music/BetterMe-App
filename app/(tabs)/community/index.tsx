@@ -179,12 +179,12 @@ const CommunityFeed = () => {
             <Text className='text-primary font-notoSemiBold text-subTitle'>Better Me</Text>
           </View>
           
-          <View className=' relative'>
+          {/* <View className=' relative'>
             <TouchableOpacity activeOpacity={0.6} onPress={()=>{router.push('/community/search')}} className='p-[6px] rounded-full bg-primary'>
               <BellIcon width={24} height={24} color={'white'}/>
             </TouchableOpacity>
             <View className='h-3 w-3 absolute right-0 top-0 rounded-full bg-red'/>
-          </View>
+          </View> */}
           <TouchableOpacity activeOpacity={0.6} onPress={()=>{router.push('/community/search')}} className='p-[6px] rounded-full bg-primary'>
             <SearchIcon width={24} height={24} color={'white'}/>
           </TouchableOpacity>
