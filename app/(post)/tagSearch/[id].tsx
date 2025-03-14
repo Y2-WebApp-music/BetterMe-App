@@ -35,8 +35,8 @@ const SearchCommunity = () => {
 
       if (data) {
         const formattedData: PostContent[] = data.map((post: any) => ({
-          post_id: post._id,
-          date: post.post_date,
+          post_id: post.post_id,
+          date: post.date,
           content: post.content,
           tag: post.tag,
           like: post.like,
@@ -102,15 +102,17 @@ const SearchCommunity = () => {
             <BackButton goto={'/'}/>
           </View>
         </View>
-        <View className='w-full h-auto'>
+        <View className='w-full h-auto mb-2'>
           <View className='items-center justify-center w-full'>
+            <Text style={{color:colors.subText}} className='font-noto text-body'>Tag</Text>
             <Text style={[{ fontSize: 26, color: colors.primary, fontWeight: '400' }]}>
-              {tagName}
+              "{tagName}"
             </Text>
           </View>
         </View>
+        <View style={{height:1, width:'100%',backgroundColor:colors.gray}}/>
         <ScrollView
-          className='w-full h-auto mt-2'
+          className='w-full h-auto'
           contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start'}}
           showsVerticalScrollIndicator={false}
           keyboardDismissMode='on-drag'
@@ -119,8 +121,6 @@ const SearchCommunity = () => {
           }
           scrollEventThrottle={16}
         >
-
-          <View style={{height:1, width:'100%',backgroundColor:colors.gray}}/>
 
                 {tagPostList && tagPostList.length != 0 ?(
                   <View className='w-full'>

@@ -86,8 +86,12 @@ const AddTagBottomModal = forwardRef<BottomSheetModal, AddTagBottomModalProps>(
           </View>
 
         <View style={{backgroundColor:colors.white, borderColor:colors.gray}} className="border rounded-normal p-1 px-[10px] flex-row ">
-          <BottomSheetTextInput style={[styles.input, {width:'90%', color:colors.text, padding:4, backgroundColor:colors.white}]} className='grow' placeholder='Search some tag...' value={searchQuery} 
-        onChangeText={setSearchQuery} />
+          <BottomSheetTextInput
+            style={[styles.input, {width:'90%', color:colors.text, padding:4, backgroundColor:colors.white}]}
+            className='grow'
+            placeholder='Search some tag...'
+            onChangeText={setSearchQuery}
+          />
         </View>
           
             <View className="flex-row flex-wrap gap-2 p-2 w-full">

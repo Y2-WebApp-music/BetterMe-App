@@ -42,7 +42,7 @@ const CommentBottomModal = forwardRef<Ref, CommentBottomModalProps>(({ post_id }
   )
 
   const [commentList, setCommentList] = useState<Comment[]>([])
-  const [isLoad, setIsLoad] = useState(false);
+  const [isLoad, setIsLoad] = useState(true);
 
   const MemoizedRenderItem = memo(({ item }: { item: Comment }) => (
     <View key={item._id} style={styles.itemContainer} className="">
@@ -106,7 +106,7 @@ const CommentBottomModal = forwardRef<Ref, CommentBottomModalProps>(({ post_id }
   const [comment, setComment] = useState<string>('')
 
   const defaultWidth = screenWidth * 0.82;
-  const expandedWidth = screenWidth * 0.68;
+  const expandedWidth = screenWidth * 0.66;
 
   const inputWidth = useSharedValue(defaultWidth);
   const buttonOpacity = useSharedValue(0);
@@ -196,8 +196,7 @@ const CommentBottomModal = forwardRef<Ref, CommentBottomModalProps>(({ post_id }
   }, []);
 
   useLayoutEffect(() => {
-    if (isVisible === 0) {
-      setIsLoad(true);
+    if (isVisible === 0 && isLoad) {
       setComment('');
       getComments().finally(() => setIsLoad(false));
     }
@@ -244,7 +243,7 @@ const CommentBottomModal = forwardRef<Ref, CommentBottomModalProps>(({ post_id }
                   placeholder='write some comment..'
                   onPress={triggerMediumHaptics}
                   onChangeText={handleTextChange}
-                  keyboardType="default"
+                  keyboardType='default'
                 />
               </Animated.View>
               <Animated.View style={[animatedButtonStyle,{justifyContent:'center'}]}>
