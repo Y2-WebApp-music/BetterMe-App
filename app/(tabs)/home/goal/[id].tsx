@@ -217,22 +217,22 @@ export default function GoalScreen() {
                   <OptionIcon width={22} height={22} color={colors.darkGray}/>
                 </TouchableOpacity>
                 {isOptionsVisible && (
-                <View style={{backgroundColor:colors.white, borderColor:colors.gray}} className='absolute z-20 right-0 top-6 min-h-24 min-w-32 rounded-normal border p-4 flex-col gap-2'>
-                  <TouchableOpacity onPress={toggleSwitch} style={{borderColor:colors.gray}} className='p-2 px-4 border rounded-normal flex-row gap-2 justify-center items-center'>
-                    <Switch
-                      trackColor={{false: '#fff', true: '#0DC47C'}}
-                      thumbColor={goalData.public_goal ? '#FFF' : '#fff'}
-                      ios_backgroundColor="#FBFFFF"
-                      onValueChange={toggleSwitch}
-                      value={goalData.public_goal}
-                    />
-                    <Text style={{color:colors.subText}} className='font-noto text-heading3'>public this goal</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={()=>{setOpenModal(!openModal)}} style={{borderColor:colors.gray}} className='p-2 px-4 border rounded-normal flex-row gap-2 justify-center items-center'>
-                    <DeleteIcon width={26} height={26} color={colors.darkGray} />
-                    <Text style={{color:colors.subText}} className='font-noto text-heading3'>delete this goal</Text>
-                  </TouchableOpacity>
-                </View>
+                  <View style={{backgroundColor:colors.white, borderColor:colors.gray}} className='absolute z-20 right-0 top-6 min-h-24 min-w-32 rounded-normal border p-4 flex-col gap-2'>
+                    <TouchableOpacity onPress={toggleSwitch} style={{borderColor:colors.gray}} className='p-2 px-4 border rounded-normal flex-row gap-2 justify-center items-center'>
+                      <Switch
+                        trackColor={{false: '#fff', true: '#0DC47C'}}
+                        thumbColor={goalData.public_goal ? '#FFF' : '#fff'}
+                        ios_backgroundColor="#FBFFFF"
+                        onValueChange={toggleSwitch}
+                        value={goalData.public_goal}
+                      />
+                      <Text style={{color:colors.subText}} className='font-noto text-heading3'>public this goal</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={()=>{setOpenModal(!openModal)}} style={{borderColor:colors.gray}} className='p-2 px-4 border rounded-normal flex-row gap-2 justify-center items-center'>
+                      <DeleteIcon width={26} height={26} color={colors.darkGray} />
+                      <Text style={{color:colors.subText}} className='font-noto text-heading3'>delete this goal</Text>
+                    </TouchableOpacity>
+                  </View>
                 )}
               </View>
             </View>

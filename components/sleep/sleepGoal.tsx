@@ -8,9 +8,12 @@ import { differenceInMinutes, format, isAfter, setHours, setMinutes, setSeconds 
 import axios from 'axios';
 import { sleepCard } from '../../types/sleep';
 import { SERVER_URL } from '@env';
+import { userEvent } from '@testing-library/react-native';
+import { useAuth } from '../../context/authContext';
 
 const SleepGoal = () => {
   const { colors } = useTheme();
+  const { user } = useAuth();
 
   const [toggle, setToggle] = useState(false);
   const [sleepTime, setSleepTime] = useState({ hours: 0, minutes: 0 });
@@ -44,21 +47,16 @@ const SleepGoal = () => {
 
   const handleToggle = useCallback(async () => {
     try {
-      const sleepDuration = await toggleSleep();
+      const sleepDuration = await toggleSleep(user?._id || '');
       setToggle((prev) => !prev);
-
-      if (sleepDuration) {
-        setSleepTime({
-          hours: Math.floor(sleepDuration / 60),
-          minutes: sleepDuration % 60,
-        });
-      } else {
-        setSleepTime({ hours: 0, minutes: 0 });
-      }
+      setSleepTime({
+        hours: sleepDuration ? Math.floor(sleepDuration / 60) : 0,
+        minutes: sleepDuration ? sleepDuration % 60 : 0,
+      });
     } catch (error) {
       console.error('Error toggling sleep:', error);
     }
-  }, []);
+  }, [user]);
 
   const backgroundColor = animatedValue.interpolate({
     inputRange: [0, 1],
@@ -147,7 +145,12 @@ const resetIfNeeded = async () => {
   }
 };
 
-export const toggleSleep = async (): Promise<number | null> => {
+
+type sleepRecordProp = sleepCard & {
+  create_by:string
+}
+
+export const toggleSleep = async (user:string): Promise<number | null> => {
   await resetIfNeeded();
 
   const existingTime = await AsyncStorage.getItem('sleepData');
@@ -181,11 +184,13 @@ export const toggleSleep = async (): Promise<number | null> => {
 
   console.log('Final Valid Sleep Time:', validSleepTime);
 
-    const newRecord: sleepCard = {
+  if (user){
+    const newRecord: sleepRecordProp = {
       total_time: validSleepTime,
       date: startTime.toISOString(),
       start_time: startTime.toISOString(),
       end_time: endTime.toISOString(),
+      create_by: user
     };
 
     const existingRecords = await AsyncStorage.getItem('sleepRecords');
@@ -202,8 +207,9 @@ export const toggleSleep = async (): Promise<number | null> => {
     }
 
     await AsyncStorage.removeItem('sleepData');
-    return validSleepTime;
-  
+  }
+
+  return validSleepTime;
 };
 
 export default SleepGoal;

@@ -1,7 +1,7 @@
 import { StyleSheet, Animated, View, Dimensions } from 'react-native'
 import React from 'react'
 
-const {width} = Dimensions.get('screen');
+const {width} = Dimensions.get('window');
 
 type PaginationProps = {
     data: any[];

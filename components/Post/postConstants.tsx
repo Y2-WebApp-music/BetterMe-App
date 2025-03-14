@@ -77,7 +77,7 @@ export const AllTag = () => {
           <TouchableOpacity
             style={{ backgroundColor: colors.primary, marginHorizontal: 2 }}
             className="rounded-full p-1 px-2"
-            onPress={()=>{router.push('/community/search')}}
+            onPress={()=>{router.push(`(post)/tagSearch/${item.id}`)}}
           >
             <Text
               style={{color:'#fff'}}

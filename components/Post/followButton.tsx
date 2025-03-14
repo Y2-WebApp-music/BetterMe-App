@@ -80,6 +80,7 @@ const FollowButton = ({userPostID}:{userPostID:string}) => {
         alignSelf: 'flex-start',
         backgroundColor: isFollowing ? colors.gray : colors.primary,
         paddingLeft: isFollowing ? 12 : 14,
+        paddingRight:8
       }}
       disabled={loading}
     >

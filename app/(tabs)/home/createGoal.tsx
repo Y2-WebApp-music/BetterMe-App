@@ -62,6 +62,10 @@ const CreateGoal = () => {
   }, []);
 
   const [search, setSearch] = useState('')
+  const handleSubmit = async () => {
+    console.log('search input', search);
+  }
+
   return (
     <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-center items-center font-noto">
       <View className='w-[92%] mt-4'>
@@ -83,7 +87,7 @@ const CreateGoal = () => {
             </View>
           </View>
         </View>
-        <SearchInput name={'search goal ...'} value={search} handleChange={(e)=>{setSearch(e)}}/>
+        <SearchInput search={search} setSearch={setSearch} submit={handleSubmit}/>
       </View>
 
       <View className="flex-1 w-[92%] mt-4">

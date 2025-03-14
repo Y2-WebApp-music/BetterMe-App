@@ -7,6 +7,8 @@ const AuthLayout = () => {
     <Stack>
       <Stack.Screen name="postCreate" options={{ headerShown: false }} />
       <Stack.Screen name="[id]" options={{ headerShown: false }} />
+      <Stack.Screen name="edit/[id]" options={{ headerShown: false }} />
+      <Stack.Screen name="tagSearch/[id]" options={{ headerShown: false }} />
     </Stack>
   )
 }

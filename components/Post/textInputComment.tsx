@@ -94,6 +94,7 @@ const TextInputComment = ({comment, setComment, submit}:TextInputCommentProp) =>
                     styles.input,
                     { backgroundColor: colors.white, borderColor: colors.gray, color: colors.text }
                   ]}
+                  className=' font-noto'
                   placeholder="Write a comment..."
                   value={comment}
                   onPress={triggerMediumHaptics}
@@ -128,7 +129,6 @@ const styles = StyleSheet.create({
   input: {
     borderRadius: 99,
     fontSize: 16,
-    lineHeight: 20,
     padding: 10,
     borderWidth: 1,
   },

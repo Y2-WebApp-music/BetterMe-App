@@ -5,7 +5,7 @@ import React, { useRef, useState } from 'react';
 import { Dimensions, FlatList, NativeScrollEvent, NativeSyntheticEvent, Animated as ReactAnimated, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View, ViewToken } from 'react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView, } from 'react-native-gesture-handler';
 import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withDelay, withSpring, withTiming } from 'react-native-reanimated';
-import { CommentIcon, OptionIcon } from '../../constants/icon';
+import { CommentIcon, DeleteIcon, OptionIcon, PenIcon } from '../../constants/icon';
 import { useAuth } from '../../context/authContext';
 import { useTheme } from '../../context/themeContext';
 import { PostContent } from '../../types/community';
@@ -19,6 +19,7 @@ import * as Haptics from 'expo-haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { SERVER_URL } from '@env';
+import ConfirmDeleteModal from '../modal/ConfirmDeleteModal';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -159,9 +160,32 @@ const PostWithPhoto = ({ openComment, post_id, ...props }: PostContent & PostWit
     opacity: scale.value > 0 ? 1 : 0,
   }));
 
+  const deletePost = async () => {
+    console.log('Delete Goal');
+    try {
+      const response = await axios.delete(`${SERVER_URL}/community/post/delete/${post_id}`);
+
+      let data = response.data
+
+      if (data.message == "Post not found") {
+        console.error('Can not find Post ID')
+        return
+      }
+
+      router.back()
+
+    } catch (err) {
+      console.error('Delete Post Fail:', err);
+    }
+  }
+
+  const [openDeleteModal,setOpenDeleteModal] = useState(false)
+  const [isOptionsVisible, setOptionsVisible] = useState(false);
+  const toggleOptions = () => { setOptionsVisible(!isOptionsVisible) };
+  const closeOptions = () => { setOptionsVisible(false) };
+
   return (
     <GestureHandlerRootView style={{paddingHorizontal:14, width:'100%', borderBottomWidth:1, borderColor:colors.gray, paddingBottom:4}}>
-      
     <View style={{backgroundColor:colors.background}} className=' flex-row gap-2 items-center justify-between'>
 
       <View className='my-2 items-center flex-row gap-2'>
@@ -180,12 +204,25 @@ const PostWithPhoto = ({ openComment, post_id, ...props }: PostContent & PostWit
 
       </View>
       {props._id === user?._id ? (
-        <TouchableOpacity className="flex-row rounded-full p-1 px-2">
+        <TouchableOpacity onPress={toggleOptions} className="flex-row rounded-full p-1 px-2">
           <OptionIcon width={24} height={24} color={colors.darkGray}/>
         </TouchableOpacity>
       ):(
         <View>
           <FollowButton userPostID={props._id}/>
+        </View>
+      )}
+
+      {isOptionsVisible && (
+        <View style={{backgroundColor:colors.white, borderColor:colors.gray}} className='absolute z-20 right-0 top-6 min-h-24 min-w-32 rounded-normal border p-4 flex-col gap-2'>
+          <TouchableOpacity onPress={()=>{router.push(`(post)/edit/${post_id}`)}} style={{borderColor:colors.gray}} className='p-2 px-4 border rounded-normal flex-row gap-2 justify-start items-center'>
+            <PenIcon width={26} height={26} color={colors.darkGray} />
+            <Text style={{color:colors.subText}} className='font-noto text-heading3'>Edit post</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={()=>{setOpenDeleteModal(!openDeleteModal)}} style={{borderColor:colors.gray}} className='p-2 px-4 border rounded-normal flex-row gap-2 justify-start items-center'>
+            <DeleteIcon width={26} height={26} color={colors.darkGray} />
+            <Text style={{color:colors.subText}} className='font-noto text-heading3'>delete post</Text>
+          </TouchableOpacity>
         </View>
       )}
     </View>
@@ -264,6 +301,14 @@ const PostWithPhoto = ({ openComment, post_id, ...props }: PostContent & PostWit
 
       <TagList tagId={props.tag}/>
     </View>
+    <ConfirmDeleteModal
+      isOpen={openDeleteModal}
+      setIsOpen={setOpenDeleteModal}
+      title='post'
+      detail={'This will delete delete permanently. You cannot undo this action.'}
+      handelDelete={deletePost}
+      deleteType={'Delete'}
+    />
   </GestureHandlerRootView>
   )
 }

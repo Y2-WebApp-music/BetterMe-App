@@ -12,9 +12,9 @@ import { FlashList } from '@shopify/flash-list';
 import { useAuth } from '../../../../../context/authContext';
 import { GoalData, Task } from '../../../../../types/goal';
 import BackButton from '../../../../../components/Back';
-import { Image } from 'react-native';
 import { DeleteIcon, OptionIcon } from '../../../../../constants/icon';
 import { AddIcon } from '../../../../../constants/icon';
+import { Image } from 'expo-image';
 const { width } = Dimensions.get('window');
 const circle_length = width * 0.62;
 const r = circle_length / (2 * Math.PI);
@@ -104,6 +104,7 @@ export default function CommunityGoalScreen() {
     fetchGoalData().finally(() => setRefreshing(false));
   }, []);
 
+  const blurhash = 'UAQ0UC4-0K00TOEdxWjE0WS[xr-q02tlo|S1';
 
   return (
     <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-center items-center font-noto" >
@@ -194,8 +195,10 @@ export default function CommunityGoalScreen() {
                     <View className="w-full flex-row items-start gap-4">
                       {/* User profile */}
                       <Image
-                        source={{ uri: goalData.profile_img }}
-                        style={{ width: 40, height: 40, borderRadius: 25 }} 
+                        source={goalData.profile_img}
+                        style={{ width: 40, height: 40, borderRadius: 25 }}
+                        placeholder={{blurhash}}
+                        transition={200}
                       />
 
                       {/* Text Section */}

@@ -18,9 +18,9 @@ import { format } from 'date-fns';
 import { getDownloadURL, ref, uploadBytes } from '@firebase/storage';
 import { firebaseStorage } from '../../components/auth/firebaseConfig';
 import uuid from 'react-native-uuid';
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 const screenWidth = Dimensions.get('window').width;
-
 
 const PostCreate = () => {
 
@@ -102,7 +102,7 @@ const PostCreate = () => {
       }
   
       setDownloadURL(urls);
-      console.log("All images uploaded:", urls);
+      console.log("All images uploaded:", urls.length);
   
       return urls;
     } catch (error) {
@@ -127,20 +127,20 @@ const PostCreate = () => {
   const postToDB = async () => {
     setCreating(true)
     try {
-      let tagList = selectedTags.map((item)=> item.id)
-      const url = await handleImageUpload();
+      let tagList = selectedTags.map((item)=> item.id) || []
+      const url = photos.length !== 0? await handleImageUpload() : []
 
-      if (url && user) {
+      if (user) {
         const response = await axios.post(`${SERVER_URL}/community/post/create`, {
           content: content,
-          image_url: url,
+          image_url: url || [],
           tag: tagList,
           create_by: user?._id,
           post_date: new Date(),
         });
     
         const data = response.data;
-        console.log("=============== ::: Post Data ::: ===============\n", data)
+        // console.log("=============== ::: Post Data ::: ===============\n", data)
         
         if (data.message === "Post content is empty") {
           return setErr("Post content is empty");
@@ -161,12 +161,6 @@ const PostCreate = () => {
 
   const handlePost = async () => {
     if (content.trim() !== '') {
-      if (selectedTags.length === 0) {
-        console.log('At least one tag is required');
-        setWarning(true);
-        setErr('At least one tag is required');
-        return;
-      }
 
       setCreating(true)
       await postToDB();
@@ -177,6 +171,8 @@ const PostCreate = () => {
       console.log('Post content is empty');
     }
   };
+
+  const blurhash = 'UAQ0UC4-0K00TOEdxWjE0WS[xr-q02tlo|S1';
 
   return (
     <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-center items-center font-noto">
@@ -207,9 +203,10 @@ const PostCreate = () => {
                 style={styles.image}
                 source={user?.photoURL ? user?.photoURL : user?.gender === 1 ? require('../../assets/maleAvatar.png') : require('../../assets/femaleAvatar.png')}
                 contentFit="cover"
-                transition={1000}
+                placeholder={{blurhash}}
+                transition={300}
               />
-              <TextInput style={{color:colors.text}} className="w-[85%] text-body " placeholder="write something..." multiline={true}  value={content} onChangeText={setContent}/>
+              <TextInput style={{color:colors.text}} className="w-[85%] text-body font-noto" placeholder="write something..." multiline={true}  value={content} onChangeText={setContent}/>
             </View>
 
 
@@ -232,7 +229,13 @@ const PostCreate = () => {
                 showsHorizontalScrollIndicator={false}
                 renderItem={({ item, index }) => (
                   <View style={styles.imageWrapper}>
-                    <Image source={{ uri: item }} style={styles.selectedImage} contentFit="cover" />
+                    <Image
+                      source={{ uri: item }}
+                      style={styles.selectedImage}
+                      contentFit="cover"
+                      placeholder={{blurhash}}
+                      transition={300}
+                    />
                     <TouchableOpacity style={[styles.deleteButton,{backgroundColor:colors.primary}]} onPress={() => removePhoto(index)}>
                       <CloseIcon width={26} height={26} color="white" />
                     </TouchableOpacity>
@@ -248,7 +251,7 @@ const PostCreate = () => {
                   <Text className="text-subText  ">Add photo</Text>
                 </TouchableOpacity>
                 <TouchableOpacity className="flex flex-row items-center gap-1" onPress={handleOpenPress}>
-                  <FoodIcon width={24} height={24} color={colors.nonFocus}  />
+                  <AntDesign name="tag" size={24} color={colors.nonFocus} />
                   <Text className="text-subText">Add tag</Text>
                 </TouchableOpacity>
               </View>
@@ -308,9 +311,9 @@ export const styles = StyleSheet.create({
     top: 5,
     right: 5,
     backgroundColor: 'rgba(0,0,0,0.6)',
-    width: 28,
-    height: 28,
-    borderRadius: 12,
+    width: 29,
+    height: 29,
+    borderRadius: 999,
     justifyContent: 'center',
     alignItems: 'center',
   },

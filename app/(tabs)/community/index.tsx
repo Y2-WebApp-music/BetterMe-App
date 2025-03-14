@@ -186,9 +186,9 @@ const CommunityFeed = () => {
               <View style={{ transform: [{ translateY: 1 }], }} className='mr-auto'>
                 <Text style={{color:colors.subText}} className='font-noto'>What are you doing?</Text>
               </View>
-              <PenIcon width={24} height={24} color={colors.nonFocus}/>
+              <PenIcon width={24} height={24} color={colors.primary}/>
             </TouchableOpacity>
-            <GalleryIcon width={30} height={30} color={colors.nonFocus}/>
+            {/* <GalleryIcon width={30} height={30} color={colors.nonFocus}/> */}
           </View>
         </View>
       </Animated.View>
@@ -223,7 +223,7 @@ const CommunityFeed = () => {
                 <FlashList
                   data={postList}
                   renderItem={({ item }) => (
-                    item.photo? (
+                    item.photo?.length !== 0? (
                       <PostWithPhoto
                         _id={item._id}
                         username={item.username}

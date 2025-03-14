@@ -17,7 +17,7 @@ const SlideItem = ({item} : SlideItemProps) =>{
                 contentFit="cover"
                 style={styles.image}
                 placeholder={{ blurhash }}
-                transition={400}
+                transition={300}
             />
         </View>
     )

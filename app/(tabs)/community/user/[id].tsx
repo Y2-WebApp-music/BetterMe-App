@@ -40,6 +40,7 @@ const Userprofile = () => {
   const [postList, setPostList] = useState<PostContent[] | null>(null)
   const [goalList,setGoalList] = useState<homeGoalCardProp[]>([])
   const [viewPost, setViewPost] = useState(true);
+  const [isLoad, setIsLoad] = useState(true)
 
 
   const getUserData = async (): Promise<UserDataProps | null> => {
@@ -162,9 +163,24 @@ const Userprofile = () => {
   ] : []
 
   useFocusEffect(
-    useCallback(() => {
-      getPostData()
-      getGoalData()
+    useCallback(() =>  {
+      let isActive = true;
+
+      const fetchData = async () => {
+        setIsLoad(true);
+        try {
+          await getPostData();
+          await getGoalData();
+        } finally {
+          if (isActive) setIsLoad(false);
+        }
+      };
+
+      fetchData();
+
+      return () => {
+        isActive = false;
+      };
     }, [])
   );
 
@@ -308,13 +324,14 @@ const Userprofile = () => {
 
             <View style={{height:1, width:'100%',backgroundColor:colors.gray}} className=' my-3'/>
 
-            {viewPost && postList? (
-              postList.length != 0 ? (
+            {viewPost? (
+              !isLoad? (
+              postList &&  postList.length != 0 ? (
                 <View className='w-full'>
                   <FlashList
                     data={postList}
                     renderItem={({ item }) => (
-                      item.photo? (
+                      item.photo?.length !== 0? (
                         <PostWithPhoto
                           _id={item._id}
                           username={item.username}
@@ -350,6 +367,11 @@ const Userprofile = () => {
                 ):(
                   <View className='flex-1 justify-center items-center'>
                     <Text style={{color:colors.subText}} className='text-heading2'>No post</Text>
+                  </View>
+                )
+                ):(
+                  <View className='flex-1 justify-center items-center'>
+                    <Text style={{color:colors.subText}} className='text-heading2'>Loading...</Text>
                   </View>
                 )
             ):(

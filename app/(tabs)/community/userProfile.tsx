@@ -31,6 +31,7 @@ const UserProfile = () => {
   const [goalList,setGoalList] = useState<homeGoalCardProp[]>([])
   const [viewPost, setViewPost] = useState(true);
   const [noGoal, setNoGoal] = useState(false)
+  const [isLoad, setIsLoad] = useState(true)
 
 
   const getPostData = async () => {
@@ -117,9 +118,24 @@ const UserProfile = () => {
   ] : []
 
   useFocusEffect(
-    useCallback(() => {
-      getPostData()
-      getGoalData()
+    useCallback(() =>  {
+      let isActive = true;
+
+      const fetchData = async () => {
+        setIsLoad(true);
+        try {
+          await getPostData();
+          await getGoalData();
+        } finally {
+          if (isActive) setIsLoad(false);
+        }
+      };
+
+      fetchData();
+
+      return () => {
+        isActive = false;
+      };
     }, [])
   );
 
@@ -133,7 +149,10 @@ const UserProfile = () => {
   }, []);
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-  const handleOpenPress = () => {
+  const [selectedPostId, setSelectedPostId] = useState<string>('');
+
+  const handleOpenPress = (post_id: string) => {
+    setSelectedPostId(post_id);
     bottomSheetModalRef.current?.present();
   };
 
@@ -163,7 +182,7 @@ const UserProfile = () => {
                 <Text style={{color:colors.subText}} className=' font-not pb-1'>{user?.email}</Text>
                 <Text style={{color:colors.subText}} className=' font-noto pb-1'>333k post {goalList.length} goal</Text>
                 <View>
-                  <TouchableOpacity onPress={()=>{router.push(`/community/post/create`)}} className=' bg-primary flex-row gap-2 p-2 px-4 justify-center items-center rounded-full'>
+                  <TouchableOpacity onPress={()=>{router.push('/(post)/postCreate')}} className=' bg-primary flex-row gap-2 p-2 px-4 justify-center items-center rounded-full'>
                     <Text className='text-body text-white font-notoMedium'>Create post</Text>
                     <PenIcon width={22} height={22} color={'white'}/>
                   </TouchableOpacity>
@@ -193,13 +212,14 @@ const UserProfile = () => {
 
             <View style={{height:1, width:'100%',backgroundColor:colors.gray}} className='my-3'/>
 
-            {viewPost && postList? (
-              postList.length != 0 ? (
+            {viewPost? (
+              !isLoad? (
+              postList && postList.length != 0 ? (
                 <View className='w-full'>
                   <FlashList
                     data={postList}
                     renderItem={({ item }) => (
-                      item.photo? (
+                      item.photo?.length !== 0? (
                         <PostWithPhoto
                           _id={item._id}
                           username={item.username}
@@ -235,6 +255,11 @@ const UserProfile = () => {
                 ):(
                   <View className='flex-1 justify-center items-center'>
                     <Text style={{color:colors.subText}} className='text-heading2'>No post</Text>
+                  </View>
+                )
+                ):(
+                  <View className='flex-1 justify-center items-center'>
+                    <Text style={{color:colors.subText}} className='text-heading2'>Loading...</Text>
                   </View>
                 )
             ):(
@@ -296,7 +321,7 @@ const UserProfile = () => {
               </View>
             )}
         </ScrollView>
-      <CommentBottomModal ref={bottomSheetModalRef} />
+      <CommentBottomModal ref={bottomSheetModalRef} post_id={selectedPostId}/>
       </KeyboardAvoidingView>
     </SafeAreaView>
   )

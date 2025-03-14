@@ -33,9 +33,12 @@ const AddTagBottomModal = forwardRef<BottomSheetModal, AddTagBottomModalProps>(
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ["60%", "100%"], []);
 
-  const filteredTags = useMemo(() => {
-    return data.filter((tag) => tag.text.toLowerCase().includes(searchQuery.toLowerCase()));
-  }, [searchQuery, data]);
+  const filteredTags = useMemo(() => 
+  data
+    .filter((tag) => tag.text.toLowerCase().includes(searchQuery.toLowerCase()))
+    .filter((tag) => !selectedTags.some((selected) => selected.id === tag.id))
+, [searchQuery, data, selectedTags]);
+
   const onSelectTag = (tag: { id: number; text: string }) => {
     setSelectedTags((prevSelected) => {
       const isAlreadySelected = prevSelected.some((t) => t.id === tag.id);

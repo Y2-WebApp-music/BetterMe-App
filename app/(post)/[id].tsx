@@ -9,7 +9,7 @@ import { FlashList } from '@shopify/flash-list';
 import { Comment, commentDummy } from '../../types/community';
 import { useTheme } from '../../context/themeContext';
 import { Image } from 'expo-image';
-import { LikeIcon } from '../../constants/icon'
+import { LikeIcon, PenIcon } from '../../constants/icon'
 import { router } from 'expo-router';
 import { PostContent } from '../../types/community';
 import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withDelay, withSpring, withTiming } from 'react-native-reanimated';
@@ -38,7 +38,7 @@ const CommunityPost = () => {
   const [commentData, setCommentData]= useState<Comment[] | null>(null)
 
   const [refreshing, setRefreshing] = useState(false);
-  const [isLoad, setIsLoad] = useState(false);
+  const [isLoad, setIsLoad] = useState(true);
 
   const [index, setIndex] = useState(0);
   const scrollX = useRef(new ReactAnimated.Value(0)).current;
@@ -328,7 +328,18 @@ const CommunityPost = () => {
                     </View>
                   </View>
                   <View>
-                    <FollowButton userPostID={postData._id}/>
+                  {user?._id === postData._id ? (
+                      <TouchableOpacity
+                        onPress={()=>{router.push(`(post)/edit/${postData.post_id}`)}}
+                        className={`flex-row gap-1 p-1 px-2 justify-center items-center rounded-full w-auto`}
+                        style={{alignSelf: 'flex-start', backgroundColor: colors.nonFocus, paddingLeft:10}}
+                      >
+                        <Text style={{ color:'#fff' }} className={`text-body font-notoMedium`}> edit post </Text>
+                        <PenIcon height={20} width={20} color={'#fff'}/>
+                      </TouchableOpacity>
+                    ):(
+                      <FollowButton userPostID={postData._id}/>
+                    )}
                   </View>
                 </View>
                 <Text style={{ marginVertical:3, color: colors.text }} className='text-body font-noto ml-2'>{postData.content}</Text>
@@ -388,14 +399,17 @@ const CommunityPost = () => {
                 }
 
 
-                <View className="items-center justify-end mb-2 pr-2 flex-row">
+                <View className="items-center justify-end mb-1 pr-2 flex-row">
+                  <View className='grow justify-end'>
+                    <Text style={{color:colors.subText}} className='text-body font-noto ml-2'>{formatNumber(postData.comment)} comment</Text>
+                  </View>
                   <LikeButton like={postData.like} post_id={postData.post_id}/>
                   <Text style={{color:colors.subText}} className='ml-1 font-notoMedium'>like</Text>
                 </View>
 
 
                 <View style={{paddingHorizontal:14, borderColor:colors.gray}} className='w-full border-b mb-2 '/>
-                <Text style={{color:colors.subText}} className='text-body font-noto mb-2 ml-4'>{formatNumber(postData.comment)} comment</Text>
+                {/* <Text style={{color:colors.subText}} className='text-body font-noto mb-2 ml-4'>{formatNumber(postData.comment)} comment</Text> */}
                 {commentData? (
                   <FlashList
                     data={commentData}
