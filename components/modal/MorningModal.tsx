@@ -35,7 +35,12 @@ const MorningModal = ({totalGoal, isOpen, setIsOpen, toggle, setToggle, sleepTim
   const { colors } = useTheme();
   const { user } = useAuth();
 
-  const percent = useMemo(() => Math.round((8 / 12) * 100), []);
+  const [values, setValues] = useState([0, 0, 0]);
+  const setDonutValues = () => setValues(targetValues);
+
+  const [totalTime, setTotalTime] = useState(0)
+
+  const percent = useMemo(() => Math.round((totalTime / 720) * 100), []);
   const progress = useSharedValue(0);
 
   useEffect(() => {
@@ -45,10 +50,6 @@ const MorningModal = ({totalGoal, isOpen, setIsOpen, toggle, setToggle, sleepTim
   const animatedProps = useAnimatedProps(() => ({
     strokeDashoffset: circle_length * (1 - progress.value),
   }));
-
-
-  const [values, setValues] = useState([0, 0, 0]);
-  const setDonutValues = () => setValues(targetValues);
 
   const [start, setStart] = useState<string>('')
   const [end, setEnd] = useState<string>('')
@@ -61,6 +62,7 @@ const MorningModal = ({totalGoal, isOpen, setIsOpen, toggle, setToggle, sleepTim
       const sleepData = await toggleSleep(user?._id || '', !toggle);
   
       if (sleepData) {
+        setTotalTime(sleepData.total_time)
         setSleepTime({
           hours: Math.floor(sleepData.total_time / 60),
           minutes: sleepData.total_time % 60,
@@ -85,9 +87,10 @@ const MorningModal = ({totalGoal, isOpen, setIsOpen, toggle, setToggle, sleepTim
   }
 
   useLayoutEffect(()=>{
-    console.log(' === Morning Modal Use === ');
-    
-    getSleepData()
+    if (isOpen){
+      console.log(' === Morning Modal Use === ');
+      getSleepData()
+    }
   },[isOpen])
 
   return (

@@ -55,7 +55,7 @@ const SleepGoal = ({toggle, setToggle, sleepTime, setSleepTime}:SleepGoalProp) =
         const newState = !prev;
         return newState;
       });
-  
+      
       const sleepDuration = await toggleSleep(user?._id || '', !toggle);
   
       if (sleepDuration) {
@@ -82,7 +82,7 @@ const SleepGoal = ({toggle, setToggle, sleepTime, setSleepTime}:SleepGoalProp) =
           const sleepRecordsString = await AsyncStorage.getItem('sleepRecords');
           const sleepRecords = sleepRecordsString ? JSON.parse(sleepRecordsString) : [];
       
-          if (sleepRecords) {
+          if (sleepRecords.length !== 0) {
             console.log('sleepRecords');
             
             setSleepTime({
