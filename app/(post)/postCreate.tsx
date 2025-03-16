@@ -1,14 +1,14 @@
 
 import { Dimensions, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View, KeyboardAvoidingView, Platform, TextInput, FlatList } from 'react-native';
-import { AddIcon, GalleryIcon, FoodIcon, CloseIcon } from '../../constants/icon';
-import React, { useState, useRef, useMemo, useEffect } from 'react';
+import { AddIcon, GalleryIcon, FoodIcon, CloseIcon, LeftArrowIcon } from '../../constants/icon';
+import React, { useState, useRef, useMemo, useEffect, useLayoutEffect } from 'react';
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { BottomSheetModal } from '@gorhom/bottom-sheet/src';
 import axios from 'axios';
 import { SERVER_URL } from '@env';
 import { useRoute } from "@react-navigation/native";
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 import { useAuth } from '../../context/authContext';
 import { useTheme } from '../../context/themeContext';
 import BackButton from '../../components/Back';
@@ -19,6 +19,7 @@ import { getDownloadURL, ref, uploadBytes } from '@firebase/storage';
 import { firebaseStorage } from '../../components/auth/firebaseConfig';
 import uuid from 'react-native-uuid';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import { Alert } from 'react-native';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -35,11 +36,17 @@ const PostCreate = () => {
   const [warning, setWarning] = useState(false)
 
   const pickImage = async () => {
+
+    if (photos.length >= 10) {
+      setErr('There are more than 10 photos, please remove some.')
+      setWarning(true)
+      return
+    }
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      aspect: [4, 4],
+      // aspect: [4, 4],
       quality: 1,
-      selectionLimit: 10,
+      selectionLimit: 10 - photos.length,
       allowsMultipleSelection: true,
       allowsEditing: false,
       orderedSelection: true,
@@ -158,7 +165,6 @@ const PostCreate = () => {
     }
   };
 
-
   const handlePost = async () => {
     if (content.trim() !== '') {
 
@@ -172,7 +178,65 @@ const PostCreate = () => {
     }
   };
 
+  
+  const navigation = useNavigation()
+  const [changed, setChanged] = useState(false)
+  const buttonClickedRef = useRef(false);
+
+  const handleBack = () => {
+    buttonClickedRef.current = true;
+    router.back()
+  }
+
+  useEffect(()=>{
+    if (photos.length !== 0 || content != '' || selectedTags.length !== 0) {
+      setChanged(true)
+    } else {
+      setChanged(false)
+    }
+  },[photos, content, selectedTags])
+
+  useEffect(() => {
+    const beforeRemoveHandler = (e: any) => {
+      const action = e.data.action;
+      console.log('changed:', changed, ' buttonClickedRef.current:', buttonClickedRef.current);
+  
+      if (!changed && buttonClickedRef.current) {
+        buttonClickedRef.current = false;
+        return;
+      }
+  
+      e.preventDefault();
+  
+      Alert.alert(
+        'Discard changes?',
+        'You have unsaved changes. Are you sure to discard them and leave the screen?',
+        [
+          {
+            text: 'Discard',
+            style: 'destructive',
+            onPress: () => {
+              buttonClickedRef.current = false;
+              navigation.dispatch(action);
+            },
+          },
+          { text: "Don't leave", style: 'cancel', onPress: () => {} },
+        ]
+      );
+    };
+  
+    const unsubscribe = navigation.addListener('beforeRemove', beforeRemoveHandler);
+    return () => unsubscribe();
+  
+  }, [changed, navigation]);
+
   const blurhash = 'UAQ0UC4-0K00TOEdxWjE0WS[xr-q02tlo|S1';
+
+  const textInputRef = useRef<TextInput>(null);
+
+  useLayoutEffect(() => {
+    textInputRef.current?.focus();
+  }, []);
 
   return (
     <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-center items-center font-noto">
@@ -180,12 +244,17 @@ const PostCreate = () => {
         <>
       <View className="w-[92%]">
         <View className="max-w-[14vw] my-4">
-          <BackButton goto={'/menu'} />
+        <TouchableOpacity onPress={handleBack} className='will-change-contents w-fit flex flex-row items-center justify-start'>
+                <View>
+                  <LeftArrowIcon width={14} height={14} color={colors.text} />
+                </View>
+                <Text style={{color:colors.text}}>Back</Text>
+              </TouchableOpacity>
         </View>
       </View>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1, width: '100%', alignItems: 'center' }}>
         <View className="w-full h-full items-center">
-          <ScrollView className="w-[92%] h-auto " contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', marginTop: 6 }} showsVerticalScrollIndicator={false} keyboardDismissMode="on-drag">
+          <ScrollView className="w-[92%] h-auto " contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', marginTop: 6 }} showsVerticalScrollIndicator={false}>
             <View className="flex flex-row items-center">
               <View className="grow">
                 <Text className="text-subTitle text-primary font-noto">Create post</Text>
@@ -206,9 +275,16 @@ const PostCreate = () => {
                 placeholder={{blurhash}}
                 transition={300}
               />
-              <TextInput style={{color:colors.text}} className="w-[85%] text-body font-noto" placeholder="write something..." multiline={true}  value={content} onChangeText={setContent}/>
+              <TextInput
+                ref={textInputRef}
+                style={{ color: colors.text }}
+                className="w-[85%] text-body font-noto"
+                placeholder="write something..."
+                multiline={true}
+                value={content}
+                onChangeText={setContent}
+              />
             </View>
-
 
             <View className="flex-row flex-wrap mt-2">
               {selectedTags.map((tag) => (
@@ -277,7 +353,7 @@ const PostCreate = () => {
       )}
       <AddTagBottomModal ref={bottomSheetModalRef} selectedTags={selectedTags} setSelectedTags={setSelectedTags} />
       <WarningModal
-        title={'Please complete detail'}
+        title={'Warning'}
         detail={err}
         isOpen={warning}
         setIsOpen={()=>setWarning(!warning)}
@@ -325,24 +401,3 @@ export const styles = StyleSheet.create({
 });
 
 export default PostCreate;
-
-
-function setWarning(arg0: boolean) {
-  throw new Error('Function not implemented.');
-}
-
-function setErr(arg0: string) {
-  throw new Error('Function not implemented.');
-}
-
-function setCountdown(counter: number) {
-  throw new Error('Function not implemented.');
-}
-
-function setIsConfirming(arg0: boolean) {
-  throw new Error('Function not implemented.');
-}
-
-function setCountdownInterval(interval: NodeJS.Timeout) {
-  throw new Error('Function not implemented.');
-}

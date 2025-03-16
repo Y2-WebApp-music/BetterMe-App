@@ -39,7 +39,6 @@ const UserProfile = () => {
       const response = await axios.get(`${SERVER_URL}/community/user-posts/${user?._id}`);
       const data = response.data
 
-      console.log('response Feed sample[0] \n',data[0]);
       if ( data.message === "User not found") {return console.error('User not found')}
 
       if (data) {

@@ -48,11 +48,17 @@ const PostCreate = () => {
   const [warning, setWarning] = useState(false)
 
   const pickImage = async () => {
+    if (photos.length >= 10) {
+      setErr('There are more than 10 photos, please remove some.')
+      setWarning(true)
+      return
+    }
+
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       aspect: [4, 4],
       quality: 1,
-      selectionLimit: 10,
+      selectionLimit: 10 - photos.length,
       allowsMultipleSelection: true,
       allowsEditing: false,
       orderedSelection: true,
@@ -341,7 +347,7 @@ const PostCreate = () => {
       )}
       <AddTagBottomModal ref={bottomSheetModalRef} selectedTags={selectedTags} setSelectedTags={setSelectedTags} />
       <WarningModal
-        title={'Please complete detail'}
+        title={'Warning'}
         detail={err}
         isOpen={warning}
         setIsOpen={()=>setWarning(!warning)}
