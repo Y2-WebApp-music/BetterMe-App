@@ -9,7 +9,7 @@ import { FlashList } from '@shopify/flash-list';
 import { Comment, commentDummy } from '../../types/community';
 import { useTheme } from '../../context/themeContext';
 import { Image } from 'expo-image';
-import { LikeIcon, PenIcon } from '../../constants/icon'
+import { LikeIcon, OptionIcon, PenIcon } from '../../constants/icon'
 import { router } from 'expo-router';
 import { PostContent } from '../../types/community';
 import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withDelay, withSpring, withTiming } from 'react-native-reanimated';
@@ -25,6 +25,8 @@ import * as Haptics from 'expo-haptics';
 import { useAuth } from '../../context/authContext';
 import LikeButton from '../../components/Post/likeButton';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { BottomSheetModal } from '@gorhom/bottom-sheet/src';
+import PostOptionBottomModal from '../../components/modal/PostEditModal';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -36,6 +38,7 @@ const CommunityPost = () => {
 
   const [postData, setPostData]= useState<PostContent | null>(null)
   const [commentData, setCommentData]= useState<Comment[] | null>(null)
+  const [like, setLike] = useState<number | 0>(postData?.like || 0)
 
   const [refreshing, setRefreshing] = useState(false);
   const [isLoad, setIsLoad] = useState(true);
@@ -73,7 +76,7 @@ const CommunityPost = () => {
       const response = await axios.get(`${SERVER_URL}/community/post/${id}`);
       const data = response.data
 
-      console.log('response post detail \n',data);
+      console.log('response post detail status 200 ok::\n');
       if ( data.message === "Post not found") {return }
 
       if (data) {
@@ -189,6 +192,7 @@ const CommunityPost = () => {
 
       if (response.data) {
         console.warn('Like :', response.data?.message)
+        response.data?.message === "Like post success" && setLike(like + 1);
         setPostData((prev) => {
           if (!prev) return prev;
           return {
@@ -273,6 +277,13 @@ const CommunityPost = () => {
     }
   }
 
+  const [selectedPostId, setSelectedPostId] = useState<string>('');
+  const optionSheetModalRef = useRef<BottomSheetModal>(null);
+  const handleOpenOption = (post_id: string) => {
+    setSelectedPostId(post_id);
+    optionSheetModalRef.current?.present();
+  };
+
   return (
     <GestureHandlerRootView>
     <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-center items-center font-noto">
@@ -329,13 +340,8 @@ const CommunityPost = () => {
                   </View>
                   <View>
                   {user?._id === postData._id ? (
-                      <TouchableOpacity
-                        onPress={()=>{router.push(`(post)/edit/${postData.post_id}`)}}
-                        className={`flex-row gap-1 p-1 px-2 justify-center items-center rounded-full w-auto`}
-                        style={{alignSelf: 'flex-start', backgroundColor: colors.nonFocus, paddingLeft:10}}
-                      >
-                        <Text style={{ color:'#fff' }} className={`text-body font-notoMedium`}> edit post </Text>
-                        <PenIcon height={20} width={20} color={'#fff'}/>
+                      <TouchableOpacity onPress={()=>{handleOpenOption(postData.post_id)}} className="flex-row rounded-full p-1 px-2">
+                        <OptionIcon width={24} height={24} color={colors.darkGray}/>
                       </TouchableOpacity>
                     ):(
                       <FollowButton userPostID={postData._id}/>
@@ -403,7 +409,7 @@ const CommunityPost = () => {
                   <View className='grow justify-end'>
                     <Text style={{color:colors.subText}} className='text-body font-noto ml-2'>{formatNumber(postData.comment)} comment</Text>
                   </View>
-                  <LikeButton like={postData.like} post_id={postData.post_id}/>
+                  <LikeButton like={like} post_id={postData.post_id} setLike={setLike}/>
                   <Text style={{color:colors.subText}} className='ml-1 font-notoMedium'>like</Text>
                 </View>
 
@@ -463,6 +469,7 @@ const CommunityPost = () => {
         </View>
         </View>
       </KeyboardAvoidingView>
+      <PostOptionBottomModal ref={optionSheetModalRef} post_id={selectedPostId}/>
       </SafeAreaView>
     </GestureHandlerRootView>
   )

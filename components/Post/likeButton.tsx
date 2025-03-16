@@ -11,12 +11,17 @@ import * as Haptics from 'expo-haptics';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-const LikeButton = ({ like, post_id }: { like: number, post_id: string }) => {
+type LikeButtonProp = {
+  post_id:string
+  like:number
+  setLike:(like:number) => void
+}
+
+const LikeButton = ({ like, post_id, setLike }:LikeButtonProp) => {
   const { user, likedPost, setLikedPost } = useAuth()
   const systemTheme = useColorScheme();
   const { colors, theme } = useTheme()
   
-  const [likeCount, setLikeCount] = useState(like)
   const [isLiked, setIsLiked] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -52,7 +57,7 @@ const LikeButton = ({ like, post_id }: { like: number, post_id: string }) => {
 
       if (response.data) {
         setIsLiked((prev) => !prev)
-        setLikeCount((prev) => (isLiked ? like : prev + 1))
+        setLike(isLiked ? like - 1 : like + 1);
         console.warn('Like :', response.data?.message)
       } else {
         console.warn('Like Failed:', response.data?.message)
@@ -131,7 +136,7 @@ const LikeButton = ({ like, post_id }: { like: number, post_id: string }) => {
         <MaterialCommunityIcons name="cards-heart-outline" size={26} color={colors.darkGray} />
       </View>
       <Text style={{ color: colors.subText }} className="text-body font-notoMedium">
-        {formatNumber(likeCount)}
+        {formatNumber(like)}
       </Text>
     </TouchableOpacity>
   )

@@ -11,16 +11,21 @@ import { useAuth } from '../../context/authContext';
 import { formatNumber, TagList } from './postConstants';
 import { format } from 'date-fns';
 import LikeButton from './likeButton';
+import ConfirmDeleteModal from '../modal/ConfirmDeleteModal';
+import axios from 'axios';
+import { SERVER_URL } from '@env';
 
 
 type PostWithPhotoProp = {
   openComment : (post_id:string) => void
+  openOption : (post_id:string) => void
 }
 
-const PostOnlyText = ({ openComment, post_id, ...props }: PostContent & PostWithPhotoProp) => {
+const PostOnlyText = ({ openComment, openOption, post_id, ...props }: PostContent & PostWithPhotoProp) => {
 
   const { colors } = useTheme();
   const { user } = useAuth()
+  const [like, setLike] = useState<number | 0>(props.like)
 
   const screenWidth = Dimensions.get('window').width;
   const styles = StyleSheet.create({
@@ -32,10 +37,27 @@ const PostOnlyText = ({ openComment, post_id, ...props }: PostContent & PostWith
     },
   });
 
-  const [openDeleteModal,setOpenDeleteModal] = useState(false)
-  const [isOptionsVisible, setOptionsVisible] = useState(false);
-  const toggleOptions = () => { setOptionsVisible(!isOptionsVisible) };
-  const closeOptions = () => { setOptionsVisible(false) };
+  const deletePost = async () => {
+    console.log('Delete Goal');
+    try {
+      const response = await axios.delete(`${SERVER_URL}/community/post/delete/${post_id}`);
+
+      let data = response.data
+
+      if (data.message == "Post not found") {
+        console.error('Can not find Post ID')
+        return
+      }
+
+      router.back()
+
+    } catch (err) {
+      console.error('Delete Post Fail:', err);
+    }
+  }
+
+  const [optionVisible, setOptionVisible] = useState(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false)
 
   return (
     <View style={{paddingHorizontal:14, borderColor:colors.gray}} className='w-full border-b pb-2 '>
@@ -58,25 +80,12 @@ const PostOnlyText = ({ openComment, post_id, ...props }: PostContent & PostWith
         </View>
 
         {props._id === user?._id ? (
-          <TouchableOpacity onPress={toggleOptions} className="flex-row rounded-full p-1 px-2">
+          <TouchableOpacity onPress={()=>{openOption(post_id)}} className="flex-row rounded-full p-1 px-2">
             <OptionIcon width={24} height={24} color={colors.darkGray}/>
           </TouchableOpacity>
         ):(
           <View>
             <FollowButton userPostID={props._id}/>
-          </View>
-        )}
-
-        {isOptionsVisible && (
-          <View style={{backgroundColor:colors.white, borderColor:colors.gray}} className='absolute z-20 right-0 top-6 min-h-24 min-w-32 rounded-normal border p-4 flex-col gap-2'>
-            <TouchableOpacity onPress={()=>{router.push(`(post)/edit/${post_id}`)}} style={{borderColor:colors.gray}} className='p-2 px-4 border rounded-normal flex-row gap-2 justify-start items-center'>
-              <PenIcon width={26} height={26} color={colors.darkGray} />
-              <Text style={{color:colors.subText}} className='font-noto text-heading3'>Edit post</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={()=>{setOpenDeleteModal(!openDeleteModal)}} style={{borderColor:colors.gray}} className='p-2 px-4 border rounded-normal flex-row gap-2 justify-start items-center'>
-              <DeleteIcon width={26} height={26} color={colors.darkGray} />
-              <Text style={{color:colors.subText}} className='font-noto text-heading3'>delete post</Text>
-            </TouchableOpacity>
           </View>
         )}
       </View>
@@ -90,7 +99,7 @@ const PostOnlyText = ({ openComment, post_id, ...props }: PostContent & PostWith
 
       <View style={{paddingBottom:8}} className="mt-2 flex-row gap-2 items-center justify-between">
         <View style={{gap:14}} className=" items-end flex-row">
-          <LikeButton like={props.like} post_id={post_id}/>
+          <LikeButton like={like} post_id={post_id} setLike={setLike}/>
 
           <TouchableOpacity onPress={()=>{openComment(post_id)}} className=" flex-row gap-1 items-center">
             <CommentIcon width={26} height={26}color={colors.darkGray}/>
@@ -102,6 +111,14 @@ const PostOnlyText = ({ openComment, post_id, ...props }: PostContent & PostWith
 
         <TagList tagId={props.tag}/>
       </View>
+      <ConfirmDeleteModal
+        isOpen={openDeleteModal}
+        setIsOpen={setOpenDeleteModal}
+        title='post'
+        detail={'This will delete delete permanently. You cannot undo this action.'}
+        handelDelete={deletePost}
+        deleteType={'Delete'}
+      />
     </View>
   )
 

@@ -21,6 +21,7 @@ import FollowButton from '../../../../components/Post/followButton';
 import { formatNumber } from '../../../../components/Post/postConstants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AddIcon } from '../../../../constants/icon';
+import PostOptionBottomModal from '../../../../components/modal/PostEditModal';
 
 
 const screenWidth = Dimensions.get('window').width;
@@ -253,6 +254,12 @@ const Userprofile = () => {
     bottomSheetModalRef.current?.present();
   };
 
+  const optionSheetModalRef = useRef<BottomSheetModal>(null);
+  const handleOpenOption = (post_id: string) => {
+    setSelectedPostId(post_id);
+    optionSheetModalRef.current?.present();
+  };
+
   return (
     <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-center items-center font-noto">
       <KeyboardAvoidingView
@@ -344,6 +351,7 @@ const Userprofile = () => {
                           comment={item.comment}
                           photo={item.photo}
                           openComment={handleOpenPress}
+                          openOption={handleOpenOption}
                         />
                       ):(
                         <PostOnlyText
@@ -357,6 +365,7 @@ const Userprofile = () => {
                           like={item.like}
                           comment={item.comment}
                           openComment={handleOpenPress}
+                          openOption={handleOpenOption}
                         />
                       )
                     )
@@ -434,6 +443,7 @@ const Userprofile = () => {
             )}
         </ScrollView>
       <CommentBottomModal ref={bottomSheetModalRef} post_id={selectedPostId}/>
+      <PostOptionBottomModal ref={optionSheetModalRef} post_id={selectedPostId}/>
       </KeyboardAvoidingView>
     </SafeAreaView>
   )

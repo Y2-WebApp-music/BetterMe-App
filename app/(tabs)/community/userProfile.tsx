@@ -18,6 +18,7 @@ import { useTheme } from '../../../context/themeContext';
 import FollowButton from '../../../components/Post/followButton';
 import { BottomSheetModal } from '@gorhom/bottom-sheet/src';
 import CommentBottomModal from '../../../components/modal/CommentBottomModal';
+import PostOptionBottomModal from '../../../components/modal/PostEditModal';
 
 
 const screenWidth = Dimensions.get('window').width;
@@ -149,10 +150,16 @@ const UserProfile = () => {
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const [selectedPostId, setSelectedPostId] = useState<string>('');
-
-  const handleOpenPress = (post_id: string) => {
+  
+  const handleOpenComment = (post_id: string) => {
     setSelectedPostId(post_id);
     bottomSheetModalRef.current?.present();
+  };
+  
+  const optionSheetModalRef = useRef<BottomSheetModal>(null);
+  const handleOpenOption = (post_id: string) => {
+    setSelectedPostId(post_id);
+    optionSheetModalRef.current?.present();
   };
 
   return (
@@ -230,7 +237,8 @@ const UserProfile = () => {
                           like={item.like}
                           comment={item.comment}
                           photo={item.photo}
-                          openComment={handleOpenPress}
+                          openComment={handleOpenComment}
+                          openOption={handleOpenOption}
                         />
                       ):(
                         <PostOnlyText
@@ -243,7 +251,8 @@ const UserProfile = () => {
                           tag={item.tag}
                           like={item.like}
                           comment={item.comment}
-                          openComment={handleOpenPress}
+                          openComment={handleOpenComment}
+                          openOption={handleOpenOption}
                         />
                       )
                     )
@@ -281,9 +290,9 @@ const UserProfile = () => {
                         data={inprogressGoal}
                         renderItem={({ item }) =>
                           <CommunityGoalCard
-                            goal_id={item.goal_id} 
-                            goal_name={item.goal_name} 
-                            total_task={item.total_task} 
+                            goal_id={item.goal_id}
+                            goal_name={item.goal_name}
+                            total_task={item.total_task}
                             complete_task={item.complete_task}
                           />
                         }
@@ -321,6 +330,7 @@ const UserProfile = () => {
             )}
         </ScrollView>
       <CommentBottomModal ref={bottomSheetModalRef} post_id={selectedPostId}/>
+      <PostOptionBottomModal ref={optionSheetModalRef} post_id={selectedPostId}/>
       </KeyboardAvoidingView>
     </SafeAreaView>
   )

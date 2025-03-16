@@ -16,6 +16,7 @@ import { PostContent, postDummy } from '../../../types/community';
 import axios from 'axios';
 import { SERVER_URL } from '@env';
 import { AllTag, SelectTagList } from '../../../components/Post/postConstants';
+import PostOptionBottomModal from '../../../components/modal/PostEditModal';
 
 
 const screenWidth = Dimensions.get('window').width;
@@ -154,6 +155,12 @@ const CommunityFeed = () => {
     bottomSheetModalRef.current?.present();
   };
 
+  const optionSheetModalRef = useRef<BottomSheetModal>(null);
+  const handleOpenOption = (post_id: string) => {
+    setSelectedPostId(post_id);
+    optionSheetModalRef.current?.present();
+  };
+
   return (
     <SafeAreaView style={{backgroundColor:colors.background}} className=" relative w-full h-full justify-center items-center font-noto">
       <View style={{position:'relative', left:0, width:'100%', backgroundColor:colors.background}} className=' z-10'>
@@ -255,6 +262,7 @@ const CommunityFeed = () => {
                         comment={item.comment}
                         photo={item.photo}
                         openComment={handleOpenPress}
+                        openOption={handleOpenOption}
                       />
                     ):(
                       <PostOnlyText
@@ -268,6 +276,7 @@ const CommunityFeed = () => {
                         like={item.like}
                         comment={item.comment}
                         openComment={handleOpenPress}
+                        openOption={handleOpenOption}
                       />
                     )
                   )
@@ -309,6 +318,7 @@ const CommunityFeed = () => {
 
       <View style={{ position:'absolute', top:0, left:0, right:0, height: insets.top, zIndex:100, backgroundColor:colors.background }} />
       <CommentBottomModal ref={bottomSheetModalRef} post_id={selectedPostId} />
+      <PostOptionBottomModal ref={optionSheetModalRef} post_id={selectedPostId}/>
       </SafeAreaView>
   )
 }

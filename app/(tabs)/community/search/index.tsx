@@ -17,6 +17,8 @@ import axios from 'axios';
 import Animated, { useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useAuth } from '../../../../context/authContext';
 import { useFocusEffect } from 'expo-router';
+import CommentBottomModal from '../../../../components/modal/CommentBottomModal';
+import PostOptionBottomModal from '../../../../components/modal/PostEditModal';
 
 const SearchCommunity = () => {
 
@@ -61,6 +63,34 @@ const SearchCommunity = () => {
 
     } catch (error: any){
       console.error('Get Post Error: ',error)
+    }
+  }
+
+  const getGoalFeed = async () => {
+    try {
+      const response = await axios.post(`${SERVER_URL}/community/search/goal`, {
+        keyword:''
+      });
+      const data = response.data
+
+      if (data) {
+        const formattedData: searchGoalCard[] = data.map((item: any) => ({
+          goal_id: item.goal_id,
+          goal_name: item.goal_name,
+          total_task: item.total_task,
+          start_date: item.start_date,
+          end_date: item.end_date,
+          complete_task: item.complete_task,
+          create_by: item.create_by.username,
+        }));
+  
+        setGoalList(formattedData);
+      } else {
+        return
+      }
+
+    } catch (error: any){
+      console.error('Search Post Failed: ',error)
     }
   }
 
@@ -210,11 +240,6 @@ const SearchCommunity = () => {
     }, 2000);
   }, []);
 
-  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-  const handleOpenPress = () => {
-    bottomSheetModalRef.current?.present();
-  };
-
   const tagList = useMemo(() => TagCommunity, []);
   const handleTagSelected = async (id:number) => {
     const selectedTag = tagList.find(tag => tag.id === id);
@@ -230,6 +255,7 @@ const SearchCommunity = () => {
       if (!serverResponse && search === ''){
         setIsLoad(true)
         getFeed().finally(()=>setIsLoad(false))
+        getGoalFeed().finally(()=>setIsLoad(false))
       }
     }, [serverResponse])
   );
@@ -274,6 +300,19 @@ const SearchCommunity = () => {
       ],
     }
   })
+
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const handleOpenComment = (post_id: string) => {
+    setSelectedPostId(post_id);
+    bottomSheetModalRef.current?.present();
+  };
+
+  const [selectedPostId, setSelectedPostId] = useState<string>('');
+  const optionSheetModalRef = useRef<BottomSheetModal>(null);
+  const handleOpenOption = (post_id: string) => {
+    setSelectedPostId(post_id);
+    optionSheetModalRef.current?.present();
+  };
 
   return (
     <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-center items-center font-noto">
@@ -360,7 +399,8 @@ const SearchCommunity = () => {
                         like={item.like}
                         comment={item.comment}
                         photo={item.photo}
-                        openComment={handleOpenPress}
+                        openComment={handleOpenComment}
+                        openOption={handleOpenOption}
                       />
                     ):(
                       <PostOnlyText
@@ -373,7 +413,8 @@ const SearchCommunity = () => {
                         tag={item.tag}
                         like={item.like}
                         comment={item.comment}
-                        openComment={handleOpenPress}
+                        openComment={handleOpenComment}
+                        openOption={handleOpenOption}
                       />
                     )
                   )
@@ -432,7 +473,8 @@ const SearchCommunity = () => {
                             like={item.like}
                             comment={item.comment}
                             photo={item.photo}
-                            openComment={handleOpenPress}
+                            openComment={handleOpenComment}
+                            openOption={handleOpenOption}
                           />
                         ):(
                           <PostOnlyText
@@ -445,7 +487,8 @@ const SearchCommunity = () => {
                             tag={item.tag}
                             like={item.like}
                             comment={item.comment}
-                            openComment={handleOpenPress}
+                            openComment={handleOpenComment}
+                            openOption={handleOpenOption}
                           />
                         )
                       )
@@ -464,6 +507,8 @@ const SearchCommunity = () => {
             )
           )}
         </Animated.ScrollView>
+        <CommentBottomModal ref={bottomSheetModalRef} post_id={selectedPostId}/>
+        <PostOptionBottomModal ref={optionSheetModalRef} post_id={selectedPostId}/>
       </KeyboardAvoidingView>
     </SafeAreaView>
   )
