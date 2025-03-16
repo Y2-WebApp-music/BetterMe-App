@@ -131,9 +131,12 @@ const PostCreate = () => {
     return downloadURL;
   };
 
+  const [postDB, setPostDB] = useState(false)
+
   const postToDB = async () => {
     setCreating(true)
     try {
+      setPostDB(true)
       let tagList = selectedTags.map((item)=> item.id) || []
       const url = photos.length !== 0? await handleImageUpload() : []
 
@@ -160,6 +163,7 @@ const PostCreate = () => {
   
       }
     } catch (error) {
+      setPostDB(false)
       setCreating(false)
       console.error("Can not create post:", error);
     }
@@ -200,6 +204,9 @@ const PostCreate = () => {
     const beforeRemoveHandler = (e: any) => {
       const action = e.data.action;
       console.log('changed:', changed, ' buttonClickedRef.current:', buttonClickedRef.current);
+
+      console.log('postDB ',postDB);
+      if (postDB) return;
   
       if (!changed && buttonClickedRef.current) {
         buttonClickedRef.current = false;
@@ -224,11 +231,16 @@ const PostCreate = () => {
         ]
       );
     };
-  
+
     const unsubscribe = navigation.addListener('beforeRemove', beforeRemoveHandler);
-    return () => unsubscribe();
+
+    return () => {
+      if (!postDB) {
+        unsubscribe();
+      }
+    };
   
-  }, [changed, navigation]);
+  }, [postDB, changed, navigation]);
 
   const blurhash = 'UAQ0UC4-0K00TOEdxWjE0WS[xr-q02tlo|S1';
 
