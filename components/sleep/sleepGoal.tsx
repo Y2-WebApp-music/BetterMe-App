@@ -1,5 +1,5 @@
 import { View, Text, Animated, TouchableWithoutFeedback, Easing } from 'react-native';
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback, useLayoutEffect } from 'react';
 import { DayIcon, NightIcon } from '../../constants/icon';
 import { StyleSheet } from 'react-native';
 import { useTheme } from '../../context/themeContext';
@@ -10,19 +10,27 @@ import { sleepCard } from '../../types/sleep';
 import { SERVER_URL } from '@env';
 import { userEvent } from '@testing-library/react-native';
 import { useAuth } from '../../context/authContext';
+import { useFocusEffect } from 'expo-router';
 
-const SleepGoal = () => {
+
+type SleepGoalProp = {
+  toggle: boolean;
+  setToggle: React.Dispatch<React.SetStateAction<boolean>>;
+  sleepTime: { hours: number; minutes: number };
+  setSleepTime: (time: { hours: number; minutes: number }) => void;
+};
+
+const SleepGoal = ({toggle, setToggle, sleepTime, setSleepTime}:SleepGoalProp) => {
   const { colors } = useTheme();
   const { user } = useAuth();
-
-  const [toggle, setToggle] = useState(false);
-  const [sleepTime, setSleepTime] = useState({ hours: 0, minutes: 0 });
 
   useEffect(() => {
     const checkStorage = async () => {
       try {
         const existingTime = await AsyncStorage.getItem('sleepData');
+
         setToggle(!!existingTime);
+        
       } catch (error) {
         console.error('Error checking sleepData:', error);
       }
@@ -31,10 +39,6 @@ const SleepGoal = () => {
   }, []);
 
   const animatedValue = useRef(new Animated.Value(toggle ? 1 : 0)).current;
-
-  useEffect(() => {
-    console.log('Sleep toggle', toggle);
-  }, [toggle]);
 
   useEffect(() => {
     Animated.timing(animatedValue, {
@@ -47,16 +51,58 @@ const SleepGoal = () => {
 
   const handleToggle = useCallback(async () => {
     try {
-      const sleepDuration = await toggleSleep(user?._id || '');
-      setToggle((prev) => !prev);
-      setSleepTime({
-        hours: sleepDuration ? Math.floor(sleepDuration / 60) : 0,
-        minutes: sleepDuration ? sleepDuration % 60 : 0,
+      setToggle((prev) => {
+        const newState = !prev;
+        return newState;
       });
+  
+      const sleepDuration = await toggleSleep(user?._id || '', !toggle);
+  
+      if (sleepDuration) {
+        setSleepTime({
+          hours: Math.floor(sleepDuration.total_time / 60),
+          minutes: sleepDuration.total_time % 60,
+        });
+      } else {
+        setSleepTime({ hours: 0, minutes: 0 });
+      }
     } catch (error) {
       console.error('Error toggling sleep:', error);
     }
-  }, [user]);
+  }, [user,toggle]);
+
+  const [displayToggle, setDisplayToggle] = useState(true)
+
+  useFocusEffect(
+    useCallback(() => {
+      console.log('sleep Goal useCallback');
+  
+      const getSleepData = async () => {
+        try {
+          const sleepRecordsString = await AsyncStorage.getItem('sleepRecords');
+          const sleepRecords = sleepRecordsString ? JSON.parse(sleepRecordsString) : [];
+      
+          if (sleepRecords) {
+            console.log('sleepRecords');
+            
+            setSleepTime({
+              hours: Math.floor(sleepRecords[0].total_time / 60 || 0),
+              minutes: sleepRecords[0].total_time % 60 || 0,
+            });
+            const resetTime = setHours(setMinutes(setSeconds(new Date(), 0), 0), 18);
+            console.log(isAfter(new Date(), resetTime));
+            
+            isAfter(new Date(), resetTime) ? setDisplayToggle(true) : setDisplayToggle(false)
+            !isAfter(new Date(), resetTime) && setToggle(false)
+          }
+
+        } catch (error) {
+          console.error('Error fetching sleep data:', error);
+        }
+      };
+      getSleepData()
+    }, [])
+  );
 
   const backgroundColor = animatedValue.interpolate({
     inputRange: [0, 1],
@@ -79,7 +125,7 @@ const SleepGoal = () => {
 
       <View style={{ paddingLeft: 10 }} className='grow'>
         <View style={{ transform: [{ translateY: 8 }] }}>
-          <Text style={{ color: colors.subText }} className='font-noto'>Sleep time</Text>
+          <Text style={{ color: colors.subText }} className='font-noto'>{displayToggle ? 'Sleep time':'last night'}</Text>
         </View>
         <View className='flex-row gap-1 items-end'>
           <Text style={{ color: colors.night }} className='text-title font-notoMedium'>{sleepTime.hours}</Text>
@@ -93,22 +139,30 @@ const SleepGoal = () => {
         </View>
       </View>
 
-      <View style={{ transform: [{ translateY: 8 }] }} className='relative flex-col justify-center items-center'>
-        <TouchableWithoutFeedback testID="toggle-button" onPress={handleToggle}>
-          <Animated.View style={[styles.container, { backgroundColor }]}>
-            <Animated.View style={[styles.round, { transform: [{ translateX }], width: roundWidth }]}>
-              {toggle ? (
-                <NightIcon width={20} height={20} color={colors.night} />
-                // <Text>NightIcon</Text>
-              ) : (
-                // <Text>DayIcon</Text>
-                <DayIcon width={20} height={20} color={colors.yellow} />
-              )}
+      {displayToggle ? (
+        <View style={{ transform: [{ translateY: 8 }] }} className='relative flex-col justify-center items-center'>
+          <TouchableWithoutFeedback testID="toggle-button" onPress={handleToggle}>
+            <Animated.View style={[styles.container, { backgroundColor }]}>
+              <Animated.View style={[styles.round, { transform: [{ translateX }], width: roundWidth }]}>
+                {toggle ? (
+                  <NightIcon width={20} height={20} color={colors.night} />
+                  // <Text>NightIcon</Text>
+                ) : (
+                  // <Text>DayIcon</Text>
+                  <DayIcon width={20} height={20} color={colors.yellow} />
+                )}
+              </Animated.View>
             </Animated.View>
-          </Animated.View>
-        </TouchableWithoutFeedback>
-        <Text style={{ color: colors.subText }} className='font-noto text-detail'>{toggle ? 'Sleeping' : 'Waking'}</Text>
-      </View>
+          </TouchableWithoutFeedback>
+          <Text style={{ color: colors.subText }} className='font-noto text-detail'>{toggle ? 'Sleeping' : 'Waking'}</Text>
+        </View>
+      ):(
+        <View>
+          <Text style={{color:colors.subText}} className='font-noto text-heading3'>
+            {new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(new Date().setDate(new Date().getDate() - 1)))}
+          </Text>
+        </View>
+      )}
     </View>
   );
 };
@@ -141,7 +195,7 @@ const resetIfNeeded = async () => {
   if (!lastReset || isAfter(new Date(), resetTime)) {
     await AsyncStorage.removeItem('sleepRecords');
     await AsyncStorage.setItem('lastResetTime', new Date().toISOString());
-    console.log('Sleep data reset at 18:00');
+    console.log('==== Sleep data reset ====');
   }
 };
 
@@ -150,44 +204,61 @@ type sleepRecordProp = sleepCard & {
   create_by:string
 }
 
-export const toggleSleep = async (user:string): Promise<number | null> => {
+export const toggleSleep = async (user: string, isToggled: boolean): Promise<sleepRecordProp | null> => {
   await resetIfNeeded();
 
+  // Check if sleepData exists
+  console.log('isToggled ',isToggled);
+  
   const existingTime = await AsyncStorage.getItem('sleepData');
-  console.log('Existing sleepData:', existingTime);
+  console.log('Existing sleepData:', existingTime && new Date(existingTime).toLocaleString());
 
-  if (!existingTime) {
+  const resetTime = setHours(setMinutes(setSeconds(new Date(), 0), 0), 18);
+  if (!existingTime && isToggled && isAfter(new Date(), resetTime)) {
+    // If there is no existing time and the toggle is true, start tracking sleep
     await AsyncStorage.setItem('sleepData', new Date().toISOString());
-    console.log('Started sleep tracking.');
+    console.log('==> Started sleep tracking. <==');
     return null;
   }
 
-  const startTime = new Date(existingTime);
-  const endTime = new Date();
-  const sleepDuration = differenceInMinutes(endTime, startTime);
-  console.log('Start Time:', startTime);
-  console.log('End Time:', endTime);
-  console.log('Calculated Sleep Duration:', sleepDuration);
+  if (existingTime && !isToggled) {
+    // If there is existing sleep data and the toggle is false, calculate the sleep duration
+    const startTime = new Date(existingTime);
+    const endTime = new Date();
+    const sleepDuration = differenceInMinutes(endTime, startTime);
+    console.log('Start Time:', startTime.toLocaleString());
+    console.log('End Time:', endTime.toLocaleString());
+    console.log('Calculated Sleep Duration:', sleepDuration);
 
-  if (sleepDuration < 120 || sleepDuration > 780) {
-    console.log('Invalid sleep duration:', sleepDuration);
-    await AsyncStorage.removeItem('sleepData');
-    return null;
-  }
+    // Check if the sleep duration is valid
+    if (sleepDuration < 120 || sleepDuration > 780) {
+      console.log('Invalid sleep duration:', sleepDuration);
+      await AsyncStorage.removeItem('sleepData');
+      console.log('- Return NULL -');
+      return null;
+    }
 
-  const validSleepTime = sleepDuration - 30;
-  if (validSleepTime < 90) {
-    console.log('Valid sleep time too short after excluding first 30 minutes.');
-    await AsyncStorage.removeItem('sleepData');
-    return null;
-  }
+    const validSleepTime = sleepDuration - 30;
+    if (validSleepTime < 90) {
+      console.log('Valid sleep time too short after excluding first 30 minutes.');
+      await AsyncStorage.removeItem('sleepData');
+      console.log('- Return NULL -');
+      return null;
+    }
 
-  console.log('Final Valid Sleep Time:', validSleepTime);
+    console.log('Final Valid Sleep Time:', validSleepTime);
 
-  if (user){
+    // Check if the sleep started late at night
+    const isSameDay = startTime.toDateString() === endTime.toDateString();
+    const isLateNight = startTime.getHours() >= 0 && startTime.getHours() < 6;
+
+    const sleepDate = (isSameDay && isLateNight)
+      ? new Date(startTime.setDate(startTime.getDate() - 1))
+      : startTime;
+
     const newRecord: sleepRecordProp = {
       total_time: validSleepTime,
-      date: startTime.toISOString(),
+      sleep_date: sleepDate.toISOString(),
       start_time: startTime.toISOString(),
       end_time: endTime.toISOString(),
       create_by: user
@@ -200,16 +271,40 @@ export const toggleSleep = async (user:string): Promise<number | null> => {
 
     console.log(`Valid sleep recorded: ${Math.floor(validSleepTime / 60)}h ${validSleepTime % 60}m`);
 
-    const hourNow = new Date().getHours();
-    if (hourNow >= 6 && hourNow <= 12) {
-      // await axios.post(`${SERVER_URL}/sleep/createSleep`, newRecord);
-      console.warn('Post Sleep Time to DB \n', newRecord)
-    }
-
+    console.log('removeItem sleepData ');
     await AsyncStorage.removeItem('sleepData');
+
+    console.warn('Post Sleep Time to DB \n', newRecord)
+    await postDB(newRecord);
+    console.log('return newRecord');
+
+    return newRecord;
   }
 
-  return validSleepTime;
+  console.log('- Final Return NULL -');
+  return null;
 };
+
+const postDB = async (newRecord:sleepRecordProp) => {
+  try {
+    const response = await axios.post(`${SERVER_URL}/sleep/create`, newRecord);
+
+    const data = response.data
+
+    if (data.message === "Create sleep success") {
+      console.log('Create sleep success');
+      console.log(
+        'sleep_date',new Date(data.sleep.sleep_date).toLocaleString(), '\n',
+        'start_time',new Date(data.sleep.start_time).toLocaleString(),'\n',
+        'end_time',new Date(data.sleep.end_time).toLocaleString(),'\n',
+        'total_time',data.sleep.total_time,'\n',
+        'create_by',data.sleep.create_by,'\n',
+      );
+    }
+
+  } catch(error) {
+    console.error(error)
+  }
+}
 
 export default SleepGoal;

@@ -1,23 +1,21 @@
+import { SERVER_URL } from '@env';
+import { toDateId } from '@marceloterreiro/flash-calendar';
+import { FlashList } from "@shopify/flash-list";
+import axios from 'axios';
 import { Image } from 'expo-image';
 import { router, useFocusEffect } from 'expo-router';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Dimensions, RefreshControl, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { Dimensions, RefreshControl, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import FoodGoal from '../../../components/food/foodGoal';
 import HomeGoalCard from '../../../components/goal/homeGoalCard';
+import MorningModal from '../../../components/modal/MorningModal';
+import SleepGoal, { toggleSleep } from '../../../components/sleep/sleepGoal';
 import { AddIcon } from '../../../constants/icon';
 import { useAuth } from '../../../context/authContext';
-import { goalDataDummy, homeGoalCardProp } from '../../../types/goal';
-import SleepGoal from '../../../components/sleep/sleepGoal';
-import FoodGoal from '../../../components/food/foodGoal';
-import { SERVER_URL } from '@env';
-import axios from 'axios';
-import { FlashList } from "@shopify/flash-list";
-import { toDateId } from '@marceloterreiro/flash-calendar';
-import { colors, ThemeMode } from '../../../constants/Colors';
 import { useTheme } from '../../../context/themeContext';
-import MorningModal from '../../../components/modal/MorningModal';
-import CommentBottomModal from '../../../components/modal/CommentBottomModal';
-import BottomSheet from '@gorhom/bottom-sheet/src';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { homeGoalCardProp } from '../../../types/goal';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { differenceInMinutes, isAfter, setHours, setMinutes, setSeconds } from 'date-fns';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -31,7 +29,9 @@ const Home = () => {
   const [todayGoal, setTodayGoal] = useState<homeGoalCardProp[]>([])
   const [totalCal, setTotalCal] = useState(0)
 
-  const [morning, setMorning] = useState(true)
+  const [toggle, setToggle] = useState(false);
+  const [sleepTime, setSleepTime] = useState({ hours: 0, minutes: 0 });
+  const [morning, setMorning] = useState(false)
 
   const getTodayGoal = async () => {
     try {
@@ -57,7 +57,6 @@ const Home = () => {
       const response = await axios.get(`${SERVER_URL}/calendar/meal/summary/${today}`);
       const data = response.data
 
-      console.log('response \n',data);
       if ( data.message === "No meals found") {return setTotalCal(0)}
 
       if (data) {
@@ -91,19 +90,48 @@ const Home = () => {
   ] : [];
 
   const [refreshing, setRefreshing] = useState(false);
-  const onRefresh = useCallback(() => {
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    getTodayGoal().finally(() => setRefreshing(false));
-    getSummaryMeal().finally(() => setRefreshing(false));
+    await Promise.all([getTodayGoal(), getSummaryMeal()]);
+    setRefreshing(false);
   }, []);
 
   const [profileImage, setProfileImage] = useState('')
 
   useFocusEffect(
     useCallback(() => {
-      getTodayGoal();
-      getSummaryMeal();
-      setProfileImage(user?.photoURL ? user?.photoURL : user?.gender === 1 ? require('../../../assets/maleAvatar.png') : require('../../../assets/femaleAvatar.png'))
+      const fetchData = async () => {
+        getTodayGoal();
+        getSummaryMeal();
+  
+        setProfileImage(
+          user?.photoURL
+            ? user.photoURL
+            : user?.gender === 1
+            ? require('../../../assets/maleAvatar.png')
+            : require('../../../assets/femaleAvatar.png')
+        );
+
+        if (user) {
+          const existingRecords = await AsyncStorage.getItem('sleepRecords');
+          const lastReset = await AsyncStorage.getItem('lastResetTime');
+          const existingTime = await AsyncStorage.getItem('sleepData');
+
+          const sleepRecords = existingRecords ? JSON.parse(existingRecords) : [];
+          const now = new Date()
+          const start = new Date(existingTime || now.toISOString());
+          const sleepDuration = differenceInMinutes(now, start)
+          const isNewDay = !lastReset || lastReset !== now.toISOString();
+          const resetTime = setHours(setMinutes(setSeconds(new Date(), 0), 0), 22);
+
+          if (isNewDay && sleepDuration > 120 && sleepRecords.length === 0 && isAfter(new Date(), resetTime)){
+            setMorning(true)
+          }
+        }
+        console.log('=================================');
+      };
+  
+      fetchData();
     }, [])
   );
 
@@ -165,8 +193,19 @@ const Home = () => {
               </Text>
             </View>
             <FoodGoal totalCal={totalCal} />
-            <SleepGoal />
+            <SleepGoal
+              toggle={toggle}
+              setToggle={setToggle}
+              sleepTime={sleepTime}
+              setSleepTime={setSleepTime}
+            />
           </View>
+
+          {/* <View>
+            <TouchableOpacity onPress={()=>{setMorning(true)}} className='my-1 p-2 px-4 rounded-full bg-primary'>
+              <Text className='text-body font-noto text-white'>Dev mode : Morning Modal</Text>
+            </TouchableOpacity>
+          </View> */}
 
           {/*
           =============================
@@ -210,7 +249,15 @@ const Home = () => {
             </View>
           </View>
         </ScrollView>
-        <MorningModal isOpen={morning} setIsOpen={setMorning}/>
+        <MorningModal
+          totalGoal={todayGoal.length}
+          isOpen={morning}
+          setIsOpen={setMorning}
+          toggle={toggle}
+          setToggle={setToggle}
+          sleepTime={sleepTime}
+          setSleepTime={setSleepTime}
+        />
     </SafeAreaView>
   )
 }

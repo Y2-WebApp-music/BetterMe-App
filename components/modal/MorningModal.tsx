@@ -1,33 +1,39 @@
 import { View, Text, TouchableOpacity, Dimensions, StyleSheet } from 'react-native'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import { useTheme } from '../../context/themeContext';
 import Modal from './Modal';
 import { DayIcon, NightIcon, RightArrowIcon } from '../../constants/icon';
 import Svg, { Circle, Defs, Mask, Rect } from 'react-native-svg';
 import Animated, { Easing, useAnimatedProps, useSharedValue, withTiming } from 'react-native-reanimated';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { toggleSleep } from '../sleep/sleepGoal';
+import { useAuth } from '../../context/authContext';
+import { format } from 'date-fns';
 
 type MorningModalProp = {
+  totalGoal:number
   isOpen:boolean
   setIsOpen:(isOpen:boolean) => void
+  toggle: boolean;
+  setToggle: React.Dispatch<React.SetStateAction<boolean>>;
+  sleepTime: { hours: number; minutes: number };
+  setSleepTime: (time: { hours: number; minutes: number }) => void;
 }
 
 const { width } = Dimensions.get('window');
-const circle_length = width * 0.8; // Total stroke length
-const r = circle_length / (2 * Math.PI); // Adjusted radius for correct scaling
+const circle_length = width * 0.8;
+const r = circle_length / (2 * Math.PI);
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
-
-
 
 const targetValues = [100, 130, 70];
 const space = 20;
 const easing = Easing.inOut(Easing.quad);
 
-
-
-const MorningModal = ({isOpen, setIsOpen}:MorningModalProp) => {
+const MorningModal = ({totalGoal, isOpen, setIsOpen, toggle, setToggle, sleepTime, setSleepTime}:MorningModalProp) => {
 
   const { colors } = useTheme();
+  const { user } = useAuth();
 
   const percent = useMemo(() => Math.round((8 / 12) * 100), []);
   const progress = useSharedValue(0);
@@ -43,6 +49,46 @@ const MorningModal = ({isOpen, setIsOpen}:MorningModalProp) => {
 
   const [values, setValues] = useState([0, 0, 0]);
   const setDonutValues = () => setValues(targetValues);
+
+  const [start, setStart] = useState<string>('')
+  const [end, setEnd] = useState<string>('')
+
+  const getSleepData = async () => {
+    try {
+      const sleepRecordsString = await AsyncStorage.getItem('sleepRecords');
+      const sleepRecords = sleepRecordsString ? JSON.parse(sleepRecordsString) : [];
+  
+      const sleepData = await toggleSleep(user?._id || '', !toggle);
+  
+      if (sleepData) {
+        setSleepTime({
+          hours: Math.floor(sleepData.total_time / 60),
+          minutes: sleepData.total_time % 60,
+        });
+        setStart(sleepData.start_time || sleepRecords?.[0]?.start_time || '');
+        setEnd(sleepData.end_time || sleepRecords?.[0]?.end_time || '');
+      }
+    } catch (error) {
+      console.error('Error fetching sleep data:', error);
+    }
+  };
+
+  const handleContinue = async () => {
+    try {
+      if (toggle) {
+        setToggle((prev) => !prev);
+      }
+      setIsOpen(false)
+    } catch(error) {
+      console.error('Error toggling sleep:', error);
+    }
+  }
+
+  useLayoutEffect(()=>{
+    console.log(' === Morning Modal Use === ');
+    
+    getSleepData()
+  },[isOpen])
 
   return (
     <Modal isOpen={isOpen} setIsOpen={setIsOpen}>
@@ -114,11 +160,11 @@ const MorningModal = ({isOpen, setIsOpen}:MorningModalProp) => {
               <Text style={{color:colors.subText}} className='text-heading3'>Total Sleep Time</Text>
             </View>
             <View style={{transform: [{ translateX: 2 }]}} className='flex-row gap-1 items-end'>
-              <Text style={{ color: colors.night, fontSize:40 }} className='font-notoMedium'>5</Text>
+              <Text style={{ color: colors.night, fontSize:40 }} className='font-notoMedium'>{sleepTime.hours}</Text>
               <View style={{ transform: [{ translateY: -14 }] }}>
                 <Text style={{ color: colors.subText }} className='text-body'>h</Text>
               </View>
-              <Text style={{ color: colors.night, fontSize:40 }} className=' font-notoMedium'>21</Text>
+              <Text style={{ color: colors.night, fontSize:40 }} className=' font-notoMedium'>{sleepTime.minutes}</Text>
               <View style={{ transform: [{ translateY: -14 }] }}>
                 <Text style={{ color: colors.subText}} className='text-body'>m</Text>
               </View>
@@ -138,7 +184,7 @@ const MorningModal = ({isOpen, setIsOpen}:MorningModalProp) => {
                       <Text style={{color:colors.subText}} className=' font-noto'>Sleep</Text>
                   </View>
                   <View style={{ transform: [{ translateX: 4 }] }} className='flex-row gap-1 items-end'>
-                    <Text style={{color: colors.subText}} className='text-heading3 '>33:32</Text>
+                    <Text style={{color: colors.subText}} className='text-heading3'>{start ? format(start,'HH:mm') : ''}</Text>
                   </View>
                 </View>
               </View>
@@ -149,8 +195,8 @@ const MorningModal = ({isOpen, setIsOpen}:MorningModalProp) => {
                     <DayIcon  width={12} height={12} color={colors.yellow}/>
                     <Text style={{color:colors.subText}} className=' font-noto'>Wake Up</Text>
                   </View>
-                  <View style={{ transform: [{ translateX: 12 }] }} className='flex-row gap-1 items-end'>
-                    <Text style={{color: colors.subText}} className='text-heading3 '>33:32</Text>
+                  <View style={{ transform: [{ translateX: 18 }] }} className='flex-row gap-1 items-end'>
+                    <Text style={{color: colors.subText}} className='text-heading3'>{end ? format(end,'HH:mm') : ''}</Text>
                   </View>
                 </View>
               </View>
@@ -160,7 +206,7 @@ const MorningModal = ({isOpen, setIsOpen}:MorningModalProp) => {
                     <Text style={{color:colors.subText}} className=' font-noto'>Goal Today</Text>
                   </View>
                   <View style={{ transform: [{translateY: -4}] }} className='flex-row gap-1 items-end justify-center'>
-                    <Text style={{color: colors.yellow, height:34}} className='text-subTitle font-notoMedium'>4</Text>
+                    <Text style={{color: colors.yellow, height:34}} className='text-subTitle font-notoMedium'>{totalGoal}</Text>
                     <Text style={{color: colors.subText}} className='text-heading3 '>goals</Text>
                     {/* <Text style={{color: colors.subText}} className='text-heading3 mt-3'>no goal</Text> */}
                   </View>
@@ -172,7 +218,7 @@ const MorningModal = ({isOpen, setIsOpen}:MorningModalProp) => {
         </View>
 
         <View className='flex items-center mt-6 mb-4'>
-          <TouchableOpacity onPress={()=>{setIsOpen(false)}} style={{backgroundColor:colors.primary, paddingLeft:30}} className='flex-row gap-2 p-2 px-6 justify-center items-center rounded-full'>
+          <TouchableOpacity onPress={handleContinue} style={{backgroundColor:colors.primary, paddingLeft:30}} className='flex-row gap-2 p-2 px-6 justify-center items-center rounded-full'>
             <Text className='text-heading3 text-white font-notoMedium'>Continue</Text>
             <RightArrowIcon width={20} height={20} color={'#fff'}/>
           </TouchableOpacity>

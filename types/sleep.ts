@@ -1,6 +1,6 @@
 export type sleepCard = {
   total_time:number
-  date:string
+  sleep_date:string
   start_time:string
   end_time:string
 }
