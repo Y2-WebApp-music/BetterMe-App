@@ -252,11 +252,15 @@ const SearchCommunity = () => {
 
   useFocusEffect(
     useCallback(() => {
+      const fetchData = async () => {
+        await getFeed()
+        await getGoalFeed().finally(()=>setIsLoad(false))
+      }
       if (!serverResponse && search === ''){
         setIsLoad(true)
-        getFeed().finally(()=>setIsLoad(false))
-        getGoalFeed().finally(()=>setIsLoad(false))
+        fetchData()
       }
+
     }, [serverResponse])
   );
 
