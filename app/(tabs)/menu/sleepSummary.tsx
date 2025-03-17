@@ -92,7 +92,7 @@ const SleepSummary = () => {
 
     const avgStartTime = new Date(startTimes.reduce((a, b) => a + b, 0) / startTimes.length).toISOString();
     const avgEndTime = new Date(endTimes.reduce((a, b) => a + b, 0) / endTimes.length).toISOString();
-    const avg_time = total_time / sleepData.length;
+    const avg_time = Math.round(total_time / sleepData.length);
 
     return { total_time, start_time: avgStartTime, end_time: avgEndTime, avg_time };
   };
@@ -102,7 +102,7 @@ const SleepSummary = () => {
     console.log(`${SERVER_URL}/sleep/weekly?date=${formattedDate}&id=${user?._id}`);
     
     try {
-      const response = await axios.get(`${SERVER_URL}/sleep/weekly?date=${currentSunday.toISOString()}&id=${user?._id}`);
+      const response = await axios.get(`${SERVER_URL}/sleep/weekly?date=${formattedDate}&id=${user?._id}`);
   
       const data = response.data
       

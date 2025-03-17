@@ -3,7 +3,7 @@ import { AddIcon, DayIcon, NightIcon, PenIcon  } from '../../constants/icon'
 import { useTheme } from '../../context/themeContext';
 import EditSleepModal from '../modal/EditSleepModal';
 import { useCallback, useEffect, useState } from 'react';
-import { sleepCardDisplay } from '../../types/sleep';
+import { sleepCard, sleepCardDisplay } from '../../types/sleep';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from 'expo-router';
 import { addDays, differenceInMinutes, format, subDays } from 'date-fns';
@@ -11,6 +11,7 @@ import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import axios from 'axios';
 import { SERVER_URL } from '@env';
 import { useAuth } from '../../context/authContext';
+import AddSleepModal from '../modal/AddSleepModal';
 
 type SleepTodayProp = {
   select_date?:string
@@ -20,6 +21,7 @@ const SleepToday = ({select_date}:SleepTodayProp) => {
   const { colors } = useTheme();
   const { user } = useAuth()
 
+  const [addSleep, setAddSleep] = useState(false)
   const [editSleep, setEditSleep] = useState(false)
   const [sleepData, setSleepData] = useState<sleepCardDisplay>({
     sleep_id:'',
@@ -38,7 +40,7 @@ const SleepToday = ({select_date}:SleepTodayProp) => {
       const response = await axios.get(`${SERVER_URL}/sleep/data?date=${date}&id=${user?._id}`);
 
       if ( response.data.message === "No sleep found") {
-        setSleepData({sleep_id:'',total_time: 0, sleep_date: null, start_time: null, end_time: null, create_by: ''})
+        setSleepData({sleep_id:'',total_time: 0, sleep_date: date, start_time: null, end_time: null, create_by: ''})
         setSleepTime({ hours: 0, minutes: 0 })
         return
       }
@@ -150,6 +152,54 @@ const SleepToday = ({select_date}:SleepTodayProp) => {
     }
   }
 
+  const createTime = async (startTime:Date, endTime:Date) => {
+    let newTime = differenceInMinutes(endTime, startTime) - 30
+    let start_Time = startTime
+
+    if (newTime >= 1440) {
+      start_Time = addDays(startTime, 1)
+      newTime = differenceInMinutes(endTime, start_Time) - 30
+      
+      setSleepData((prev)=>({...prev, start_time: start_Time.toISOString()}))
+    } else if (newTime < 0) {
+      start_Time = subDays(startTime, 1);
+      newTime = differenceInMinutes(endTime, start_Time) - 30;
+
+      setSleepData((prev)=>({...prev, start_time: start_Time.toISOString()}))
+    }
+
+    const hour = Math.floor(newTime/60)
+    const minute = newTime % 60
+
+    setSleepData((prev) => ({...prev , totalTime : newTime}))
+    setSleepTime({hours:hour, minutes:minute})
+
+    if (user && sleepData.sleep_date) {
+      const newRecord: sleepCard = {
+        total_time: newTime,
+        sleep_date: sleepData.sleep_date,
+        start_time: start_Time.toISOString(),
+        end_time: endTime.toISOString(),
+        create_by: user?._id,
+      };
+
+      try {
+        const response = await axios.post(`${SERVER_URL}/sleep/create`, newRecord);
+    
+        const data = response.data
+    
+        if (data.message === "Create sleep success") {
+          console.log('data.sleep',data.sleep);
+          setSleepData((prev) => ({...prev, sleep_id: data.sleep._id}))
+
+          return data.sleep
+        }
+      } catch(error) {
+        console.error('createTime ',error)
+      }
+    }
+  }
+
   useFocusEffect(
     useCallback(() => {
       if (select_date){
@@ -217,6 +267,7 @@ const SleepToday = ({select_date}:SleepTodayProp) => {
         <View>
           <TouchableOpacity
             activeOpacity={0.6}
+            onPress={()=>{setAddSleep(true)}}
             style={{backgroundColor:colors.darkGray}} className='p-1 px-4 rounded-full flex-row justify-center items-center gap-2'
           >
             <Text style={{color:'#fff'}} className='font-noto text-body'> Add Time</Text>
@@ -225,26 +276,31 @@ const SleepToday = ({select_date}:SleepTodayProp) => {
         </View>
       )}
 
-      <EditSleepModal
-        date={sleepData.sleep_date ? new Date(sleepData.sleep_date) : new Date()}
-        startTime={sleepData.start_time ? new Date(sleepData.start_time) : new Date()}
-        setStartTime={(newStart) =>
-          setSleepData((prev) => ({
-            ...prev,
-            start_time: newStart.toISOString(),
-          }))
-        }
-        endTime={sleepData.end_time ? new Date(sleepData.end_time) : new Date()}
-        setEndTime={(newEnd) =>
-          setSleepData((prev) => ({
-            ...prev,
-            end_time: newEnd.toISOString(),
-          }))
-        }
-        isOpen={editSleep}
-        setIsOpen={setEditSleep}
-        updateTime={updateTime}
-      />
+      {sleepData.sleep_date && sleepData.start_time && sleepData.end_time &&
+        <EditSleepModal
+          date={new Date(sleepData.sleep_date)}
+          startTime={new Date(sleepData.start_time)}
+          setStartTime={(newStart) => setSleepData((prev) => ({ ...prev, start_time: newStart.toISOString() }))}
+          endTime={new Date(sleepData.end_time)}
+          setEndTime={(newEnd) => setSleepData((prev) => ({ ...prev, end_time: newEnd.toISOString() }))}
+          isOpen={editSleep}
+          setIsOpen={setEditSleep}
+          updateTime={updateTime}
+        />
+      }
+
+      {sleepData.sleep_date &&
+        <AddSleepModal
+          date={new Date(sleepData.sleep_date)}
+          startTime={new Date(sleepData.sleep_date)}
+          setStartTime={(newStart) => setSleepData((prev) => ({ ...prev, start_time: newStart.toISOString() }))}
+          endTime={new Date(sleepData.sleep_date)}
+          setEndTime={(newEnd) => setSleepData((prev) => ({ ...prev, end_time: newEnd.toISOString() }))}
+          isOpen={addSleep}
+          setIsOpen={setAddSleep}
+          createTime={createTime}
+        />
+      }
 
     </View>
   )

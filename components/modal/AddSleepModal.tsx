@@ -30,10 +30,10 @@ type EditSleepModalProp = {
   setEndTime:(value:Date) => void
   isOpen:boolean
   setIsOpen:(isOpen:boolean) => void
-  updateTime:(startTime:Date, endTime:Date) => void
+  createTime:(startTime:Date, endTime:Date) => void
 }
 
-const AddSleepModal = ({date, startTime, setStartTime, endTime, setEndTime, isOpen, setIsOpen, updateTime}:EditSleepModalProp) => {
+const AddSleepModal = ({date, startTime, setStartTime, endTime, setEndTime, isOpen, setIsOpen, createTime}:EditSleepModalProp) => {
 
   const { colors } = useTheme();
 
@@ -68,7 +68,7 @@ const AddSleepModal = ({date, startTime, setStartTime, endTime, setEndTime, isOp
     setStartTime(newStartTime);
     setEndTime(newEndTime);
 
-    updateTime(newStartTime, newEndTime)
+    createTime(newStartTime, newEndTime)
   
     setIsOpen(false);
   };
@@ -163,7 +163,7 @@ const AddSleepModal = ({date, startTime, setStartTime, endTime, setEndTime, isOp
 
         <View className='w-full items-end justify-center flex-row gap-3 mt-4'>
           <TouchableOpacity onPress={handleConfirmPress} className='will-change-contents flex flex-row items-center justify-center rounded-full p-1 px-6 bg-primary'>
-            <Text className='w-fit text-white text-heading2 font-notoMedium'>Confirm</Text>
+            <Text className='w-fit text-white text-heading2 font-notoMedium'>Create</Text>
           </TouchableOpacity>
         </View>
       </View>

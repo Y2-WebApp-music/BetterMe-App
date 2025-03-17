@@ -9,11 +9,16 @@ import { sleepCard, sleepCardDisplay } from '../../types/sleep'
 import { useFocusEffect } from 'expo-router'
 import axios from 'axios'
 import { SERVER_URL } from '@env'
+import AddSleepModal from '../modal/AddSleepModal'
+import { useAuth } from '../../context/authContext'
 
 const SleepDaySummary = ({sleep_id, total_time, sleep_date, start_time, end_time, create_by}:sleepCardDisplay) => {
 
   const { colors } = useTheme();
+  const { user } = useAuth();
+
   const [editSleep, setEditSleep] = useState(false)
+  const [addSleep, setAddSleep] = useState(false)
 
   const [sleepData, setSleepData] = useState({
     sleep_id:sleep_id,
@@ -43,7 +48,7 @@ const SleepDaySummary = ({sleep_id, total_time, sleep_date, start_time, end_time
           end_time:new Date(end_time),
           create_by: create_by
         })
-      } else {
+      } else if (sleep_date){
         setSleepTime({
           hours: 0,
           minutes: 0 ,
@@ -51,7 +56,7 @@ const SleepDaySummary = ({sleep_id, total_time, sleep_date, start_time, end_time
         setSleepData({
           sleep_id:'',
           totalTime: 0,
-          sleep_date: null,
+          sleep_date: new Date(sleep_date),
           start_time: null,
           end_time: null,
           create_by: ''
@@ -112,6 +117,55 @@ const SleepDaySummary = ({sleep_id, total_time, sleep_date, start_time, end_time
     }
   }
 
+  const createTime = async (startTime:Date, endTime:Date) => {
+    let newTime = differenceInMinutes(endTime, startTime) - 30
+    let start_Time = startTime
+
+    if (newTime >= 1440) {
+      start_Time = addDays(startTime, 1)
+      newTime = differenceInMinutes(endTime, start_Time) - 30
+      
+      setSleepData((prev)=>({...prev, start_time: start_Time}))
+    } else if (newTime < 0) {
+      start_Time = subDays(startTime, 1);
+      newTime = differenceInMinutes(endTime, start_Time) - 30;
+
+      setSleepData((prev)=>({...prev, start_time: start_Time}))
+    }
+
+    const hour = Math.floor(newTime/60)
+    const minute = newTime % 60
+
+    setSleepData((prev) => ({...prev , totalTime : newTime}))
+    setSleepTime({hours:hour, minutes:minute})
+
+    if (user && sleepData.sleep_date) {
+      const newRecord: sleepCard = {
+        total_time: newTime,
+        sleep_date: sleepData.sleep_date.toISOString(),
+        start_time: start_Time.toISOString(),
+        end_time: endTime.toISOString(),
+        create_by: user?._id,
+      };
+
+      try {
+        const response = await axios.post(`${SERVER_URL}/sleep/create`, newRecord);
+    
+        const data = response.data
+    
+        if (data.message === "Create sleep success") {
+          console.log('data.sleep',data.sleep);
+          setSleepData((prev) => ({...prev, sleep_id: data.sleep._id}))
+
+          return data.sleep
+        }
+    
+      } catch(error) {
+        console.error('createTime ',error)
+      }
+    }
+  }
+
   return (
     <View style={{paddingVertical:10, backgroundColor:colors.white, borderColor:colors.gray}} className='px-4 border rounded-normal flex-row items-center'>
       <View className='grow'>
@@ -166,6 +220,7 @@ const SleepDaySummary = ({sleep_id, total_time, sleep_date, start_time, end_time
         <View>
           <TouchableOpacity
             activeOpacity={0.6}
+            onPress={()=>{setAddSleep(true)}}
             style={{backgroundColor:colors.darkGray}} className='p-1 px-4 rounded-full flex-row justify-center items-center gap-2'
           >
             <Text style={{color:'#fff'}} className='font-noto text-body'> Add Time</Text>
@@ -184,6 +239,18 @@ const SleepDaySummary = ({sleep_id, total_time, sleep_date, start_time, end_time
           isOpen={editSleep}
           setIsOpen={setEditSleep}
           updateTime={updateTime}
+        />
+      }
+      {sleepData.sleep_date &&
+        <AddSleepModal
+          date={sleepData.sleep_date}
+          startTime={sleepData.sleep_date}
+          setStartTime={(newStart) => setSleepData((prev) => ({ ...prev, start_time: newStart }))}
+          endTime={sleepData.sleep_date}
+          setEndTime={(newEnd) => setSleepData((prev) => ({ ...prev, end_time: newEnd }))}
+          isOpen={addSleep}
+          setIsOpen={setAddSleep}
+          createTime={createTime}
         />
       }
     </View>
