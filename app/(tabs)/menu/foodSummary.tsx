@@ -233,6 +233,9 @@ type SummaryHeaderProp = {
 const SummaryHeader = ({weeklyTotal, currentSunday, setCurrentSunday}:SummaryHeaderProp) => {
 
   const { colors } = useTheme();
+  const today = new Date();
+  const isFutureDisabled = addDays(currentSunday, 7) > today;
+  const nextWeekColor = isFutureDisabled ? colors.nonFocus : colors.primary;
 
   const handlePrevWeek = (): void => {
     const prevSunday = subDays(currentSunday, 7);
@@ -259,8 +262,8 @@ const SummaryHeader = ({weeklyTotal, currentSunday, setCurrentSunday}:SummaryHea
           <TouchableOpacity onPress={handlePrevWeek}>
             <BackwardIcon width={34} height={34} color={colors.primary}/>
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleNextWeek}>
-            <ForwardIcon width={34} height={34} color={colors.primary}/>
+          <TouchableOpacity onPress={handleNextWeek} disabled={isFutureDisabled}>
+            <ForwardIcon width={34} height={34} color={nextWeekColor}/>
           </TouchableOpacity>
         </View>
       </View>
