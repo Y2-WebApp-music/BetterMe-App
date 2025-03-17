@@ -44,11 +44,11 @@ const SleepToday = ({select_date}:SleepTodayProp) => {
         setSleepTime({ hours: 0, minutes: 0 })
         return
       }
-      const data = response.data[0]
+      const data = response.data
       console.log('sleep data ',data);
 
       setSleepData({
-        sleep_id:data._id,
+        sleep_id:data.sleep_id,
         total_time: data.total_time,
         sleep_date: data.sleep_date,
         start_time: data.start_time,
