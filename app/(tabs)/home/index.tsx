@@ -124,7 +124,11 @@ const Home = () => {
           const isNewDay = !lastReset || lastReset !== now.toISOString();
           const resetTime = setHours(setMinutes(setSeconds(new Date(), 0), 0), 22);
 
-          if (isNewDay && sleepDuration > 120 && sleepRecords.length === 0 && isAfter(new Date(), resetTime)){
+          console.log('isNewDay',isNewDay);
+          console.log('sleepDuration',sleepDuration);
+          console.log('sleepRecords',sleepRecords);
+
+          if (isNewDay && sleepDuration > 120 && sleepRecords.length === 0){
             console.log('Will open modal');
             setMorning(true)
           }

@@ -229,7 +229,7 @@ const Menu = () => {
           </View>
           <SleepSummary />
           <Text style={{color:colors.subText}} className=' my-2'>last night : {format(subDays(today, 1),'dd MMM yyyy')}</Text>
-          <SleepToday />
+          <SleepToday/>
 
           <View style={{height:1, width:'100%', backgroundColor:colors.gray}} className='my-3'/>
 

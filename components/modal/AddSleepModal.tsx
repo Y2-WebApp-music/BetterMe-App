@@ -33,7 +33,7 @@ type EditSleepModalProp = {
   updateTime:(startTime:Date, endTime:Date) => void
 }
 
-const EditSleepModal = ({date, startTime, setStartTime, endTime, setEndTime, isOpen, setIsOpen, updateTime}:EditSleepModalProp) => {
+const AddSleepModal = ({date, startTime, setStartTime, endTime, setEndTime, isOpen, setIsOpen, updateTime}:EditSleepModalProp) => {
 
   const { colors } = useTheme();
 
@@ -189,4 +189,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EditSleepModal
+export default AddSleepModal

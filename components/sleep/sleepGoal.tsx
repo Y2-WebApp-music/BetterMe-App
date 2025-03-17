@@ -83,7 +83,14 @@ const SleepGoal = ({toggle, setToggle, sleepTime, setSleepTime}:SleepGoalProp) =
           const sleepRecords = sleepRecordsString ? JSON.parse(sleepRecordsString) : [];
       
           if (sleepRecords.length !== 0) {
-            console.log('sleepRecords');
+            const reset = await resetIfNeeded();
+
+            if (reset){
+              setSleepTime({
+                hours: 0,
+                minutes: 0,
+              });
+            }
             
             setSleepTime({
               hours: Math.floor(sleepRecords[0].total_time / 60 || 0),
@@ -196,18 +203,14 @@ const resetIfNeeded = async () => {
     await AsyncStorage.removeItem('sleepRecords');
     await AsyncStorage.setItem('lastResetTime', new Date().toISOString());
     console.log('==== Sleep data reset ====');
+    return true
   }
+  return false
 };
 
-
-type sleepRecordProp = sleepCard & {
-  create_by:string
-}
-
-export const toggleSleep = async (user: string, isToggled: boolean): Promise<sleepRecordProp | null> => {
+export const toggleSleep = async (user: string, isToggled: boolean): Promise<sleepCard | null> => {
   await resetIfNeeded();
 
-  // Check if sleepData exists
   console.log('isToggled ',isToggled);
   
   const existingTime = await AsyncStorage.getItem('sleepData');
@@ -215,14 +218,12 @@ export const toggleSleep = async (user: string, isToggled: boolean): Promise<sle
 
   const resetTime = setHours(setMinutes(setSeconds(new Date(), 0), 0), 18);
   if (!existingTime && isToggled && isAfter(new Date(), resetTime)) {
-    // If there is no existing time and the toggle is true, start tracking sleep
     await AsyncStorage.setItem('sleepData', new Date().toISOString());
     console.log('==> Started sleep tracking. <==');
     return null;
   }
 
   if (existingTime && !isToggled) {
-    // If there is existing sleep data and the toggle is false, calculate the sleep duration
     const startTime = new Date(existingTime);
     const endTime = new Date();
     const sleepDuration = differenceInMinutes(endTime, startTime);
@@ -230,7 +231,6 @@ export const toggleSleep = async (user: string, isToggled: boolean): Promise<sle
     console.log('End Time:', endTime.toLocaleString());
     console.log('Calculated Sleep Duration:', sleepDuration);
 
-    // Check if the sleep duration is valid
     if (sleepDuration < 120 || sleepDuration > 780) {
       console.log('Invalid sleep duration:', sleepDuration);
       await AsyncStorage.removeItem('sleepData');
@@ -248,7 +248,6 @@ export const toggleSleep = async (user: string, isToggled: boolean): Promise<sle
 
     console.log('Final Valid Sleep Time:', validSleepTime);
 
-    // Check if the sleep started late at night
     const isSameDay = startTime.toDateString() === endTime.toDateString();
     const isLateNight = startTime.getHours() >= 0 && startTime.getHours() < 6;
 
@@ -256,7 +255,7 @@ export const toggleSleep = async (user: string, isToggled: boolean): Promise<sle
       ? new Date(startTime.setDate(startTime.getDate() - 1))
       : startTime;
 
-    const newRecord: sleepRecordProp = {
+    const newRecord: sleepCard = {
       total_time: validSleepTime,
       sleep_date: sleepDate.toISOString(),
       start_time: startTime.toISOString(),
@@ -264,28 +263,23 @@ export const toggleSleep = async (user: string, isToggled: boolean): Promise<sle
       create_by: user
     };
 
-    const existingRecords = await AsyncStorage.getItem('sleepRecords');
-    const records: sleepCard[] = existingRecords ? JSON.parse(existingRecords) : [];
-    records.push(newRecord);
-    await AsyncStorage.setItem('sleepRecords', JSON.stringify(records));
-
     console.log(`Valid sleep recorded: ${Math.floor(validSleepTime / 60)}h ${validSleepTime % 60}m`);
 
     console.log('removeItem sleepData ');
     await AsyncStorage.removeItem('sleepData');
 
-    console.warn('Post Sleep Time to DB \n', newRecord)
-    await postDB(newRecord);
+    console.warn('Post Sleep Time to DB \n')
+    const response = await postDB(newRecord);
     console.log('return newRecord');
 
-    return newRecord;
+    return response;
   }
 
   console.log('- Final Return NULL -');
   return null;
 };
 
-const postDB = async (newRecord:sleepRecordProp) => {
+const postDB = async (newRecord:sleepCard) => {
   try {
     const response = await axios.post(`${SERVER_URL}/sleep/create`, newRecord);
 
@@ -293,13 +287,15 @@ const postDB = async (newRecord:sleepRecordProp) => {
 
     if (data.message === "Create sleep success") {
       console.log('Create sleep success');
-      console.log(
-        'sleep_date',new Date(data.sleep.sleep_date).toLocaleString(), '\n',
-        'start_time',new Date(data.sleep.start_time).toLocaleString(),'\n',
-        'end_time',new Date(data.sleep.end_time).toLocaleString(),'\n',
-        'total_time',data.sleep.total_time,'\n',
-        'create_by',data.sleep.create_by,'\n',
-      );
+      console.log('data.sleep',data.sleep);
+
+      console.log('will store in AsyncStorage sleepRecords');
+      const existingRecords = await AsyncStorage.getItem('sleepRecords');
+      const records: sleepCard[] = existingRecords ? JSON.parse(existingRecords) : [];
+      records.push(data.sleep);
+      await AsyncStorage.setItem('sleepRecords', JSON.stringify(records));
+
+      return data.sleep
     }
 
   } catch(error) {

@@ -168,7 +168,7 @@ const WeekCalendar = () => {
         >
           <View className='flex-col gap-2'>
             {/* <Text className='font-noto text-heading3'>{new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(selectedDate))}</Text> */}
-            <SleepToday/>
+            <SleepToday select_date={selectedDate.toDateString()}/>
             {mealSummary &&
               <CalendarFoodToday total_calorie={mealSummary?.total_calorie} total_protein={mealSummary?.total_protein} total_carbs={mealSummary?.total_carbs} total_fat={mealSummary?.total_fat}/>
             }

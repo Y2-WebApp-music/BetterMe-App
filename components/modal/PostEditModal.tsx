@@ -118,7 +118,7 @@ const PostOptionBottomModal = forwardRef<Ref, PostOptionBottomModalProps>(({ pos
           {!deleteModal ? (
           <View className= 'w-full p-2 flex gap-2'>
             <View className=' justify-center items-center mb-2'>
-              <Text className=' font-noto text-heading2'>Post Setting</Text>
+              <Text style={{color:colors.text}} className=' font-noto text-heading2'>Post Setting</Text>
             </View>
             <View className='gap-3'>
               <TouchableOpacity

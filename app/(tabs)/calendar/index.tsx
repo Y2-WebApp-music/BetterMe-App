@@ -79,13 +79,13 @@ const MonthCalendar = () => {
       const response = await axios.get(`${SERVER_URL}/calendar/meal/${selectedDate}`);
       const data = response.data 
 
-      console.log('response \n',data);
+      console.log('response getDateMeal\n',);
       if (data) {
         setMealList(data)
       }
 
     } catch (error: any){
-      console.error(error)
+      console.error('getDateMeal',error)
     }
   }
 
@@ -94,13 +94,13 @@ const MonthCalendar = () => {
       const response = await axios.get(`${SERVER_URL}/calendar/goal/${selectedDate}`);
       const data = response.data
 
-      console.log('response \n',data);
+      console.log('response getDateGoal\n');
       if (data) {
         setGoalList(data)
       }
 
     } catch (error: any){
-      console.error(error)
+      console.error('getDateGoal',error)
     }
   }
 
@@ -109,7 +109,7 @@ const MonthCalendar = () => {
       const response = await axios.get(`${SERVER_URL}/calendar/meal/summary/${selectedDate}`);
       const data = response.data
 
-      console.log('response \n',data);
+      console.log('response getSummaryMeal \n');
       if ( data.message === "No meals found") {return setMealSummary({
         total_calorie:0,
         total_protein:0,
@@ -129,7 +129,7 @@ const MonthCalendar = () => {
       }
 
     } catch (error: any){
-      console.error(error)
+      console.error('getSummaryMeal',error)
     }
   }
 
@@ -275,7 +275,7 @@ const MonthCalendar = () => {
           </View>
           <View style={{ transform: [{ translateY: -18 }] }} className='flex-col gap-2'>
             <Text style={{color:colors.text}} className='font-noto text-heading3'>{new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(selectedDate))}</Text>
-            <SleepToday/>
+            <SleepToday select_date={selectedDate}/>
             {mealSummary &&
               <CalendarFoodToday total_calorie={mealSummary?.total_calorie} total_protein={mealSummary?.total_protein} total_carbs={mealSummary?.total_carbs} total_fat={mealSummary?.total_fat}/>
             }
