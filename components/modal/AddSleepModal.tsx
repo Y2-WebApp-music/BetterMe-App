@@ -116,40 +116,6 @@ const AddSleepModal = ({date, startTime, setStartTime, endTime, setEndTime, isOp
 
         </View>
 
-        {/* <View className="flex-row gap-2 mt-4 justify-center">
-          {[
-            { label: "Sleep", date: startTime, onChange: handleDateChange("start"), icon: 'NightIcon' },
-            { label: "Wake up", date: endTime, onChange: handleDateChange("end"), icon: 'DayIcon' },
-          ].map(({ label, date, onChange, icon }, index) => (
-            <View style={{width:'40%'}} key={index} className="items-start justify-center">
-              <View className='flex-row gap-1 items-end justify-center my-2'>
-                {icon === "NightIcon" ? (
-                  <NightIcon width={18} height={18} color={colors.night}/>
-                ):(
-                  <DayIcon width={18} height={18} color={colors.yellow}/>
-                )}
-                <Text style={{ color:colors.subText}} className="text-body">
-                  {label}
-                </Text>
-              </View>
-              <View style={{ alignItems: "center" }}>
-                <RNDateTimePicker
-                  display='inline'
-                  mode="time"
-                  value={date}
-                  onChange={onChange}
-                  locale="en-US"
-                  themeVariant={
-                    theme === "dark" || (theme === "system" && systemTheme === "dark")
-                      ? "dark"
-                      : "light"
-                  }
-                />
-              </View>
-            </View>
-          ))}
-        </View> */}
-
         <View style={{ height:SIZE+6, width:SIZE+6, display:'flex', justifyContent:'center', alignItems:'center'}}>
           <GestureHandlerRootView style={{flex:1}}>
             <CircularSlider start={start} end={end}/>

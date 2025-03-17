@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity } from 'react-native'
 import React, { useCallback, useLayoutEffect, useState } from 'react'
 import { AddIcon, DayIcon, NightIcon, PenIcon, RightArrowIcon } from '../../constants/icon'
-import { addDays, differenceInMinutes, format, subDays } from 'date-fns'
+import { addDays, addMinutes, differenceInMinutes, format, setHours, subDays } from 'date-fns'
 import { useTheme } from '../../context/themeContext'
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler'
 import EditSleepModal from '../modal/EditSleepModal'
@@ -244,9 +244,9 @@ const SleepDaySummary = ({sleep_id, total_time, sleep_date, start_time, end_time
       {sleepData.sleep_date &&
         <AddSleepModal
           date={sleepData.sleep_date}
-          startTime={sleepData.sleep_date}
+          startTime={setHours(sleepData.sleep_date, 1)}
           setStartTime={(newStart) => setSleepData((prev) => ({ ...prev, start_time: newStart }))}
-          endTime={sleepData.sleep_date}
+          endTime={setHours(sleepData.sleep_date, 3)}
           setEndTime={(newEnd) => setSleepData((prev) => ({ ...prev, end_time: newEnd }))}
           isOpen={addSleep}
           setIsOpen={setAddSleep}

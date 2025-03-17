@@ -12,7 +12,7 @@ import { preventAutoHideAsync } from 'expo-router/build/utils/splash'
 import { sleepCard, sleepCardDisplay, sleepDatabase } from '../../../types/sleep'
 import axios from 'axios'
 import { SERVER_URL } from '@env'
-import { addDays, format, startOfWeek, subDays } from 'date-fns'
+import { addDays, format, formatDate, startOfWeek, subDays } from 'date-fns'
 import { useFocusEffect } from 'expo-router'
 import { useAuth } from '../../../context/authContext'
 import { FlashList } from '@shopify/flash-list'
@@ -172,7 +172,7 @@ const SleepSummary = () => {
                 <Text style={{color:colors.text}} className=' text-heading3 font-noto'>Last Night</Text>
               </View>
               <Text style={{color:colors.subText}} className=' font-noto'>
-                {new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date())}
+                {format(subDays(new Date(),1),'dd MMMM yyy')}
               </Text>
             </View>
             <SleepToday/>

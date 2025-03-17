@@ -4,11 +4,13 @@ import {
   PanGestureHandler,
   PanGestureHandlerGestureEvent,
 } from "react-native-gesture-handler";
-import Animated, { useAnimatedGestureHandler } from "react-native-reanimated";
+import Animated, { runOnJS, useAnimatedGestureHandler } from "react-native-reanimated";
 import { canvas2Polar, Vector } from "react-native-redash";
 
 import { CENTER, containedInSquare, normalize, STROKE } from "./Constants";
 import CursorOverlay from "./CursorOverlay";
+
+import * as Haptics from 'expo-haptics';
 
 enum Region {
   START,
@@ -22,6 +24,10 @@ interface GestureProps {
   startPos: Animated.SharedValue<Vector>;
   endPos: Animated.SharedValue<Vector>;
 }
+
+const triggerLightHaptics = async () => {
+  await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+};
 
 const Gesture = ({ start, end, startPos, endPos }: GestureProps) => {
   const onGestureEvent = useAnimatedGestureHandler<
@@ -51,6 +57,7 @@ const Gesture = ({ start, end, startPos, endPos }: GestureProps) => {
         end.value = normalize(end.value + delta);
       }
       ctx.offset = theta;
+      runOnJS(triggerLightHaptics)()
     },
   });
   return (
