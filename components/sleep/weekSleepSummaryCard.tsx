@@ -1,5 +1,5 @@
 import { View, Text, Animated, TouchableWithoutFeedback, Easing, TouchableOpacity } from 'react-native'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { NightIcon, BackwardIcon, ForwardIcon  } from '../../constants/icon'
 import WeekSleepChart from './weekSleepChart'
 import { useTheme } from '../../context/themeContext'
@@ -8,6 +8,7 @@ import axios from 'axios'
 import { SERVER_URL } from '@env'
 import { useAuth } from '../../context/authContext'
 import { sleepDatabase } from '../../types/sleep'
+import { useFocusEffect } from 'expo-router'
 
 const getSundayDate = (date: Date): Date => startOfWeek(date, { weekStartsOn: 0 });
 
@@ -73,9 +74,15 @@ const SleepSummary = () => {
     }
   }
 
-  useEffect(()=>{
-    getWeeklyTime()
-  },[currentSunday])
+  // useEffect(()=>{
+  //   getWeeklyTime()
+  // },[currentSunday])
+
+  useFocusEffect(
+    useCallback(() => {
+      getWeeklyTime()
+    }, [currentSunday])
+  );
 
   return (
     <View style={{paddingHorizontal:15, paddingVertical:12, backgroundColor:colors.white, borderColor:colors.gray }} className=' w-full rounded-normal border p-2 justify-center items-center flex-row gap-2'>

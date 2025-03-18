@@ -26,7 +26,7 @@ const SleepToday = ({select_date}:SleepTodayProp) => {
   const [sleepData, setSleepData] = useState<sleepCardDisplay>({
     sleep_id:'',
     total_time: 0,
-    sleep_date: null,
+    sleep_date: select_date? select_date : null,
     start_time: null,
     end_time: null,
     create_by: '',
@@ -94,6 +94,7 @@ const SleepToday = ({select_date}:SleepTodayProp) => {
         }
       } else {
         const getDate = subDays(new Date(), 1)
+        setSleepData((prev)=>({...prev, sleep_date: getDate.toISOString()}))
         await getByDate(getDate.toDateString())
       }
     } catch (error) {
