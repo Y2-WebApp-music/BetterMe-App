@@ -81,21 +81,47 @@ const SleepSummary = () => {
     }
 
     let total_time = 0;
-    let startTimes: number[] = [];
-    let endTimes: number[] = [];
+    let startTimesInMinutes: number[] = [];
+    let endTimesInMinutes: number[] = [];
 
     sleepData.forEach(({ total_time: sleepTime, start_time, end_time }) => {
         total_time += sleepTime;
-        startTimes.push(new Date(start_time).getTime());
-        endTimes.push(new Date(end_time).getTime());
+
+        const startDate = new Date(start_time);
+        const endDate = new Date(end_time);
+        
+        const startMinutes = startDate.getHours() * 60 + startDate.getMinutes();
+        const endMinutes = endDate.getHours() * 60 + endDate.getMinutes();
+
+        startTimesInMinutes.push(startMinutes);
+        endTimesInMinutes.push(endMinutes);
     });
 
-    const avgStartTime = new Date(startTimes.reduce((a, b) => a + b, 0) / startTimes.length).toISOString();
-    const avgEndTime = new Date(endTimes.reduce((a, b) => a + b, 0) / endTimes.length).toISOString();
+    const avgStartTimeInMinutes = startTimesInMinutes.reduce((a, b) => a + b, 0) / startTimesInMinutes.length;
+    const avgStartHour = Math.floor(avgStartTimeInMinutes / 60);
+    const avgStartMinute = Math.round(avgStartTimeInMinutes % 60);
+
+    const avgEndTimeInMinutes = endTimesInMinutes.reduce((a, b) => a + b, 0) / endTimesInMinutes.length;
+    const avgEndHour = Math.floor(avgEndTimeInMinutes / 60);
+    const avgEndMinute = Math.round(avgEndTimeInMinutes % 60);
+
+    const avgStartTime = new Date(0);
+    avgStartTime.setHours(avgStartHour);
+    avgStartTime.setMinutes(avgStartMinute);
+    
+    const avgEndTime = new Date(0);
+    avgEndTime.setHours(avgEndHour);
+    avgEndTime.setMinutes(avgEndMinute);
+
     const avg_time = Math.round(total_time / sleepData.length);
 
-    return { total_time, start_time: avgStartTime, end_time: avgEndTime, avg_time };
-  };
+    return { 
+        total_time, 
+        start_time: avgStartTime.toISOString(), 
+        end_time: avgEndTime.toISOString(), 
+        avg_time 
+    };
+};
 
   const getWeeklyData = async () => {
     const formattedDate = format(currentSunday, 'yyyy-MM-dd');

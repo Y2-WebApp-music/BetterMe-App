@@ -33,8 +33,6 @@ const SleepDaySummary = ({sleep_id, total_time, sleep_date, start_time, end_time
 
   useFocusEffect(
     useCallback(() => {
-      console.log('sleep Goal useCallback')
-
       if (total_time && sleep_date && start_time && end_time) {
         setSleepTime({
           hours: Math.floor(total_time / 60),

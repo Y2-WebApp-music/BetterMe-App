@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { sleepCard, sleepCardDisplay } from '../../types/sleep';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from 'expo-router';
-import { addDays, differenceInMinutes, format, subDays } from 'date-fns';
+import { addDays, differenceInMinutes, format, setHours, subDays } from 'date-fns';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import axios from 'axios';
 import { SERVER_URL } from '@env';
@@ -292,9 +292,9 @@ const SleepToday = ({select_date}:SleepTodayProp) => {
       {sleepData.sleep_date &&
         <AddSleepModal
           date={new Date(sleepData.sleep_date)}
-          startTime={new Date(sleepData.sleep_date)}
+          startTime={setHours(new Date(sleepData.sleep_date), 1)}
           setStartTime={(newStart) => setSleepData((prev) => ({ ...prev, start_time: newStart.toISOString() }))}
-          endTime={new Date(sleepData.sleep_date)}
+          endTime={setHours(new Date(sleepData.sleep_date),2)}
           setEndTime={(newEnd) => setSleepData((prev) => ({ ...prev, end_time: newEnd.toISOString() }))}
           isOpen={addSleep}
           setIsOpen={setAddSleep}

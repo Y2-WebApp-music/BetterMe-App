@@ -216,8 +216,7 @@ export const toggleSleep = async (user: string, isToggled: boolean): Promise<sle
   const existingTime = await AsyncStorage.getItem('sleepData');
   console.log('Existing sleepData:', existingTime && new Date(existingTime).toLocaleString());
 
-  const resetTime = setHours(setMinutes(setSeconds(new Date(), 0), 0), 18);
-  if (!existingTime && isToggled && isAfter(new Date(), resetTime)) {
+  if (!existingTime && isToggled) {
     await AsyncStorage.setItem('sleepData', new Date().toISOString());
     console.log('==> Started sleep tracking. <==');
     return null;
