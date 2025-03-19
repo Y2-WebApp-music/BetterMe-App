@@ -46,6 +46,7 @@ const Gesture = ({ start, end, startPos, endPos }: GestureProps) => {
         const { theta } = canvas2Polar({ x, y }, CENTER);
         ctx.offset = theta;
       }
+      runOnJS(triggerLightHaptics)()
     },
     onActive: ({ x, y }, ctx) => {
       const { theta } = canvas2Polar({ x, y }, CENTER);
@@ -57,8 +58,10 @@ const Gesture = ({ start, end, startPos, endPos }: GestureProps) => {
         end.value = normalize(end.value + delta);
       }
       ctx.offset = theta;
-      runOnJS(triggerLightHaptics)()
     },
+    onEnd:() => {
+      runOnJS(triggerLightHaptics)()
+    }
   });
   return (
     <PanGestureHandler onGestureEvent={onGestureEvent}>

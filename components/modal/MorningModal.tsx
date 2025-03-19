@@ -187,7 +187,7 @@ const MorningModal = ({totalGoal, isOpen, setIsOpen, toggle, setToggle, sleepTim
                       <Text style={{color:colors.subText}} className=' font-noto'>Sleep</Text>
                   </View>
                   <View style={{ transform: [{ translateX: 4 }] }} className='flex-row gap-1 items-end'>
-                    <Text style={{color: colors.subText}} className='text-heading3'>{start ? format(start,'HH:mm') : ''}</Text>
+                    <Text style={{color: colors.subText}} className='text-heading3'>{start ? format(start,'HH:mm') : '--:--'}</Text>
                   </View>
                 </View>
               </View>
@@ -199,7 +199,7 @@ const MorningModal = ({totalGoal, isOpen, setIsOpen, toggle, setToggle, sleepTim
                     <Text style={{color:colors.subText}} className=' font-noto'>Wake Up</Text>
                   </View>
                   <View style={{ transform: [{ translateX: 18 }] }} className='flex-row gap-1 items-end'>
-                    <Text style={{color: colors.subText}} className='text-heading3'>{end ? format(end,'HH:mm') : ''}</Text>
+                    <Text style={{color: colors.subText}} className='text-heading3'>{end ? format(end,'HH:mm') : '--:--'}</Text>
                   </View>
                 </View>
               </View>

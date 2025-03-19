@@ -41,7 +41,6 @@ export const absoluteDuration = (start: number, end: number) => {
 export const radToMinutes = (rad: number) => {
   "worklet";
   const minutes = ((rad - PI / 2 + TAU) % TAU) * (24 * 60) / TAU;
-  
   return minutes;
 };
 

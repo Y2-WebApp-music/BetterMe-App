@@ -331,7 +331,7 @@ const PostCreate = () => {
       </>
       ):(
         <View className='flex-1 justify-center items-center'>
-          <Text className='text-subTitle text-primary animate-pulse'>Creating...</Text>
+          <Text className='text-subTitle text-primary animate-pulse'>Updating...</Text>
           <View className='mt-2'>
             {(uploadProgress > 0)?(
               uploadProgress < 10 ? (
