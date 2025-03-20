@@ -250,9 +250,19 @@ export const toggleSleep = async (user: string, isToggled: boolean): Promise<sle
     const isSameDay = startTime.toDateString() === endTime.toDateString();
     const isLateNight = startTime.getHours() >= 0 && startTime.getHours() < 6;
 
-    const sleepDate = (isSameDay && isLateNight)
+    let sleepDate = (isSameDay && isLateNight)
       ? new Date(startTime.setDate(startTime.getDate() - 1))
-      : startTime;
+      : new Date(startTime);
+
+    sleepDate.setUTCHours(0, 0, 0, 0);
+
+
+    const utcPlus7 = new Date(sleepDate);
+    utcPlus7.setHours(utcPlus7.getHours() + 7);
+
+    if (utcPlus7.getHours() >= 0 && utcPlus7.getHours() < 6) {
+      sleepDate.setUTCDate(sleepDate.getUTCDate() + 1);
+    }
 
     const newRecord: sleepCard = {
       total_time: validSleepTime,

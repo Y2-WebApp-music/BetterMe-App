@@ -40,7 +40,7 @@ const MorningModal = ({totalGoal, isOpen, setIsOpen, toggle, setToggle, sleepTim
 
   const [totalTime, setTotalTime] = useState(0)
 
-  const percent = useMemo(() => Math.round((totalTime / 720) * 100), []);
+  const percent = useMemo(() => Math.round((totalTime / 720) * 100), [totalTime]);
   const progress = useSharedValue(0);
 
   useEffect(() => {
@@ -85,6 +85,10 @@ const MorningModal = ({totalGoal, isOpen, setIsOpen, toggle, setToggle, sleepTim
       console.error('Error toggling sleep:', error);
     }
   }
+
+  useEffect(() => {
+    progress.value = withTiming(percent / 100, { duration: 1000, easing });
+  }, [percent, progress]);
 
   useLayoutEffect(()=>{
     if (isOpen){
