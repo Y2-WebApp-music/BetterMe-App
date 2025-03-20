@@ -310,7 +310,7 @@ const Userprofile = () => {
               <View style={styles.imageContainer}>
                 <Image
                   style={styles.image}
-                  source={require('../../../../assets/maleAvatar.png')}
+                  source={userData?.profile_img}
                   contentFit="cover"
                   transition={1000}
                 />

@@ -19,6 +19,7 @@ import FollowButton from '../../../components/Post/followButton';
 import { BottomSheetModal } from '@gorhom/bottom-sheet/src';
 import CommentBottomModal from '../../../components/modal/CommentBottomModal';
 import PostOptionBottomModal from '../../../components/modal/PostEditModal';
+import { formatNumber } from '../../../components/Post/postConstants';
 
 
 const screenWidth = Dimensions.get('window').width;
@@ -186,7 +187,7 @@ const UserProfile = () => {
               <View className='grow'>
                 <Text style={{color:colors.text}} className='text-heading2 font-notoMedium'>{user?.displayName}</Text>
                 <Text style={{color:colors.subText}} className=' font-not pb-1'>{user?.email}</Text>
-                <Text style={{color:colors.subText}} className=' font-noto pb-1'>333k post {goalList.length} goal</Text>
+                <Text style={{color:colors.subText}} className=' font-noto pb-1'>{formatNumber(postList?.length || 0)} post {goalList.length} goal</Text>
                 <View>
                   <TouchableOpacity onPress={()=>{router.push('/(post)/postCreate')}} className=' bg-primary flex-row gap-2 p-2 px-4 justify-center items-center rounded-full'>
                     <Text className='text-body text-white font-notoMedium'>Create post</Text>
