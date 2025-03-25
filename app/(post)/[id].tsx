@@ -377,7 +377,7 @@ const CommunityPost = () => {
                           <Pagination data={postData.photo} scrollX={scrollX} />
                         </>
                       ):(
-                        <View style={{width:screenWidth*0.96, height:screenWidth*0.96, padding:3, position:'relative' }}>
+                        <View style={{width:screenWidth*0.96, height:screenWidth*0.96, padding:3, position:'relative', marginBottom:15 }}>
                           <View
                             style = {{ width : '100%',
                               height : '100%',
