@@ -132,7 +132,8 @@ export default function GoalCreatePage() {
         start_date:form.start_date,
         end_date:form.end_date,
         tasks:form.task,
-        public_goal:form.public_goal
+        public_goal:form.public_goal,
+        create_by:user?._id
       });
       const data = response.data;
       console.log('=============== ::: userData ::: ===============\n',data);
