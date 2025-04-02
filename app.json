@@ -14,7 +14,12 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.guynut.BetterMe"
+      "bundleIdentifier": "com.guynut.BetterMe",
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -25,6 +30,7 @@
       "usesCleartextTraffic": true,
       "softwareKeyboardLayoutMode": "pan"
     },
+    
     "web": {
       "favicon": "./assets/Logo_BetterMe.png"
     },
