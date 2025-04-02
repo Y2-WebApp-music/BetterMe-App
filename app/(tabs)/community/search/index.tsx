@@ -286,7 +286,7 @@ const SearchCommunity = () => {
 
   const headerContainerStyle = useAnimatedStyle(() => {
     return {
-      height: withTiming(scrollY.value > 100 ? 107 : 165, { duration: 300 }),
+      // height: withTiming(scrollY.value > 100 ? 107 : 165, { duration: 300 }),
       transform: [
         {
           translateY: withTiming(scrollY.value > 100 ? 0 : 0, { duration: 300 })
@@ -329,7 +329,7 @@ const SearchCommunity = () => {
             <BackButton goto={'/'}/>
           </View>
         </View>
-        <Animated.View className='w-full' style={[headerContainerStyle]}>
+        <Animated.View className='w-full' style={[headerContainerStyle, {zIndex:1}]}>
           <View className='items-center justify-center w-full mt-2'>
             <Animated.View style={[{ height: 50 }, headerStyle]}>
               <Text style={[{ fontSize: 26, color: colors.primary, fontWeight: '400' }]}>
@@ -341,7 +341,7 @@ const SearchCommunity = () => {
               <View style={{height:50}}>
                 <SearchInput search={search} setSearch={setSearch} submit={handleSubmit} setFocus={setIsSearching} setClear={setServerResponse}/>
               </View>
-              <View style={{height:36, marginTop:6}} className='flex-row w-[92%] justify-start items-center gap-4 ml-4'>
+              <View style={{height:37, paddingTop:6, backgroundColor:colors.background}} className='flex-row w-full justify-start items-center gap-4 pl-4'>
                 <SwitchToggleButton
                   label="post"
                   isActive={searchType === 'post'}
@@ -368,14 +368,16 @@ const SearchCommunity = () => {
                   }}
                 />
               </View>
-              <View style={{height:1, width:'100%',backgroundColor:colors.gray}} className='my-2'/>
+              <View style={{paddingTop:6, backgroundColor:colors.background}}>
+                <View style={{height:1, width:'100%',backgroundColor:colors.gray}} />
+              </View>
             </Animated.View>
           </View>
         </Animated.View>
 
         <Animated.ScrollView
-          className='w-full h-auto'
-          contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', marginTop:6}}
+          className='w-full'
+          contentContainerStyle={[ { flexGrow: 1, justifyContent: 'flex-start', paddingTop:6, marginTop:50}]}
           showsVerticalScrollIndicator={false}
           keyboardDismissMode='on-drag'
           refreshControl={
