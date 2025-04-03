@@ -404,7 +404,7 @@ const TakePicture = () => {
                 </View>
                 <View className='w-full flex-row'>
                   <View className='grow justify-center'>
-                    <Text className='text-heading font-noto'>{data.food_name}</Text>
+                    <Text style={{color:colors.text}} className='text-heading font-noto'>{data.food_name}</Text>
                     {detail &&
                       <Text style={{color:colors.subText}} className=' font-noto -translate-y-1'>{detail}</Text>
                     }
