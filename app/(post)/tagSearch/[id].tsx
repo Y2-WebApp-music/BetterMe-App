@@ -13,6 +13,8 @@ import BackButton from '../../../components/Back';
 import SearchInput from '../../../components/SearchInput';
 import PostWithPhoto from '../../../components/Post/postWithPhoto';
 import PostOnlyText from '../../../components/Post/postOnlyText';
+import CommentBottomModal from '../../../components/modal/CommentBottomModal';
+import PostOptionBottomModal from '../../../components/modal/PostEditModal';
 
 const SearchCommunity = () => {
 
@@ -87,8 +89,17 @@ const SearchCommunity = () => {
   );
     
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-  const handleOpenPress = () => {
+  const [selectedPostId, setSelectedPostId] = useState<string>('');
+
+  const handleOpenComment = (post_id: string) => {
+    setSelectedPostId(post_id);
     bottomSheetModalRef.current?.present();
+  };
+  
+  const optionSheetModalRef = useRef<BottomSheetModal>(null);
+  const handleOpenOption = (post_id: string) => {
+    setSelectedPostId(post_id);
+    optionSheetModalRef.current?.present();
   };
 
   return (
@@ -139,7 +150,8 @@ const SearchCommunity = () => {
                             like={item.like}
                             comment={item.comment}
                             photo={item.photo}
-                            openComment={handleOpenPress}
+                            openComment={handleOpenComment}
+                            openOption={handleOpenOption}
                           />
                         ):(
                           <PostOnlyText
@@ -152,7 +164,8 @@ const SearchCommunity = () => {
                             tag={item.tag}
                             like={item.like}
                             comment={item.comment}
-                            openComment={handleOpenPress}
+                            openComment={handleOpenComment}
+                            openOption={handleOpenOption}
                           />
                         )
                       )
@@ -167,6 +180,8 @@ const SearchCommunity = () => {
                 )
           }
         </ScrollView>
+        <CommentBottomModal ref={bottomSheetModalRef} post_id={selectedPostId} postList={tagPostList} setPostList={setTagPostList}/>
+        <PostOptionBottomModal ref={optionSheetModalRef} post_id={selectedPostId}/>
       </KeyboardAvoidingView>
     </SafeAreaView>
   )

@@ -513,7 +513,7 @@ const SearchCommunity = () => {
             )
           )}
         </Animated.ScrollView>
-        <CommentBottomModal ref={bottomSheetModalRef} post_id={selectedPostId}/>
+        <CommentBottomModal ref={bottomSheetModalRef} post_id={selectedPostId} postList={postList} setPostList={setPostList}/>
         <PostOptionBottomModal ref={optionSheetModalRef} post_id={selectedPostId}/>
       </KeyboardAvoidingView>
     </SafeAreaView>

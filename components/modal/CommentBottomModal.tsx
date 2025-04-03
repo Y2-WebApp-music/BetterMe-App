@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, Button, KeyboardAvoidingView, Platform } from "react-native";
+import { StyleSheet, View, Text, Button, KeyboardAvoidingView, Platform, TextInput } from "react-native";
 import React, { forwardRef, memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetFlashList, BottomSheetFooter, BottomSheetModal, BottomSheetModalProvider, BottomSheetTextInput, BottomSheetView, TouchableOpacity, useBottomSheet, useBottomSheetModal } from '@gorhom/bottom-sheet/src';
@@ -10,7 +10,7 @@ import { useAuth } from "../../context/authContext";
 import { FlashList } from "@shopify/flash-list";
 import { AntDesign as Icon } from '@expo/vector-icons';
 import { format } from "date-fns";
-import { Comment } from "../../types/community";
+import { Comment, PostContent } from "../../types/community";
 import { useFocusEffect } from "expo-router";
 import axios from "axios";
 import { SERVER_URL } from "@env";
@@ -23,9 +23,11 @@ const screenHeight = Dimensions.get('window').height;
 type Ref = BottomSheet;
 type CommentBottomModalProps = {
   post_id: string;
+  postList:PostContent[] | null
+  setPostList:(postList:PostContent[]) => void
 };
 
-const CommentBottomModal = forwardRef<Ref, CommentBottomModalProps>(({ post_id }, ref:any) => {
+const CommentBottomModal = forwardRef<Ref, CommentBottomModalProps>(({ post_id, postList, setPostList }, ref:any) => {
   const { colors } = useTheme();
   const { user } = useAuth()
 
@@ -171,7 +173,15 @@ const CommentBottomModal = forwardRef<Ref, CommentBottomModalProps>(({ post_id }
           ...(prev ?? [])
         ]);
 
+        if (postList) {
+          const updatedPostList = postList.map((post) =>
+            post.post_id === post_id ? { ...post, comment: post.comment + 1 } : post
+          );
+          setPostList(updatedPostList);
+        }
+
         setComment('')
+        animateCheck('');
       } else {
         return
       }
@@ -244,6 +254,7 @@ const CommentBottomModal = forwardRef<Ref, CommentBottomModalProps>(({ post_id }
                   onPress={triggerMediumHaptics}
                   onChangeText={handleTextChange}
                   keyboardType='default'
+                  defaultValue={comment}
                 />
               </Animated.View>
               <Animated.View style={[animatedButtonStyle,{justifyContent:'center'}]}>
@@ -330,28 +341,3 @@ const styles = StyleSheet.create({
 });
 
 export default CommentBottomModal
-
-
-
-
-
-// const renderFooter = useCallback(
-//   (props:any) => (
-//     <BottomSheetFooter {...props} bottomInset={80}>
-//       <View className='w-full flex-row gap-1 items-center justify-center px-2'>
-//         <View className='rounded-full overflow-hidden'>
-//           <Image
-//             style={styles.image}
-//             source={user?.photoURL ? user?.photoURL : user?.gender === 1 ? require('../../assets/maleAvatar.png') : require('../../assets/femaleAvatar.png')}
-//             contentFit="cover"
-//             transition={10}
-//           />
-//         </View>
-//         <View className='grow'>
-//           <BottomSheetTextInput style={styles.input} placeholder='write some comment..'/>
-//         </View>
-//       </View>
-//     </BottomSheetFooter>
-//   ),
-//   []
-// );

@@ -317,7 +317,7 @@ const CommunityFeed = () => {
       </ScrollView>
 
       <View style={{ position:'absolute', top:0, left:0, right:0, height: insets.top, zIndex:100, backgroundColor:colors.background }} />
-      <CommentBottomModal ref={bottomSheetModalRef} post_id={selectedPostId} />
+      <CommentBottomModal ref={bottomSheetModalRef} post_id={selectedPostId} postList={postList} setPostList={setPostList}/>
       <PostOptionBottomModal ref={optionSheetModalRef} post_id={selectedPostId}/>
       </SafeAreaView>
   )
