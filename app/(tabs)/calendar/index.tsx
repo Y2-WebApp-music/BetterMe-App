@@ -95,6 +95,7 @@ const MonthCalendar = () => {
       const data = response.data
 
       console.log('response getDateGoal\n');
+
       if (data) {
         setGoalList(data)
       }

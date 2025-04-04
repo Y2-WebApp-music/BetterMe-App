@@ -41,7 +41,7 @@ const HomeGoalCard = ({goal_id, goal_name, end_date, total_task, complete_task}:
       <View className='w-[92%] h-32 flex-col gap-1 justify-center'>
         <View className='flex-col w-full h-[80%]'>
           <View className='w-full h-[78%] flex-row items-center justify-center gap-1'>
-            <View style={{width:'78%', height:'100%'}}>
+            <View style={{width:'76%', height:'100%'}}>
               <Text
                 style={{overflow: 'hidden',color:colors.text}}
                 numberOfLines={2}
@@ -51,7 +51,7 @@ const HomeGoalCard = ({goal_id, goal_name, end_date, total_task, complete_task}:
                 {goal_name}
               </Text>
             </View>
-            <View style={{width:'22%'}} className=' grow items-end'>
+            <View style={{width:'24%'}} className=' grow items-end'>
               <Text style={{color:color}} className={`font-notoMedium text-subTitle`}>{percent}%</Text>
             </View>
           </View>

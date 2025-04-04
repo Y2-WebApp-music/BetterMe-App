@@ -101,6 +101,7 @@ const Home = () => {
   useFocusEffect(
     useCallback(() => {
       const fetchData = async () => {
+        setIsNoGoal(false)
         getTodayGoal();
         getSummaryMeal();
   

@@ -16,10 +16,19 @@ const YourGoal = () => {
 
   const { colors } = useTheme();
   const { user } = useAuth()
+
   const [search, setSearch] = useState('')
+  const [isSearching, setIsSearching] = useState(false)
+  const [serverResponse, setServerResponse] = useState(false)
+
+  useEffect(()=>{
+    console.log('serverResponse',serverResponse);
+    console.log('isSearching',isSearching);
+  },[isSearching, serverResponse])
 
   const [noGoal, setNoGoal] = useState(false)
   const [allGoal, setAllGoal] = useState<homeGoalCardProp[]>([])
+  const [searchGoal, setSearchGoal] = useState<homeGoalCardProp[]>([])
 
   const [isNoTodayGoal, setIsNoTodayGoal] = useState(false)
   const [todayGoal, setTodayGoal] = useState<homeGoalCardProp[]>([])
@@ -124,6 +133,15 @@ const YourGoal = () => {
       // }),
   ] : [];
 
+  const handleSearch = () => {
+    console.log('search input', search);
+
+    setSearchGoal(allGoal.filter((item) =>
+      item.goal_name.toLowerCase().includes(search.toLowerCase())
+    ))
+    setServerResponse(true)
+  }
+
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -187,14 +205,14 @@ const YourGoal = () => {
         style={{ flex: 1, width:"100%",alignItems:'center' }}
       >
         <ScrollView
-          className='w-[92%] h-auto pb-20'
-          contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', marginTop:0}}
+          className='w-full h-auto pb-20'
+          contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', alignContent:'center', marginTop:0}}
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
         >
-          <View className='mt-2'>
+          <View className='mt-2 items-center justify-center'>
 
 
             {/*
@@ -202,16 +220,16 @@ const YourGoal = () => {
             ======== Today Goal ========
             =============================
             */}
-            <View className='mt-3'>
+            <View className='mt-3 w-[92%]'>
               <View className='flex flex-row gap-2 items-center'>
-                <Text className='text-heading3 font-noto grow'>Goals Today</Text>
+                <Text style={{color:colors.text}} className='text-heading3 font-noto grow'>Goals Today</Text>
                 <Text className='text-body font-noto text-subText'>{sortedGoalData.length} goals todo</Text>
               </View>
 
               <View className='mt-2 flex-col gap-2'>
                 {isNoTodayGoal? (
                   <View style={{width:'100%', height:80, justifyContent:'center', alignContent:'center'}}>
-                    <Text className='font-noto text-subText text-heading3 text-center'>No goal Today</Text>
+                    <Text style={{color:colors.subText}} className='font-noto text-heading3 text-center'>No goal Today</Text>
                   </View>
                 ):(
                   sortedGoalData.length != 0 ? (
@@ -237,30 +255,40 @@ const YourGoal = () => {
             ======== Goal Summary ========
             =============================
             */}
-          <View className='mt-3 pb-16 sticky'>
-            <View className='flex flex-row gap-2 items-center'>
-              <Text className='text-heading3 font-noto grow'>All Goals</Text>
+          <View className='mt-3 pb-16 sticky items-center justify-center'>
+            <View className='flex flex-row gap-2 items-center w-[92%]'>
+              <Text style={{color:colors.text}} className='text-heading3 font-noto grow'>All Goals</Text>
             </View>
-            <SearchInput
-              name={'Search Goal...'}
-              value={search}
-              handleChange={(e:string)=>setSearch(e)}
-            />
-            <View className='mt-3 flex-col gap-2'>
+            <View className='w-full'>
+              <SearchInput search={search} setSearch={setSearch} submit={handleSearch} setFocus={setIsSearching} setClear={setServerResponse}/>
+            </View>
+            <View className='mt-3 flex-col gap-2 w-[92%]'>
               {noGoal? (
                   <View className='flex-1 justify-center items-center p-6 pt-20'>
                     <Text className='font-noto text-subText text-heading3'>No goal</Text>
                   </View>
                 ):(
-                  <View className='w-full min-h-32'>
-                    <FlashList
-                      data={allGoal}
-                      renderItem={({ item }) =>
-                        <HomeGoalCard goal_id={item.goal_id} goal_name={item.goal_name} end_date={item.end_date} total_task={item.total_task} complete_task={item.complete_task}/>
-                      }
-                      estimatedItemSize={200}
-                    />
-                  </View>
+                  !isSearching && serverResponse? (
+                    <View className='w-full min-h-32'>
+                      <FlashList
+                        data={searchGoal}
+                        renderItem={({ item }) =>
+                          <HomeGoalCard goal_id={item.goal_id} goal_name={item.goal_name} end_date={item.end_date} total_task={item.total_task} complete_task={item.complete_task}/>
+                        }
+                        estimatedItemSize={200}
+                      />
+                    </View>
+                  ):(
+                    <View className='w-full min-h-32'>
+                      <FlashList
+                        data={allGoal}
+                        renderItem={({ item }) =>
+                          <HomeGoalCard goal_id={item.goal_id} goal_name={item.goal_name} end_date={item.end_date} total_task={item.total_task} complete_task={item.complete_task}/>
+                        }
+                        estimatedItemSize={200}
+                      />
+                    </View>
+                  )
                 )}
             </View>
           </View>

@@ -19,6 +19,7 @@ const CreateGoal = () => {
 
   const [refreshing, setRefreshing] = useState(false);
   const [goal,setGoal] = useState<GoalCreateCardProp[]>([])
+  const [searchGoal, setSearchGoal] = useState<GoalCreateCardProp[]>([])
   const [isNoGoal,setIsNoGoal] = useState(false)
 
   const getSearchGoal = async () => {
@@ -27,7 +28,7 @@ const CreateGoal = () => {
       const response = await axios.get(`${SERVER_URL}/goal/all`);
       const data = response.data // homeGoalCardProp[]
 
-      console.log('response \n',response.data);
+      console.log('response \n',response.data[0]);
 
       if (data.message === "Goal not found") {
         setIsNoGoal(true)
@@ -62,19 +63,27 @@ const CreateGoal = () => {
   }, []);
 
   const [search, setSearch] = useState('')
-  const handleSubmit = async () => {
+  const [isSearching, setIsSearching] = useState(false)
+  const [serverResponse, setServerResponse] = useState(false)
+
+  const handleSearch = () => {
     console.log('search input', search);
+
+    setSearchGoal(goal.filter((item) =>
+      item.goal_name.toLowerCase().includes(search.toLowerCase())
+    ))
+    setServerResponse(true)
   }
 
   return (
-    <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-center items-center font-noto">
-      <View className='w-[92%] mt-4'>
-        <View className='w-full'>
+    <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full items-center justify-center font-noto">
+      <View className='w-full mt-4 h-max items-center justify-center'>
+        <View className='w-[92%]'>
           <View className='max-w-[14vw]'>
             <BackButton goto={'/home'}/>
           </View>
         </View>
-        <View className='mt-2'>
+        <View className='mt-2 w-[92%]'>
           <View className='flex flex-row gap-2 items-center'>
             <View className='grow'>
               <Text className='text-subTitle text-primary font-notoMedium'>Create Goal</Text>
@@ -87,29 +96,53 @@ const CreateGoal = () => {
             </View>
           </View>
         </View>
-        <SearchInput search={search} setSearch={setSearch} submit={handleSubmit}/>
+        <View style={{height:50}} className='w-full mt-2'>
+          <SearchInput search={search} setSearch={setSearch} submit={handleSearch} setFocus={setIsSearching} setClear={setServerResponse}/>
+        </View>
       </View>
 
       <View className="flex-1 w-[92%] mt-4">
-        <FlashList
-          data={goal}
-          renderItem={({ item }) => (
-            <GoalCreateCard
-              goal_id={item.goal_id}
-              goal_name={item.goal_name}
-              start_date={item.start_date}
-              end_date={item.end_date}
-              total_task={item.total_task}
-              create_by={item.create_by}
+        {!isSearching && serverResponse? (
+            <FlashList
+              data={searchGoal}
+              renderItem={({ item }) => (
+                <GoalCreateCard
+                  goal_id={item.goal_id}
+                  goal_name={item.goal_name}
+                  start_date={item.start_date}
+                  end_date={item.end_date}
+                  total_task={item.total_task}
+                  create_by={item.create_by}
+                />
+              )}
+              estimatedItemSize={200}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
+              contentContainerStyle={{ paddingBottom: 16 }}
+              showsVerticalScrollIndicator={false}
             />
-          )}
-          estimatedItemSize={200}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          contentContainerStyle={{ paddingBottom: 16 }}
-          showsVerticalScrollIndicator={false}
-        />
+        ):(
+            <FlashList
+              data={goal}
+              renderItem={({ item }) => (
+                <GoalCreateCard
+                  goal_id={item.goal_id}
+                  goal_name={item.goal_name}
+                  start_date={item.start_date}
+                  end_date={item.end_date}
+                  total_task={item.total_task}
+                  create_by={item.create_by}
+                />
+              )}
+              estimatedItemSize={200}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
+              contentContainerStyle={{ paddingBottom: 16 }}
+              showsVerticalScrollIndicator={false}
+            />
+        )}
       </View>
     </SafeAreaView>
   )
