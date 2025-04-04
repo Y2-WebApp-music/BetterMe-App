@@ -45,8 +45,8 @@ export default function CommunityGoalScreen() {
     start_date:new Date().toDateString(),
     end_date:new Date(new Date().setDate(new Date().getDate() + 10)).toDateString(),
     task : [],
-    total_task:5,
-    complete_task:4,
+    total_task:1,
+    complete_task:0,
     username: '',
     profile_img:'',
   })

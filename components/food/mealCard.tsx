@@ -4,6 +4,7 @@ import { router } from 'expo-router'
 import { format } from 'date-fns';
 import { mealCard } from '../../types/food';
 import { useTheme } from '../../context/themeContext';
+import * as Haptics from 'expo-haptics';
 
 const MealCard = ({meal_id, meal_date, food_name, calorie, createByAI}:mealCard) => {
 
@@ -12,8 +13,17 @@ const MealCard = ({meal_id, meal_date, food_name, calorie, createByAI}:mealCard)
 
   const AICreate = createByAI? colors.primary:colors.green
 
+  const triggerLightHaptics = async () => {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+  };
+
+  const pressGoal = () => {
+    triggerLightHaptics()
+    router.push(`/calendar/meal/${meal_id}`)
+  }
+
   return (
-    <TouchableOpacity onPress={()=>{router.push(`/calendar/meal/${meal_id}`)}} style={{padding:12, paddingHorizontal:20, marginBottom: 8, width:'100%', backgroundColor:colors.white, borderColor:colors.gray}} className='rounded-normal border flex-row items-center justify-center'>
+    <TouchableOpacity onPress={pressGoal} style={{padding:12, paddingHorizontal:20, marginBottom: 8, width:'100%', backgroundColor:colors.white, borderColor:colors.gray}} className='rounded-normal border flex-row items-center justify-center'>
       <View style={{width:'80%'}} className='max-w-[64vw] grow'>
         <View className='flex-row gap-1 items-center'>
           <View style={{width:12, height:12,backgroundColor:AICreate}} className={`rounded-full flex justify-center items-center`}>

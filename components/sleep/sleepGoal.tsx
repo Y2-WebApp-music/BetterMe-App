@@ -11,7 +11,7 @@ import { SERVER_URL } from '@env';
 import { userEvent } from '@testing-library/react-native';
 import { useAuth } from '../../context/authContext';
 import { useFocusEffect } from 'expo-router';
-
+import * as Haptics from 'expo-haptics';
 
 type SleepGoalProp = {
   toggle: boolean;
@@ -40,6 +40,10 @@ const SleepGoal = ({toggle, setToggle, sleepTime, setSleepTime}:SleepGoalProp) =
 
   const animatedValue = useRef(new Animated.Value(toggle ? 1 : 0)).current;
 
+  const triggerMediumHaptics = async () => {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+  };
+
   useEffect(() => {
     Animated.timing(animatedValue, {
       toValue: toggle ? 1 : 0,
@@ -57,6 +61,8 @@ const SleepGoal = ({toggle, setToggle, sleepTime, setSleepTime}:SleepGoalProp) =
       });
       
       const sleepDuration = await toggleSleep(user?._id || '', !toggle);
+
+      triggerMediumHaptics()
   
       if (sleepDuration) {
         setSleepTime({

@@ -1,8 +1,8 @@
 import { View, Text, TouchableOpacity } from 'react-native'
-import React from 'react'
+import React, { useEffect } from 'react'
 import Modal from './Modal'
 import { useTheme } from '../../context/themeContext'
-
+import * as Haptics from 'expo-haptics';
 
 type ConfirmModalProp = {
   title:string

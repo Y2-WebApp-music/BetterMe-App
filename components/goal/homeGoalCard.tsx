@@ -4,7 +4,7 @@ import { router } from 'expo-router'
 import { homeGoalCardProp } from '../../types/goal'
 import { format } from 'date-fns'
 import { useTheme } from '../../context/themeContext'
-
+import * as Haptics from 'expo-haptics';
 
 const HomeGoalCard = ({goal_id, goal_name, end_date, total_task, complete_task}:homeGoalCardProp) => {
 
@@ -16,6 +16,15 @@ const HomeGoalCard = ({goal_id, goal_name, end_date, total_task, complete_task}:
   end.setDate(end.getDate() + 1);
 
   const color = percent === 100? "#0dc47c" : today > end? "#f43168" : "#FBA742"
+
+  const triggerLightHaptics = async () => {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+  };
+
+  const pressGoal = () => {
+    triggerLightHaptics()
+    router.push(`/home/goal/${goal_id}`)
+  }
 
   const progressBar = useRef(new Animated.Value(0)).current;
   useEffect(() => {
@@ -37,7 +46,7 @@ const HomeGoalCard = ({goal_id, goal_name, end_date, total_task, complete_task}:
   });
 
   return (
-    <TouchableOpacity  onPress={()=>{router.push(`/home/goal/${goal_id}`)}} style={{marginBottom: 8, backgroundColor:colors.white, borderColor:colors.gray}} className='h-32 w-full rounded-normal border justify-center items-center'>
+    <TouchableOpacity  onPress={pressGoal} style={{marginBottom: 8, backgroundColor:colors.white, borderColor:colors.gray}} className='h-32 w-full rounded-normal border justify-center items-center'>
       <View className='w-[92%] h-32 flex-col gap-1 justify-center'>
         <View className='flex-col w-full h-[80%]'>
           <View className='w-full h-[78%] flex-row items-center justify-center gap-1'>

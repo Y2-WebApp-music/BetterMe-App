@@ -1,8 +1,8 @@
 import { View, Text, TouchableOpacity } from 'react-native'
-import React from 'react'
+import React, { useEffect } from 'react'
 import Modal from './Modal'
 import { useTheme } from '../../context/themeContext'
-
+import * as Haptics from 'expo-haptics';
 
 type ConfirmModalProp = {
   title:string
@@ -14,6 +14,7 @@ type ConfirmModalProp = {
 const WarningModal = ({title, detail, isOpen, setIsOpen}:ConfirmModalProp) => {
 
   const { colors } = useTheme();
+  
 
   return (
     <Modal isOpen={isOpen} setIsOpen={setIsOpen}>

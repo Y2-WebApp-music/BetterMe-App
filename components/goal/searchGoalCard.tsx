@@ -5,6 +5,7 @@ import { router } from 'expo-router';
 import { useTheme } from '../../context/themeContext';
 import Animated, { useAnimatedProps, useSharedValue, withTiming } from 'react-native-reanimated';
 import Svg, { Circle } from 'react-native-svg';
+import * as Haptics from 'expo-haptics';
 
 const { width } = Dimensions.get('window');
 const circle_length = width * 0.6;
@@ -45,9 +46,18 @@ const SearchGoalCard = ({ goal_id, goal_name, start_date, end_date, total_task, 
     strokeDashoffset: circle_length * (1 - progress.value),
   }));
 
+  const triggerLightHaptics = async () => {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+  };
+
+  const pressGoal = () => {
+    triggerLightHaptics()
+    router.push(`/community/user/goal/${goal_id}`)
+  }
+
   return (
     <View className="flex-1 justify-center items-center">
-      <TouchableOpacity onPress={() => { router.push(`/community/user/goal/${goal_id}`); }} 
+      <TouchableOpacity onPress={pressGoal} 
         style={{ marginBottom: 8, backgroundColor: colors.background, borderColor: colors.gray, alignSelf: 'center', marginHorizontal: 'auto', width: '96%' }} 
         className='h-32 justify-center items-center rounded-normal border border-gray flex-row'>
         <View style={{ width: '72%', height: '100%', paddingLeft: 2 }} className='justify-center'> 
