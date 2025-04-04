@@ -85,7 +85,7 @@ const MealPage = () => {
           </View>
 
           {/* <View style={styles.camera} className=''> */}
-          <View className='overflow-hidden rounded-normal border border-gray'>
+          <View style={{borderColor:colors.gray}} className='overflow-hidden rounded-normal border'>
             <Image
                 style={styles.camera}
                 source={meal?.image_url}

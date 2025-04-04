@@ -61,7 +61,7 @@ const HomeGoalCard = ({goal_id, goal_name, end_date, total_task, complete_task}:
           </View>
         </View>
         <View className='h-[20%] relative'>
-          <View style={{height:12}} className='rounded-full w-full bg-DarkGray'/>
+          <View style={{height:12, backgroundColor:colors.darkGray}} className='rounded-full w-full'/>
           <Animated.View
             style={{
             position: 'absolute',

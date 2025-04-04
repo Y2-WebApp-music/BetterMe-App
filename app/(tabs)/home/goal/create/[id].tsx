@@ -125,12 +125,17 @@ export default function GoalCreatePage() {
   };
 
   const postToDB = async () => {
+    const adjustDate = (date: Date) => {
+      const newDate = new Date(date);
+      newDate.setHours(9, 0, 0, 0);
+      return newDate;
+    };
     try {
       const response = await axios.post(`${SERVER_URL}/goal/create`,{
         goal_name:form.goal_name,
         description:form.description,
-        start_date:form.start_date,
-        end_date:form.end_date,
+        start_date: adjustDate(form.start_date),
+        end_date: adjustDate(form.end_date),
         tasks:form.task,
         public_goal:form.public_goal,
         create_by:user?._id

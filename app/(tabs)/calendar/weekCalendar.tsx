@@ -102,18 +102,19 @@ const WeekCalendar = () => {
 
   useFocusEffect(
     useCallback(() => {
+      console.log('selectedDate ',selectedDate);
       getDateMeal()
       getDateGoal()
       getSummaryMeal()
-    }, [])
+    }, [selectedDate])
   );
 
-  useEffect(()=>{
-    console.log('selectedDate ',selectedDate);
-    getDateMeal()
-    getDateGoal()
-    getSummaryMeal()
-  },[selectedDate])
+  // useEffect(()=>{
+  //   console.log('selectedDate ',selectedDate);
+  //   getDateMeal()
+  //   getDateGoal()
+  //   getSummaryMeal()
+  // },[selectedDate])
 
   return (
     <SafeAreaView style={{backgroundColor:colors.background}} className="w-full h-full justify-center items-center font-noto">
@@ -227,26 +228,5 @@ const WeekCalendar = () => {
     </SafeAreaView>
   )
 }
-
-const goalDataDummy = [
-  {
-    goal_id:'1',
-    goal_name:'Title Test 1',
-    total_task:8,
-    complete_task:3,
-  },
-  {
-    goal_id:'2',
-    goal_name:'Title Test 2',
-    total_task:8,
-    complete_task:3,
-  },
-  {
-    goal_id:'3',
-    goal_name:'Title Test 3',
-    total_task:8,
-    complete_task:3,
-  },
-]
 
 export default WeekCalendar

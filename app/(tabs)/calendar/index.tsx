@@ -91,7 +91,13 @@ const MonthCalendar = () => {
 
   const getDateGoal = async () => {
     try {
-      const response = await axios.get(`${SERVER_URL}/calendar/goal/${selectedDate}`);
+      const date = (() => {
+        const d = new Date(selectedDate);
+        d.setHours(7);
+        return d.toISOString();
+      })();
+      
+      const response = await axios.get(`${SERVER_URL}/calendar/goal/${date}`);
       const data = response.data
 
       console.log('response getDateGoal\n');
@@ -136,18 +142,19 @@ const MonthCalendar = () => {
 
   useFocusEffect(
     useCallback(() => {
+      console.log('selectedDate ',selectedDate);
       getDateMeal()
       getDateGoal()
       getSummaryMeal()
-    }, [])
+    }, [selectedDate])
   );
 
-  useEffect(()=>{
-    console.log('selectedDate ',selectedDate);
-    getDateMeal()
-    getDateGoal()
-    getSummaryMeal()
-  },[selectedDate])
+  // useEffect(()=>{
+  //   console.log('selectedDate ',selectedDate);
+  //   getDateMeal()
+  //   getDateGoal()
+  //   getSummaryMeal()
+  // },[selectedDate])
 
   const linearAccent = colors.primary; // Use the primary color from theme for accent color
 
