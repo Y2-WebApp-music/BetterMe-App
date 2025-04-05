@@ -425,7 +425,10 @@ const SearchCommunity = () => {
                     )
                   )
                   }
-                  estimatedItemSize={200}
+                  estimatedItemSize={800}
+                  onLoad={({ elapsedTimeInMs }) => {
+                    console.log(`FlashList loaded in ${elapsedTimeInMs}ms`);
+                  }}
                 />
               </View>
             ):(

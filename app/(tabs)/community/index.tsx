@@ -33,7 +33,6 @@ const CommunityFeed = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [isLoad, setIsLoad] = useState(false);
 
-  // const [postList, setPostList] = useState<number[]>([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20])
   const [postList, setPostList] = useState<PostContent[] | null>(null)
 
   const insets = useSafeAreaInsets();
@@ -141,9 +140,15 @@ const CommunityFeed = () => {
   useFocusEffect(
     useCallback(() => {
       setIsLoad(true)
-      getFeed().finally(()=>{
+      const fetchData = async () => {
+        if (postList === null) {
+          await getFeed().finally(()=>{
+            setIsLoad(false)
+          })
+        }
         setIsLoad(false)
-      })
+      }
+      fetchData()
     }, [])
   );
 
@@ -281,7 +286,10 @@ const CommunityFeed = () => {
                     )
                   )
                   }
-                  estimatedItemSize={200}
+                  estimatedItemSize={800}
+                  onLoad={({ elapsedTimeInMs }) => {
+                    console.log(`FlashList loaded in ${elapsedTimeInMs}ms`);
+                  }}
                 />
               </View>
             ):(

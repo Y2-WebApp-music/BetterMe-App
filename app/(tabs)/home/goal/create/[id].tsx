@@ -13,6 +13,7 @@ import { FlashList } from '@shopify/flash-list';
 import WarningModal from '../../../../../components/modal/WarningModal';
 import RNDateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme } from '../../../../../context/themeContext';
+import { addDays } from 'date-fns';
 
 export default function GoalCreatePage() {
 
@@ -20,11 +21,14 @@ export default function GoalCreatePage() {
   const { id } = useLocalSearchParams();
   const { user } = useAuth()
 
+  const today = new Date();
+  const tomorrow = addDays(today, 1);
+
   const [form, setForm] = useState({
     goal_name:'',
     description:'',
-    start_date:new Date(),
-    end_date:new Date(),
+    start_date:today,
+    end_date:tomorrow,
     task:[
       {task_name:'',status:false},
     ],
@@ -169,12 +173,22 @@ export default function GoalCreatePage() {
         setErr('Task at least one is empty please complete it');
         return
       }
-      if (form.end_date < form.start_date) {
+      if (form.end_date.toDateString() < form.start_date.toDateString()) {
         console.log('Date is false');
         setWarning(true)
-        setErr('Can not end date less than start date');
+        setErr('Can not end date less than start date.');
         return
       }
+      if (form.end_date.toDateString() === form.start_date.toDateString()) {
+        console.log('Date in Same Day');
+        setWarning(true)
+        setErr('The start and end dates cannot be set to the same date.');
+        return
+      }
+
+      console.log('form.end_date',form.end_date);
+      console.log('form.start_date',form.start_date);
+      
 
       let counter = 3;
       setCountdown(counter)
@@ -282,7 +296,7 @@ export default function GoalCreatePage() {
                       display="spinner"
                       mode="date"
                       value={form.start_date}
-                      minimumDate={new Date()}
+                      minimumDate={today}
                       maximumDate={new Date(new Date().setDate(new Date().getDate() + 10000))}
                       onChange={(event, selectedDate) => {
                         if (selectedDate) {
@@ -302,8 +316,8 @@ export default function GoalCreatePage() {
                     <RNDateTimePicker
                       display="spinner"
                       mode="date"
-                      value={form.start_date}
-                      minimumDate={new Date()}
+                      value={form.end_date}
+                      minimumDate={tomorrow}
                       maximumDate={new Date(new Date().setDate(new Date().getDate() + 10000))}
                       onChange={(event, selectedDate) => {
                         if (selectedDate) {
@@ -325,7 +339,7 @@ export default function GoalCreatePage() {
                 setIsOpen={()=>setWarning(!warning)}
               />
 
-              <View className='mt-4 flex-col gap-2 pb-20'>
+              <View className='mt-4 flex-col gap-2 pb-10'>
                 <Text style={{color:colors.text}}>Task</Text>
 
                 <FlashList

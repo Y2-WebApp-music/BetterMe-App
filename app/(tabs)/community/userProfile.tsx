@@ -297,7 +297,10 @@ const UserProfile = () => {
                             complete_task={item.complete_task}
                           />
                         }
-                        estimatedItemSize={200}
+                        estimatedItemSize={800}
+                        onLoad={({ elapsedTimeInMs }) => {
+                          console.log(`FlashList loaded in ${elapsedTimeInMs}ms`);
+                        }}
                       />
                     ) : (
                       <View style={{width:'100%', height:80, justifyContent:'center', alignContent:'center'}}>
@@ -318,7 +321,10 @@ const UserProfile = () => {
                             complete_task={item.complete_task}
                           />
                         }
-                        estimatedItemSize={200}
+                        estimatedItemSize={400}
+                        onLoad={({ elapsedTimeInMs }) => {
+                          console.log(`FlashList loaded in ${elapsedTimeInMs}ms`);
+                        }}
                       />
                     ) : (
                       <View style={{width:'100%', height:80, justifyContent:'center', alignContent:'center'}}>
