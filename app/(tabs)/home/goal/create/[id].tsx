@@ -159,11 +159,7 @@ export default function GoalCreatePage() {
   }
 
   const handleCreateGoal = async () => {
-
-    console.log('start_date ',form.start_date.toDateString());
-    console.log('end_date ', form.end_date.toDateString());
     
-
     if ( form.goal_name != ''){
       if (form.task.length === 0) {
         console.log('At least one task is required');

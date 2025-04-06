@@ -19,6 +19,7 @@ import axios from 'axios';
 import RNDateTimePicker from '@react-native-community/datetimepicker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { useTheme } from '../../../context/themeContext';
+import WarningModal from '../../../components/modal/WarningModal';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -124,7 +125,24 @@ const AddMeal = () => {
     extrapolate: 'clamp',
   });
 
+  const [err, setErr] = useState('')
+  const [warning, setWarning] = useState(false)
+
   const handleSubmit = async () => {
+
+    if (form.food_name === '') {
+      console.log('Food Name is required');
+      setWarning(true)
+      setErr('Food Name is required');
+      return
+    }
+    if (form.protein === 0 || form.fat === 0 || form.carbs === 0) {
+      console.log('At least one nutrients is required');
+      setWarning(true)
+      setErr('protein, fat or carbs is empty');
+      return
+    }
+
     let counter = 3;
       setCountdown(counter)
       setWaiting(true);
@@ -420,9 +438,9 @@ const AddMeal = () => {
                 <Text className='text-heading font-notoMedium text-primary'>Meal detail</Text>
               </View>
               {aiCreating?(
-                <TouchableOpacity onPress={()=>setAiCreating(false)}>
-                  <Text>Cancel</Text>
-                </TouchableOpacity>
+                  <TouchableOpacity onPress={()=>setAiCreating(false)} style={{backgroundColor:colors.darkGray}} className='p-1 px-4 rounded-full justify-center items-center'>
+                    <Text className='text-body text-white font-noto'>Cancel</Text>
+                  </TouchableOpacity>
               ):(
                 <RainbowButton text={'Auto fill with AI'} active={!!photo} handleClick={getMealByAI}/>
               )}
@@ -519,20 +537,20 @@ const AddMeal = () => {
 
             </View>
             {aiCreating &&(
-              <View className=' absolute bottom-0 w-full h-[30vh] bg-Background flex-1 flex-col justify-center items-center flex gap-2 mt-2'>
-                <View className='absolute top-0 z-10 w-full h-full justify-center items-center bg-Background/50'>
+              <View style={{backgroundColor:colors.background}} className=' absolute bottom-0 w-full h-[31vh] flex-1 flex-col justify-center items-center flex gap-2 mt-2'>
+                <View className='absolute top-0 z-10 w-full h-full justify-center items-center'>
                   <Text className=' text-subTitle text-primary animate-pulse font-notoMedium'> Creating </Text>
                 </View>
-                <View className='w-full rounded-normal h-14 bg-gray animate-pulse'/>
-                <View className='w-full rounded-normal h-14 bg-gray animate-pulse'/>
+                <View style={{backgroundColor:colors.gray}} className='w-full rounded-normal h-14 animate-pulse'/>
+                <View style={{backgroundColor:colors.gray}} className='w-full rounded-normal h-14 animate-pulse'/>
                 <View className='h-auto w-full flex-row gap-4'>
-                  <View className='grow rounded-normal h-14 bg-gray animate-pulse'/>
-                  <View className='grow rounded-normal h-14 bg-gray animate-pulse'/>
-                  <View className='grow rounded-normal h-14 bg-gray animate-pulse'/>
+                  <View style={{backgroundColor:colors.gray}} className='grow rounded-normal h-14 animate-pulse'/>
+                  <View style={{backgroundColor:colors.gray}} className='grow rounded-normal h-14 animate-pulse'/>
+                  <View style={{backgroundColor:colors.gray}} className='grow rounded-normal h-14 animate-pulse'/>
                 </View>
                 <View className='h-auto w-full flex-row justify-between'>
-                  <View className='w-[25%] rounded-normal h-14 bg-gray animate-pulse'/>
-                  <View className='w-[70%] rounded-normal h-14 bg-gray animate-pulse'/>
+                  <View style={{backgroundColor:colors.gray}} className='w-[25%] rounded-normal h-14 animate-pulse'/>
+                  <View style={{backgroundColor:colors.gray}} className='w-[70%] rounded-normal h-14 animate-pulse'/>
                 </View>
               </View>
             )}
@@ -591,6 +609,12 @@ const AddMeal = () => {
                   }))}
                 } maximumDate={true} />
               )}
+              <WarningModal
+                title={'Please complete detail'}
+                detail={err}
+                isOpen={warning}
+                setIsOpen={()=>setWarning(!warning)}
+              />
     </SafeAreaView>
   );
 };
