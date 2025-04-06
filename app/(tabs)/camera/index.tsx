@@ -201,6 +201,12 @@ const TakePicture = () => {
             });
   
             console.log("API Response:", res.data);
+
+            if (res.data.message === "Error getting result from AI, please try again.") {
+              setStep(4)
+              setWaiting(false)
+              return
+            }
   
             let mealData: MealAi | null = res.data.data ?? res.data;
             
@@ -244,10 +250,6 @@ const TakePicture = () => {
     console.log("State Updated:", data);
   }, [data]);
   
-  
-  
-  
-
   const postToDB = async (image_url:string ,Menu:string, Calorie: number, Protein: number, Carbs: number, Fat: number): Promise<void> => {
 
     console.log('image_url : ',image_url);
@@ -376,17 +378,6 @@ const TakePicture = () => {
                   <Text className=' text-primary text-title font-notoMedium animate-pulse'>Waiting for Result</Text>
                 </View>
                 <View className=' opacity-40'>
-                  {/* <Skeleton.Group show={waiting}>
-                    <View className='flex flex-row'>
-                      <Skeleton colorMode={'light'} radius={12} height={65} width={screenWidth * 0.52}/>
-                      <View className='grow'/>
-                      <Skeleton colorMode={'light'} radius={12} height={50} width={screenWidth * 0.32}/>
-                    </View>
-                    <View className='my-8'>
-                      <Skeleton colorMode={'light'} radius={12} height={screenWidth * 0.92} width={screenWidth * 0.92}/>
-                    </View>
-                    <Skeleton colorMode={'light'} radius={12} height={120} width={screenWidth * 0.62}/>
-                  </Skeleton.Group> */}
                 </View>
               </View>
             ):(
@@ -467,6 +458,56 @@ const TakePicture = () => {
             </View>
             )
           }
+
+          {/*
+            =============================
+            ======= STEP4 ERROR =========
+            =============================
+          */}
+          {step === 4 &&(
+            <View className='h-auto flex justify-center'>
+              <View className='flex-row items-center'>
+                <Text style={{color:colors.red}} className='text-subTitle font-notoMedium'>Something went wrong</Text>
+                <View className='grow'/>
+              </View>
+              <View className='w-full flex-row'>
+                <View className='grow justify-center'>
+                  <Text style={{color:colors.subText}} className='text-body font-noto'>Please try again</Text>
+                </View>
+              </View>
+              <View className=' relative rounded-normal overflow-hidden mt-4'>
+                {photo &&
+                  <Image
+                    style={styles.camera}
+                    source={{ uri: photo }}
+                  />
+                }
+              </View>
+              <View className='w-full mt-4 justify-center items-center mb-10'>
+                <FormInput
+                  name={'Add some detail'}
+                  value={detail}
+                  handleChange={(e:string)=>setDetail(e)}
+                  keyboardType={'default'}
+                />
+              </View>
+              <View className=' flex-row gap-4 w-full justify-center'>
+                <TouchableOpacity
+                  onPress={handleAddFood}
+                  style={{backgroundColor:colors.nonFocus}}
+                  className='will-change-contents flex flex-row items-center justify-center rounded-full p-1 px-10'
+                >
+                  <Text className='w-fit text-white text-heading2 font-notoMedium'>Back</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleSendPhoto}
+                  className='will-change-contents flex flex-row items-center justify-center rounded-full p-1 px-10 bg-primary'
+                >
+                  <Text className='w-fit text-white text-heading font-notoMedium'>Resend</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

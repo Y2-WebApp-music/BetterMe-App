@@ -126,20 +126,23 @@ const AddMeal = () => {
   });
 
   const [err, setErr] = useState('')
+  const [errTitle, setErrTitle] = useState('Please complete detail')
   const [warning, setWarning] = useState(false)
 
   const handleSubmit = async () => {
 
     if (form.food_name === '') {
       console.log('Food Name is required');
-      setWarning(true)
+      setErrTitle('Please complete detail')
       setErr('Food Name is required');
+      setWarning(true)
       return
     }
     if (form.protein === 0 || form.fat === 0 || form.carbs === 0) {
       console.log('At least one nutrients is required');
-      setWarning(true)
+      setErrTitle('Please complete detail')
       setErr('protein, fat or carbs is empty');
+      setWarning(true)
       return
     }
 
@@ -272,6 +275,23 @@ const AddMeal = () => {
               image: base64Image,
               portion: form.portion,
             });
+
+            if (res.data.message === "Error getting result from AI, please try again.") {
+              setErrTitle('Getting result Failed')
+              setErr('Error getting result from AI, please try again.');
+              setWarning(true)
+              setForm({
+                ...form,
+                food_name: '',
+                calorie : 0,
+                protein: 0,
+                carbs: 0,
+                fat: 0,
+                createByAI:false,
+              })
+              setAiCreating(false)
+              return
+            }
 
             let mealData:MealAi | null = res.data
             console.log('mealData ',mealData);
@@ -610,7 +630,7 @@ const AddMeal = () => {
                 } maximumDate={true} />
               )}
               <WarningModal
-                title={'Please complete detail'}
+                title={errTitle}
                 detail={err}
                 isOpen={warning}
                 setIsOpen={()=>setWarning(!warning)}
