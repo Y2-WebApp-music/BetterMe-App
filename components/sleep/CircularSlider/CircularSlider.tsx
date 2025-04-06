@@ -37,11 +37,11 @@ const CircularSlider = ({ start, end }: CircularProps) => {
   const endPos = useDerivedValue(() =>
     polar2Canvas({ theta: end.value, radius: R }, CENTER)
   );
-
   
   const animatedProps = useAnimatedProps(() => {
     const p2 = startPos.value;
     const p1 = endPos.value;
+    
     const duration = absoluteDuration(end.value, start.value);
     return {
       d: `M ${p1.x} ${p1.y} ${arc(p2.x, p2.y, duration > PI)}`,

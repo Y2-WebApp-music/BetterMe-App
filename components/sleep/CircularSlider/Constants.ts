@@ -10,6 +10,12 @@ export const { PI } = Math;
 export const TAU = 2 * PI;
 export const CENTER = { x: SIZE / 2, y: SIZE / 2 };
 
+export const angleDiff = (a: number, b: number): number => {
+  "worklet";
+  const diff = Math.abs(a - b) % (2 * Math.PI);
+  return diff > Math.PI ? (2 * Math.PI) - diff : diff;
+};
+
 export const containedInSquare = (
   value: Vector,
   center: Vector,

@@ -7,7 +7,7 @@ import {
 import Animated, { runOnJS, useAnimatedGestureHandler } from "react-native-reanimated";
 import { canvas2Polar, Vector } from "react-native-redash";
 
-import { CENTER, containedInSquare, normalize, STROKE } from "./Constants";
+import { absoluteDuration, angleDiff, CENTER, containedInSquare, normalize, STROKE } from "./Constants";
 import CursorOverlay from "./CursorOverlay";
 
 import * as Haptics from 'expo-haptics';
@@ -46,23 +46,40 @@ const Gesture = ({ start, end, startPos, endPos }: GestureProps) => {
         const { theta } = canvas2Polar({ x, y }, CENTER);
         ctx.offset = theta;
       }
-      runOnJS(triggerLightHaptics)()
+      runOnJS(triggerLightHaptics)();
     },
     onActive: ({ x, y }, ctx) => {
       const { theta } = canvas2Polar({ x, y }, CENTER);
       const delta = theta - ctx.offset;
+    
+      const newStart = normalize(start.value + delta);
+      const startEndDuration = absoluteDuration(newStart, end.value);
+    
       if (ctx.region === Region.START || ctx.region === Region.MAIN) {
-        start.value = normalize(start.value + delta);
+        if (startEndDuration > 1.6) {
+          start.value = newStart;
+          ctx.offset = theta;
+        }
       }
+    
+      const newEnd = normalize(end.value + delta);
+      const startEndDurationReverse = absoluteDuration(start.value, newEnd);
+
+      console.log('startEndDurationReverse ',startEndDurationReverse);
+      
+    
       if (ctx.region === Region.END || ctx.region === Region.MAIN) {
-        end.value = normalize(end.value + delta);
+        if (startEndDurationReverse > 1.6) {
+          end.value = newEnd;
+          ctx.offset = theta;
+        }
       }
-      ctx.offset = theta;
     },
-    onEnd:() => {
-      runOnJS(triggerLightHaptics)()
+    onEnd: () => {
+      runOnJS(triggerLightHaptics)();
     }
   });
+
   return (
     <PanGestureHandler onGestureEvent={onGestureEvent}>
       <Animated.View style={StyleSheet.absoluteFill}>
