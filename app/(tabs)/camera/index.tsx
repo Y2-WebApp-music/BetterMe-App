@@ -89,6 +89,7 @@ const TakePicture = () => {
   const handleAddFood = async () => {
     setPhoto('')
     setDownloadURL('')
+    setDetail('')
     setStep(1)
   }
 
@@ -96,6 +97,7 @@ const TakePicture = () => {
     setStep(1)
     setPhoto('')
     setDownloadURL('')
+    setDetail('')
     router.push('/(tabs)/calendar/weekCalendar');
   }
 

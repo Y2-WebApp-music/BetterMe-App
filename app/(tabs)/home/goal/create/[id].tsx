@@ -28,7 +28,7 @@ export default function GoalCreatePage() {
     goal_name:'',
     description:'',
     start_date:today,
-    end_date:tomorrow,
+    end_date:today,
     task:[
       {task_name:'',status:false},
     ],
@@ -160,6 +160,10 @@ export default function GoalCreatePage() {
 
   const handleCreateGoal = async () => {
 
+    console.log('start_date ',form.start_date.toDateString());
+    console.log('end_date ', form.end_date.toDateString());
+    
+
     if ( form.goal_name != ''){
       if (form.task.length === 0) {
         console.log('At least one task is required');
@@ -173,7 +177,7 @@ export default function GoalCreatePage() {
         setErr('Task at least one is empty please complete it');
         return
       }
-      if (form.end_date.toDateString() < form.start_date.toDateString()) {
+      if (form.end_date < form.start_date) {
         console.log('Date is false');
         setWarning(true)
         setErr('Can not end date less than start date.');
