@@ -84,6 +84,10 @@ const Register = () => {
   };
 
   useEffect(() => {
+    setErr('')
+  },[form])
+
+  useEffect(() => {
     if (step === 1) {
       Animated.timing(progress1, {
         toValue: calculateStep1Progress(),
@@ -153,12 +157,22 @@ const Register = () => {
 
   const [err, setErr] = useState<string>('')
   const checkPassword = () => {
-    if (form.password === form.confirmPassword) {
-      setStep(2)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  
+    if (form.email === '') {
+      setErr('Please give your email');
+    } else if (!emailRegex.test(form.email)) {
+      setErr('Please enter a valid email');
+    } else if (form.password.length < 6) {
+      setErr('Password must be at least 6 characters');
+    } else if (form.password !== form.confirmPassword) {
+      setErr('Password and confirm password do not match');
+    } else if (form.username === '') {
+      setErr('Please give username');
     } else {
-      setErr(`password and Confirm password is doesn't match`)
+      setStep(2);
     }
-  }
+  };
 
   // Create User and Upload photo to Firebase
   const handleSubmit = async () => {
