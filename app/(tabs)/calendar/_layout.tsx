@@ -7,7 +7,7 @@ const CalendarLayout = () => {
     <Stack>
       <Stack.Screen name="index" options={{ headerShown: false, animation:'none' }} />
       <Stack.Screen name="weekCalendar" options={{ headerShown: false, animation:'none' }} />
-      <Stack.Screen name="addMeal" options={{ headerShown: false, animation:'none' }} />
+      <Stack.Screen name="addMeal/[date]" options={{ headerShown: false, animation:'none' }} />
       <Stack.Screen name="meal/[id]" options={{ headerShown: false, animation:'flip' }} />
     </Stack>
   )

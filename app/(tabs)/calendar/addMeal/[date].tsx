@@ -1,25 +1,25 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, Image, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View, Keyboard } from 'react-native';
-import BackButton from '../../../components/Back';
-import { router } from 'expo-router';
-import { CloseIcon, GalleryIcon } from '../../../constants/icon';
+import BackButton from '../../../../components/Back';
+import { router, useLocalSearchParams } from 'expo-router';
+import { CloseIcon, GalleryIcon } from '../../../../constants/icon';
 import * as ImagePicker from 'expo-image-picker';
-import FormInput from '../../../components/FormInput';
-import { Meal, MealAi } from '../../../types/food';
-import { useAuth } from '../../../context/authContext';
-import RainbowButton from '../../../components/RainbowButton';
-import NumberInput from '../../../components/NumberInput';
+import FormInput from '../../../../components/FormInput';
+import { Meal, MealAi } from '../../../../types/food';
+import { useAuth } from '../../../../context/authContext';
+import RainbowButton from '../../../../components/RainbowButton';
+import NumberInput from '../../../../components/NumberInput';
 import { CameraView, useCameraPermissions } from 'expo-camera';
-import PickDateTimeModal from '../../../components/modal/PickDateTimeModal';
+import PickDateTimeModal from '../../../../components/modal/PickDateTimeModal';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
-import { firebaseStorage } from '../../../components/auth/firebaseConfig';
+import { firebaseStorage } from '../../../../components/auth/firebaseConfig';
 import { format } from 'date-fns';
 import { SERVER_URL } from '@env';
 import axios from 'axios';
 import RNDateTimePicker from '@react-native-community/datetimepicker';
 import * as ImageManipulator from 'expo-image-manipulator';
-import { useTheme } from '../../../context/themeContext';
-import WarningModal from '../../../components/modal/WarningModal';
+import { useTheme } from '../../../../context/themeContext';
+import WarningModal from '../../../../components/modal/WarningModal';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -38,6 +38,7 @@ type MealProp = {
 
 const AddMeal = () => {
 
+  const { date } = useLocalSearchParams();
   const { colors } = useTheme();
   const { user } = useAuth()
 
@@ -47,7 +48,7 @@ const AddMeal = () => {
   const cameraRef = useRef<CameraView | null>(null);
   const [form, setForm] = useState<MealProp>({
     create_by:user?._id || '',
-    meal_date:new Date(),
+    meal_date:new Date(date.toString()),
     food_name:'',
     portion:'',
     image_url:'',
@@ -138,7 +139,7 @@ const AddMeal = () => {
       setWarning(true)
       return
     }
-    if (form.protein === 0 || form.fat === 0 || form.carbs === 0) {
+    if (form.protein === 0 && form.fat === 0 && form.carbs === 0) {
       console.log('At least one nutrients is required');
       setErrTitle('Please complete detail')
       setErr('protein, fat or carbs is empty');
