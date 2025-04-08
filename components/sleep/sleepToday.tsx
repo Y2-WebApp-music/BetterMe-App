@@ -219,7 +219,7 @@ const SleepToday = ({select_date}:SleepTodayProp) => {
 
       <View style={{paddingLeft:6}} className='grow'>
         <View style={{ transform: [{ translateY: 8 }] }}>
-          <Text style={{color:colors.subText}} className='text-heading3 font-noto '>Total time</Text>
+          <Text style={{color:colors.subText}} className='text-heading3 font-noto '>Total sleep time</Text>
         </View>
         <View className='flex-row gap-1 items-end'>
           <Text style={{color:colors.night}} className='text-title font-notoMedium'>{sleepTime.hours}</Text>
