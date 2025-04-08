@@ -34,6 +34,7 @@ const CommunityFeed = () => {
   const [isLoad, setIsLoad] = useState(false);
 
   const [postList, setPostList] = useState<PostContent[] | null>(null)
+  const [page, setPage] = useState(1);
 
   const insets = useSafeAreaInsets();
   const scrollYRef = useRef(0)
@@ -96,9 +97,16 @@ const CommunityFeed = () => {
     return Array.from(tagSet)
   };
 
-  const getFeed = async () => {
+  const getFeed = async (pageNum = 1) => {
+    console.log('get feed pageNum',pageNum);
+    
     try {
-      const response = await axios.get(`${SERVER_URL}/community/post/feed/${user?._id}`);
+      const response = await axios.get(`${SERVER_URL}/community/post/feed/${user?._id}`,{
+        params: {
+          page: pageNum,
+          limit: 6,
+        },
+      });
       const data = response.data
 
       if ( data.message === "User not found") {return console.error('User not found')}
@@ -116,11 +124,14 @@ const CommunityFeed = () => {
           username: post.create_by.username,
           profile_img: post.create_by.profile_img,
         }));
-  
-        setPostList(formattedData);
 
-        const tagList = tagInPost(formattedData)
-        setInterestTag(tagList)
+        setPostList(prev => (pageNum === 1 ? formattedData : [...(prev || []), ...formattedData]));
+
+        if (pageNum === 1) {
+          const tagList = tagInPost(formattedData);
+          setInterestTag(tagList);
+        }
+
       } else {
         return
       }
@@ -130,25 +141,33 @@ const CommunityFeed = () => {
     }
   }
 
+  const [isFetchingNextPage, setIsFetchingNextPage] = useState(false);
+
+  const loadMore = async () => {
+    
+    if (isFetchingNextPage) return;
+
+    setIsFetchingNextPage(true);
+    const nextPage = page + 1;
+    await getFeed(nextPage);
+    setPage(nextPage);
+    setIsFetchingNextPage(false);
+  }
+
   const onRefresh = useCallback(() => {
+    setPage(1)
     setRefreshing(true);
     setTimeout(() => {
-      getFeed().finally(()=>setRefreshing(false));
+      getFeed(1).finally(()=>setRefreshing(false));
     }, 200);
   }, []);
 
   useFocusEffect(
     useCallback(() => {
-      setIsLoad(true)
-      const fetchData = async () => {
-        if (postList === null) {
-          await getFeed().finally(()=>{
-            setIsLoad(false)
-          })
-        }
-        setIsLoad(false)
+      if (postList === null) {
+        setIsLoad(true)
+        getFeed(1).finally(() => setIsLoad(false));
       }
-      fetchData()
     }, [])
   );
 
@@ -191,12 +210,6 @@ const CommunityFeed = () => {
             <Text className='text-primary font-notoSemiBold text-subTitle'>Better Me</Text>
           </View>
           
-          {/* <View className=' relative'>
-            <TouchableOpacity activeOpacity={0.6} onPress={()=>{router.push('/community/search')}} className='p-[6px] rounded-full bg-primary'>
-              <BellIcon width={24} height={24} color={'white'}/>
-            </TouchableOpacity>
-            <View className='h-3 w-3 absolute right-0 top-0 rounded-full bg-red'/>
-          </View> */}
           <TouchableOpacity activeOpacity={0.6} onPress={()=>{router.push('/community/search')}} className='p-[6px] rounded-full bg-primary'>
             <SearchIcon width={24} height={24} color={'white'}/>
           </TouchableOpacity>
@@ -217,40 +230,15 @@ const CommunityFeed = () => {
               </View>
               <PenIcon width={24} height={24} color={colors.primary}/>
             </TouchableOpacity>
-            {/* <GalleryIcon width={30} height={30} color={colors.nonFocus}/> */}
           </View>
         </View>
       </Animated.View>
       </View>
 
-
-
-      <ScrollView
-        className='w-full h-auto relative'
-        contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', paddingTop:0, marginTop:headerHeight - 50}}
-        showsVerticalScrollIndicator={false}
-        keyboardDismissMode='on-drag'
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
-      >
-        {refreshing &&
-          <View className="flex-1 justify-center items-center bg-primaryblue-300">
-            <View className="flex-row space-x-2">
-              <ActivityIndicator size="large" />
-            </View>
-          </View>
-        }
-        {interestTag &&
-          <TagSection tagList={interestTag}/>
-        }
-
-        <View className="flex-1 mb-4 mt-1 flex flex-col gap-2 items-center w-full pb-5">
+        <View className="flex-1 flex flex-col gap-2 items-center w-full">
           {!isLoad?(
             postList?(
-              <View className='w-full'>
+              <View className='w-full h-full'>
                 <FlashList
                   data={postList}
                   renderItem={({ item }) => (
@@ -286,10 +274,25 @@ const CommunityFeed = () => {
                     )
                   )
                   }
-                  estimatedItemSize={800}
+                  showsVerticalScrollIndicator={false}
+                  ListHeaderComponent={
+                    <>
+                      <View style={{ height: headerHeight - 50  }} />
+                      {interestTag && <TagSection tagList={interestTag} />}
+                    </>
+                  }
+                  onEndReached={loadMore}
+                  onEndReachedThreshold={0.2}
+                  ListFooterComponent={isFetchingNextPage ? <ActivityIndicator style={{ marginVertical: 16 }} /> : null}
+                  estimatedItemSize={1000}
                   onLoad={({ elapsedTimeInMs }) => {
                     console.log(`FlashList loaded in ${elapsedTimeInMs}ms`);
                   }}
+                  refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                  }
+                  onScroll={handleScroll}
+                  scrollEventThrottle={16}
                 />
               </View>
             ):(
@@ -320,9 +323,6 @@ const CommunityFeed = () => {
           )}
             
         </View>
-
-
-      </ScrollView>
 
       <View style={{ position:'absolute', top:0, left:0, right:0, height: insets.top, zIndex:100, backgroundColor:colors.background }} />
       <CommentBottomModal ref={bottomSheetModalRef} post_id={selectedPostId} postList={postList} setPostList={setPostList}/>

@@ -37,7 +37,13 @@ const SearchCommunity = () => {
 
   const getFeed = async () => {
     try {
-      const response = await axios.get(`${SERVER_URL}/community/post/feed/${user?._id}`);
+      const response = await axios.get(`${SERVER_URL}/community/post/feed/${user?._id}`
+      ,{
+        params: {
+          page: 1,
+          limit: 10,
+        },
+      });
       const data = response.data
 
       if ( data.message === "User not found") {return console.error('User not found')}
@@ -432,9 +438,15 @@ const SearchCommunity = () => {
                 />
               </View>
             ):(
-              <View className='flex-1 justify-center items-center'>
-                <Text style={{color:colors.subText}} className='text-heading2'>No post</Text>
-              </View>
+              isLoad? (
+                <View className='flex-1 justify-center items-center'>
+                  <Text style={{color:colors.subText}} className='text-heading2'>Loading....</Text>
+                </View>
+              ):(
+                <View className='flex-1 justify-center items-center'>
+                  <Text style={{color:colors.subText}} className='text-heading2'>No post</Text>
+                </View>
+              )
             )
           )}
 
@@ -454,9 +466,15 @@ const SearchCommunity = () => {
                 estimatedItemSize={200}
               />
             ):(
-              <View className='flex-1 justify-center items-center'>
-                <Text style={{color:colors.subText}} className='text-heading2'>No goal</Text>
-              </View>
+              isLoad? (
+                <View className='flex-1 justify-center items-center'>
+                  <Text style={{color:colors.subText}} className='text-heading2'>Loading....</Text>
+                </View>
+              ):(
+                <View className='flex-1 justify-center items-center'>
+                  <Text style={{color:colors.subText}} className='text-heading2'>No goal</Text>
+                </View>
+              )
             )
           )}
 
@@ -506,9 +524,15 @@ const SearchCommunity = () => {
                     />
                   </View>
                 ):(
-                  <View className='flex-1 justify-center items-center'>
-                    <Text style={{color:colors.subText}} className='text-heading2'>No post</Text>
-                  </View>
+                  isLoad? (
+                    <View className='flex-1 justify-center items-center'>
+                      <Text style={{color:colors.subText}} className='text-heading2'>Loading....</Text>
+                    </View>
+                  ):(
+                    <View className='flex-1 justify-center items-center'>
+                      <Text style={{color:colors.subText}} className='text-heading2'>No post</Text>
+                    </View>
+                  )
                 )
               ):(
                 <SearchTag search={search} tagList={tagList} handleTagSelected={handleTagSelected}/>
