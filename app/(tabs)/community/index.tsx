@@ -111,6 +111,11 @@ const CommunityFeed = () => {
 
       if ( data.message === "User not found") {return console.error('User not found')}
 
+      if (data.length === 0) {
+        setPage(page-1)
+        return
+      }
+
       if (data) {
         const formattedData: PostContent[] = data.map((post: any) => ({
           post_id: post.post_id,
